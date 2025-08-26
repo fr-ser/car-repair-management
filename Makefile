@@ -1,19 +1,29 @@
-init_db:
-	yarn db:dev:restart
+# Top-level Makefile
+.PHONY: up down
 
-remove_db:
-	yarn db:dev:rm
+install:
+	@$(MAKE) -C backend install
+	@$(MAKE) -C frontend install
 
-up: init_db
-	yarn start:dev
+up:
+	@$(MAKE) -C backend up | sed 's/^/[backend] /' &
+	@$(MAKE) -C frontend up-noninteractive | sed 's/^/[frontend] /' &
 
-down-v: remove_db
+down:
+	@pids=$$(lsof -ti :8080); \
+	if [ -z "$$pids" ]; then \
+	  echo "No process running on port 8080"; \
+	else \
+	  kill -9 $$pids && echo "killed :8080"; \
+	fi
+	
+	@pids=$$(lsof -ti :5173); \
+	if [ -z "$$pids" ]; then \
+	  echo "No process running on port 5173"; \
+	else \
+	  kill -9 $$pids && echo "killed :8080"; \
+	fi
 
-test: init_db
-	yarn test:e2e
-
-test-cov: init_db
-	yarn test:e2e:cov
-
-run_prisma_studio:
-	npx prisma studi
+# 	kill -9 $(lsof -ti :5173)
+	@$(MAKE) -C backend down-v
+	@$(MAKE) -C frontend down

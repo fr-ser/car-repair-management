@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-BE:
     runs-on: ubuntu-latest
 
     services:
@@ -31,11 +31,32 @@ jobs:
         with:
           node-version: 22
 
-      - run: yarn install --frozen-lockfile
+      - name: install deps
+        working-directory: backend
+        run: yarn install --frozen-lockfile
 
       - name: Run tests
+        working-directory: backend
         env:
           DATABASE_URL: postgres://testuser:testpass@localhost:5432/testdb
-          JWT_SECRET: 'secret'
-          PORT: '8080'
+          JWT_SECRET: "secret"
+          PORT: "8080"
+        run: make test-cov
+
+  test-FE:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: install deps
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        working-directory: frontend
         run: make test-cov
