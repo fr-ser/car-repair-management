@@ -1,6 +1,5 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from 'generated/prisma';
 import { AppModule } from 'src/app.module';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -19,60 +18,14 @@ export async function applyMigrations() {
 }
 
 export async function createDatabase() {
-  class PrismaService extends PrismaClient {
-    constructor() {
-      super({
-        datasources: {
-          db: {
-            url: 'postgresql://postgres:123@localhost:5434/postgres',
-          },
-        },
-      });
-    }
-  }
-
-  const admin = new PrismaService();
-  const dbName = 'test';
-
-  try {
-    await admin.$executeRawUnsafe(`CREATE DATABASE "${dbName}";`, {
-      transaction: false,
-    });
-    console.log(`Database "${dbName}" created ✅`);
-    await applyMigrations();
-  } catch (err) {
-    console.error('Error creating DB:', err);
-  } finally {
-    await admin.$disconnect();
-  }
+  // we don't need to do anything for now, db is automatically created
+  console.log(`Test Database test.db created ✅`);
+  await applyMigrations();
 }
 
 export async function dropDatabase() {
-  class PrismaService extends PrismaClient {
-    constructor() {
-      super({
-        datasources: {
-          db: {
-            url: 'postgresql://postgres:123@localhost:5434/postgres',
-          },
-        },
-      });
-    }
-  }
-
-  const admin = new PrismaService();
-  const dbName = 'test';
-
-  try {
-    await admin.$executeRawUnsafe(`DROP DATABASE "${dbName}";`, {
-      transaction: false,
-    });
-    console.log(`Database "${dbName}" removed ✅`);
-  } catch (err) {
-    console.error('Error removing DB:', err);
-  } finally {
-    await admin.$disconnect();
-  }
+  await execAsync('rm ./test.db');
+  console.log(`Test Database test.db removed ✅`);
 }
 
 export async function createTestClientApp(): Promise<
