@@ -6,10 +6,12 @@ help: ## Show help
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 init_db: ## initialise an empty database
-	yarn db:dev:restart
+	rm -f ./dev.db
+	touch ./dev.db
+	yarn prisma migrate deploy
 
 remove_db: ## delete the database
-	yarn db:dev:rm
+	rm -f ./dev.db
 
 up: init_db ## initialise an empty database and starts the BE server
 	yarn start:dev
@@ -23,7 +25,7 @@ test-cov: init_db ## initialise an empty database and runs e2e tests once with c
 	yarn test:e2e:cov
 
 run_prisma_studio: ## start prisma studio
-	npx prisma studi
+	yarn prisma studio
 
 install: ## install all the dependencies
 	yarn install

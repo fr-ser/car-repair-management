@@ -6,10 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prisma:dev:deploy": "prisma migrate deploy",
-    "db:dev:rm": "rm -f ./dev.db",
-    "db:dev:up": "touch ./dev.db",
-    "db:dev:restart": "yarn db:dev:rm && yarn db:dev:up && yarn prisma:dev:deploy",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

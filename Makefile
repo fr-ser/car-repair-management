@@ -34,4 +34,4 @@ down-all: ## stop all (both be and fe)
 	@$(MAKE) -C frontend down
 
 test-e2e-playwright: ## run playwright e2e tests
-	yarn test:e2e
+	yarn playwright test
