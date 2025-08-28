@@ -29,6 +29,9 @@ build: ## build all assets for production mode
 run-server-production: ## start server in production mode (serving both the API and frontend)
 	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=../.env.development yarn start:prod
 
-down-all: ## 
+down-all: ## stop all (both be and fe)
 	@$(MAKE) -C backend down-v
 	@$(MAKE) -C frontend down
+
+test-e2e-playwright: ## run playwright e2e tests
+	yarn test:e2e

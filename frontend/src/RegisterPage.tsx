@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from "./App";
 
 type Errors = {
-  email?: string
-  password?: string
+  email?: string;
+  password?: string;
 };
 
 export default function RegisterPage() {
-  const redirect = useNavigate()
+  const redirect = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,8 +16,7 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const validate = () => {
-
-    const newErrors: Errors = {}
+    const newErrors: Errors = {};
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -52,10 +51,10 @@ export default function RegisterPage() {
           email: email,
           password: password,
         }),
-      })
-      const responseStatus = await response.status
+      });
+      const responseStatus = await response.status;
       if (responseStatus !== 201) {
-        console.error("error user not created")
+        console.error("error user not created");
       }
       setErrors({});
       // Proceed with login logic
@@ -63,10 +62,12 @@ export default function RegisterPage() {
     }
   };
 
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-md w-80">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-2xl shadow-md w-80"
+      >
         <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
         <input
           type="email"
@@ -75,6 +76,7 @@ export default function RegisterPage() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 mb-3 border rounded-xl"
           required
+          data-testid="user-email-input"
         />
         {errors.email && <p className="error">{errors.email}</p>}
         <input
@@ -84,6 +86,7 @@ export default function RegisterPage() {
           onChange={(e) => setUsername(e.target.value)}
           className="w-full p-2 mb-3 border rounded-xl"
           required
+          data-testid="user-username-input"
         />
         <input
           type="password"
@@ -92,11 +95,15 @@ export default function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 mb-4 border rounded-xl"
           required
+          data-testid="user-password-input"
         />
-        {errors.password && <p className="text-red-500 text-sm mb-4">{errors.password}</p>}
+        {errors.password && (
+          <p className="text-red-500 text-sm mb-4">{errors.password}</p>
+        )}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
+          data-testid="user-register-button"
         >
           Register
         </button>

@@ -1,0 +1,27 @@
+# OS generated files
+.DS_STORE
+
+# node.js
+node_modules/
+
+# playwright tests
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# environment files
+.env
+.env.*
+!.env.development
+deployment/production
+
+# local development artifacts
+.envrc
+
+# app artifacts
+*.pdf
+
+# database
+*.db
+*.db.backup

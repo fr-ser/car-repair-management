@@ -29,4 +29,4 @@ install: ## install all the dependencies
 	yarn install
 
 build: ## build all assets for production mode
-	rm -rf dist && yarn build
+	rm -rf dist && yarn prisma migrate dev && yarn build
