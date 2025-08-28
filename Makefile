@@ -16,25 +16,19 @@ install: ## install all the dependencies for both BE and FE
 	@$(MAKE) -C backend install
 	@$(MAKE) -C frontend install
 
-up: ## start locally both BE and FE and all the required dependencies
-	@$(MAKE) -C backend up | sed 's/^/[backend] /' &
-	@$(MAKE) -C frontend up-noninteractive | sed 's/^/[frontend] /' &
+up-be: ## start BE locally
+	@$(MAKE) -C backend up
 
-down:
-	@pids=$$(lsof -ti :8080); \
-	if [ -z "$$pids" ]; then \
-	  echo "No process running on port 8080"; \
-	else \
-	  kill -9 $$pids && echo "killed :8080"; \
-	fi
-	
-	@pids=$$(lsof -ti :5173); \
-	if [ -z "$$pids" ]; then \
-	  echo "No process running on port 5173"; \
-	else \
-	  kill -9 $$pids && echo "killed :8080"; \
-	fi
+up-fe: ## start FE locally
+	@$(MAKE) -C frontend up
 
-# 	kill -9 $(lsof -ti :5173)
+build: ## build all assets for production mode
+	@$(MAKE) -C backend build
+	@$(MAKE) -C frontend build
+
+run-server-production: ## start server in production mode (serving both the API and frontend)
+	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=../.env.development yarn start:prod
+
+down-all: ## 
 	@$(MAKE) -C backend down-v
 	@$(MAKE) -C frontend down

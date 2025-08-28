@@ -1,3 +1,5 @@
+.PHONY: *
+
 help: ## Show help
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -25,3 +27,6 @@ run_prisma_studio: ## start prisma studio
 
 install: ## install all the dependencies
 	yarn install
+
+build: ## build all assets for production mode
+	rm -rf dist && yarn build

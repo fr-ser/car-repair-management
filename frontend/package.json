@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:noninteractive": "npx vite dev --clearScreen false",
     "build": "tsc -b && vite build",
+    "build-only": "tsc -b && vite build && cp -r dist ../backend/dist/static",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:cov": "vitest run --coverage"

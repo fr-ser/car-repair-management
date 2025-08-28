@@ -1,3 +1,5 @@
+.PHONY: *
+
 help: ## Show help
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -14,3 +16,6 @@ install: ## install all the dependencies
 
 down: ## stop all the dependencies (currently there are none)
 	echo DOWN
+
+build: ## build all assets for production mode
+	yarn build-only
