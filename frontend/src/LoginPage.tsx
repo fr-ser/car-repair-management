@@ -1,6 +1,7 @@
-import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_URL } from "./App";
+import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { API_URL } from './global/config';
 
 type Errors = {
   email?: string;
@@ -11,8 +12,8 @@ type Errors = {
 export default function LoginPage() {
   const redirect = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>({});
 
   const validate = () => {
@@ -21,13 +22,13 @@ export default function LoginPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!emailRegex.test(email)) {
-      newErrors.email = "Enter a valid email";
+      newErrors.email = 'Enter a valid email';
     }
 
     if (!password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     }
 
     return newErrors;
@@ -41,9 +42,9 @@ export default function LoginPage() {
       setErrors(validationErrors);
     } else {
       const response = await fetch(`${API_URL}/auth/signin`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           // Optional: Include auth token if needed
           // "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
         },
@@ -56,13 +57,13 @@ export default function LoginPage() {
       const responseStatus = response.status;
       if (responseStatus !== 200) {
         setErrors({
-          other: "Invalid credentials",
+          other: 'Invalid credentials',
         });
       } else {
         const token = responseJson.access_token; // ← replace with actual API response
-        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem('authToken', token);
         // Proceed with login logic
-        redirect("/");
+        redirect('/');
       }
     }
   };

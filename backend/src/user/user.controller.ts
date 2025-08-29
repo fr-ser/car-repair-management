@@ -1,9 +1,8 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
-import type { Request } from 'express';
 import { GetUser } from 'src/auth/decorator';
-
 import { JwtGuard } from 'src/auth/guard';
 import type { UserWithoutHash } from 'src/auth/strategy';
+
 import { EditUserDto } from './dto';
 import { UserService } from './user.service';
 
@@ -13,9 +12,6 @@ export class UserController {
   constructor(private userService: UserService) {}
   @Get('me')
   getMe(@GetUser() user: UserWithoutHash) {
-    console.log({
-      user: user,
-    });
     return user;
   }
 

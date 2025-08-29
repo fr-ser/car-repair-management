@@ -1,17 +1,16 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from 'src/app.module';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { exec } from 'child_process';
 import * as pactum from 'pactum';
+import { AppModule } from 'src/app.module';
+import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
 export async function applyMigrations() {
   try {
     await execAsync('npx prisma migrate deploy');
-    console.log('✅ All migrations applied');
   } catch (err) {
     console.error('❌ Migration failed', err);
   }
@@ -19,13 +18,11 @@ export async function applyMigrations() {
 
 export async function createDatabase() {
   // we don't need to do anything for now, db is automatically created
-  console.log(`Test Database test.db created ✅`);
   await applyMigrations();
 }
 
 export async function dropDatabase() {
   await execAsync('rm ./test.db');
-  console.log(`Test Database test.db removed ✅`);
 }
 
 export async function createTestClientApp(): Promise<

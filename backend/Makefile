@@ -1,32 +1,29 @@
 .PHONY: *
 
 help: ## Show help
-	@echo "Available commands:"
+	@echo "Available make commands:"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-# Ensure .env exists before running any target
-.env:
-	@test -f .env || (echo "❌ Missing .env file! Please create it before running make." && exit 1)
+	@echo "Available npm/yarn commands:"
+	@npm run
 
 init_db: ## initialise an empty database
-	rm -f ./dev.db
 	touch ./dev.db
-	yarn prisma migrate deploy
+	yarn run dotenv -e .env.development yarn prisma migrate deploy
 
-remove_db: ## delete the database
-	rm -f ./dev.db
-
-up: .env init_db ## initialise an empty database and starts the BE server
+up: init_db ## initialise an empty database and starts the BE server
 	yarn start:dev
 
-down-v: remove_db ## delete the database and clean the volume
+test: ## runs all tests
+	yarn run test
+	yarn run lint
+	yarn run test:e2e
 
-test: init_db ## initialise an empty database and runs e2e tests in watch mode
-	yarn test:e2e
-
-test-cov: init_db ## initialise an empty database and runs e2e tests once with coverage report
-	yarn test:e2e:cov
+test-cov: ## runs all tests once with coverage report
+	yarn run test
+	yarn run lint
+	yarn run test:e2e:cov
 
 run_prisma_studio: ## start prisma studio
 	yarn prisma studio

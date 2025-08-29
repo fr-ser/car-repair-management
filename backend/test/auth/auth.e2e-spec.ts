@@ -1,13 +1,13 @@
 import { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {
   createDatabase,
   createTestClientApp,
   dropDatabase,
 } from 'test/helpers';
-import { ConfigService } from '@nestjs/config';
 
 describe('Auth e2e', () => {
   let app: INestApplication;
