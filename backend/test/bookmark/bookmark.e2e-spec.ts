@@ -1,15 +1,15 @@
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Bookmark } from 'generated/prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
 import * as pactum from 'pactum';
 import { CreateBookmarkDto, EditBookmarkDto } from 'src/bookmark/dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {
   createDatabase,
   createTestClientApp,
   createUser,
   dropDatabase,
 } from 'test/helpers';
-import { ConfigService } from '@nestjs/config';
 
 describe('Bookmark e2e', () => {
   let app: INestApplication;

@@ -16,13 +16,13 @@ up: init_db ## initialise an empty database and starts the BE server
 	yarn start:dev
 
 test: ## runs all tests
-	yarn test
-	yarn lint
+	yarn run test
+	yarn run lint
 	yarn run test:e2e
 
 test-cov: ## runs all tests once with coverage report
-	yarn test
-	yarn lint
+	yarn run test
+	yarn run lint
 	yarn run test:e2e:cov
 
 run_prisma_studio: ## start prisma studio

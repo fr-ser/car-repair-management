@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 import * as pactum from 'pactum';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { EditUserDto } from 'src/user/dto';
 import {
   createDatabase,
@@ -8,7 +9,6 @@ import {
   createUser,
   dropDatabase,
 } from 'test/helpers';
-import { ConfigService } from '@nestjs/config';
 
 describe('User e2e', () => {
   let app: INestApplication;

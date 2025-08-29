@@ -1,6 +1,9 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
+  "importOrder": ["^@(/.*|$)", "^[./]"],
   "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "importOrderSortSpecifiers": true,
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }
