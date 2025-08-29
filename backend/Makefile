@@ -19,16 +19,15 @@ init_db: ## initialise an empty database
 up: .env init_db ## initialise an empty database and starts the BE server
 	yarn start:dev
 
-test: ## initialise an empty database and runs all tests in watch mode
+test: ## runs all tests
 	yarn test
 	yarn lint
-	rm -f ./test.db
-	touch ./test.db
-	yarn run dotenv -e .env.test yarn run prisma migrate deploy
 	yarn run test:e2e
 
-test-cov: init_db ## initialise an empty database and runs all tests once with coverage report
-	yarn test:e2e:cov
+test-cov: ## runs all tests once with coverage report
+	yarn test
+	yarn lint
+	yarn run test:e2e:cov
 
 run_prisma_studio: ## start prisma studio
 	yarn prisma studio
