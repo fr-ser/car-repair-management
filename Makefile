@@ -7,8 +7,11 @@ help: ## Show help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	
+	@echo ""
 	@echo "[backend]"
 	@$(MAKE) -C backend help
+
+	@echo ""
 	@echo "[frontend]"
 	@$(MAKE) -C frontend help
 
@@ -35,4 +38,11 @@ run-server-production: ## start server in production mode (serving both the API 
 	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=.env.development yarn start:prod
 
 test-e2e-playwright: ## run playwright e2e tests
-	yarn playwright test
+	yarn run playwright test
+
+format: ## Format files
+	yarn run eslint --fix
+
+test: ## run all tests
+	yarn run eslint
+	@$(MAKE) test-e2e-playwright

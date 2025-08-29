@@ -1,4 +1,6 @@
-# Project Setup
+# Car Repair Management
+
+This is an application to manage a small car repair shop.
 
 ## Prerequisites
 
@@ -17,42 +19,14 @@ You can run the following command `./check-prereqs.sh` to check the requirements
 ```txt
 .
 ├── backend/      # Backend service (API, database, etc.)
-│   ├── .env      # Environment configuration for backend (required)
 │   ├── src/      # Backend source code
 │   └── Makefile  # Backend-specific commands
 ├── frontend/     # Frontend service (UI application)
-│   ├── .env      # Environment configuration for frontend (required)
 │   ├── src/      # Frontend source code
 │   └── Makefile  # Frontend-specific commands
 ├── Makefile      # Top-level commands (orchestrates backend & frontend)
 └── README.md     # This file
 ```
-
----
-
-## Environment Configuration
-
-Before starting, you need to create a `.env` file for the backend:
-
-**File:** `backend/.env`
-
-```env
-DATABASE_URL="file:../local.db"
-JWT_SECRET='super-secret'
-PORT='8080'
-```
-
-> ⚠️ Without this file, backend services will not start.
-
-Before starting, you need to create a `.env` file for the frontend:
-
-**File:** `frontend/.env`
-
-```env
-VITE_API_URL=http://localhost:8080
-```
-
-> ⚠️ Without this file, frontend may not be able to connect to your local BE.
 
 ---
 
@@ -78,17 +52,10 @@ make install
 
 ## Running the Project
 
-### Start backend
+Run the following commands in separate terminals:
 
-```bash
-make up-be
-```
-
-### Start frontend
-
-```bash
-make up-fe
-```
+- Start backend: `make up-be`
+- Start frontend: `make up-fe`
 
 ## Build for Production
 
@@ -108,8 +75,6 @@ make run-server-production
 
 ## Testing
 
-Run Playwright end-to-end tests:
+Run Playwright end-to-end tests: `make test-e2e-playwright`
 
-```bash
-make test-e2e-playwright
-```
+In order to run tests with a UI use: `yarn run playwright test --ui`

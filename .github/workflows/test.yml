@@ -23,8 +23,8 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: file:../test.db
-          JWT_SECRET: "secret"
-          PORT: "8080"
+          JWT_SECRET: 'secret'
+          PORT: '8080'
         run: make test-cov
 
   test-fe:
@@ -59,7 +59,7 @@ jobs:
         run: yarn playwright install --with-deps chromium
 
       - name: Run tests
-        run: make test-e2e-playwright
+        run: make test
 
       - uses: actions/upload-artifact@v4
         if: always()
