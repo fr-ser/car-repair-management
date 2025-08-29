@@ -1,7 +1,9 @@
 # Project Setup
 
 ## Prerequisites
+
 Make sure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (recommended via [asdf](https://asdf-vm.com))
 - [Yarn](https://yarnpkg.com/)
 - [Make](https://www.gnu.org/software/make/)
@@ -12,7 +14,7 @@ You can run the following command `./check-prereqs.sh` to check the requirements
 
 ## Project Structure
 
-```
+```txt
 .
 ├── backend/      # Backend service (API, database, etc.)
 │   ├── .env      # Environment configuration for backend (required)
@@ -29,9 +31,11 @@ You can run the following command `./check-prereqs.sh` to check the requirements
 ---
 
 ## Environment Configuration
+
 Before starting, you need to create a `.env` file for the backend:
 
 **File:** `backend/.env`
+
 ```env
 DATABASE_URL="file:../local.db"
 JWT_SECRET='super-secret'
@@ -43,16 +47,17 @@ PORT='8080'
 Before starting, you need to create a `.env` file for the frontend:
 
 **File:** `frontend/.env`
+
 ```env
 VITE_API_URL=http://localhost:8080
 ```
 
 > ⚠️ Without this file, frontend may not be able to connect to your local BE.
 
-
 ---
 
 ## Makefile Help
+
 You can always see available commands by running:
 
 ```bash
@@ -62,6 +67,7 @@ make help
 ---
 
 ## Installation
+
 Install all dependencies for backend and frontend:
 
 ```bash
@@ -72,26 +78,20 @@ make install
 
 ## Running the Project
 
-### Start backend only
+### Start backend
+
 ```bash
 make up-be
 ```
 
-### Start frontend only
+### Start frontend
+
 ```bash
 make up-fe
 ```
-
-### Start both
-```bash
-make up-be
-make up-fe
-```
-*(Run them in two terminals or in the background)*
-
----
 
 ## Build for Production
+
 Build backend and frontend assets:
 
 ```bash
@@ -106,16 +106,8 @@ make run-server-production
 
 ---
 
-## Stopping Services
-Stop everything:
-
-```bash
-make down-all
-```
-
----
-
 ## Testing
+
 Run Playwright end-to-end tests:
 
 ```bash

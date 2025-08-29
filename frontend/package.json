@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:noninteractive": "npx vite dev --clearScreen false",
+    "dev:non-interactive": "npx vite dev --clearScreen false",
     "build": "tsc -b && vite build",
     "build-only": "tsc -b && vite build && cp -r dist ../backend/dist/static",
     "lint": "eslint .",
+    "format": "eslint . --fix",
     "preview": "vite preview",
+    "test": "vitest run",
     "test:cov": "vitest run --coverage"
   },
   "dependencies": {
