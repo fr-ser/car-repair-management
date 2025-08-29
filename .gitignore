@@ -1,28 +1,27 @@
-# OS
-.DS_Store
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# OS generated files
+.DS_STORE
 
 # node.js
-/node_modules
+node_modules/
+
+# playwright tests
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# environment files
+.env
+.env.*
+!.env.development
+deployment/production
+
+# local development artifacts
+.envrc
+
+# app artifacts
+*.pdf
+
+# database
+*.db
+*.db.backup
