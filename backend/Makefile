@@ -5,6 +5,10 @@ help: ## Show help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
+# Ensure .env exists before running any target
+.env:
+	@test -f .env || (echo "❌ Missing .env file! Please create it before running make." && exit 1)
+
 init_db: ## initialise an empty database
 	rm -f ./dev.db
 	touch ./dev.db
@@ -13,7 +17,7 @@ init_db: ## initialise an empty database
 remove_db: ## delete the database
 	rm -f ./dev.db
 
-up: init_db ## initialise an empty database and starts the BE server
+up: .env init_db ## initialise an empty database and starts the BE server
 	yarn start:dev
 
 down-v: remove_db ## delete the database and clean the volume
@@ -31,4 +35,8 @@ install: ## install all the dependencies
 	yarn install
 
 build: ## build all assets for production mode
-	rm -rf dist && yarn prisma migrate dev && yarn build
+	rm -rf dist && yarn build
+
+migrate: ## run prisma migrate dev to create generated/ directory and migrate DB
+	@echo "$${CONFIG_PATH:-.env}"
+	yarn run dotenv -e $${CONFIG_PATH:-.env} prisma migrate dev

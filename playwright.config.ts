@@ -27,7 +27,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "make install build run-server-production",
+    command: "make install migrate-be-dev build run-server-production",
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     stdout: process.env.CI ? "pipe" : "ignore",
