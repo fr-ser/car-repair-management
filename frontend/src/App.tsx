@@ -1,16 +1,17 @@
-import { useNavigate } from "react-router-dom";
-import "./App.css";
+import { useNavigate } from 'react-router-dom';
+
+import './App.css';
 
 function App() {
   const redirect = useNavigate();
 
-  const token = sessionStorage.getItem("authToken");
-  const handleLogin = () => redirect("/login");
-  const handleRegister = () => redirect("/register");
+  const token = sessionStorage.getItem('authToken');
+  const handleLogin = () => redirect('/login');
+  const handleRegister = () => redirect('/register');
   const handleLogout = () => {
-    sessionStorage.removeItem("authToken");
-    console.log("Logged out");
-    redirect("/login");
+    sessionStorage.removeItem('authToken');
+    console.log('Logged out');
+    redirect('/login');
   };
 
   return (
@@ -28,7 +29,11 @@ function App() {
       <br></br>
       <br></br>
 
-      {!token ? <p>You are not logged in, LOL!</p> : <p>You are logged in, CONGRATS!</p>}
+      {!token ? (
+        <p>You are not logged in, LOL!</p>
+      ) : (
+        <p>You are logged in, CONGRATS!</p>
+      )}
     </>
   );
 }
