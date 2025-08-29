@@ -35,7 +35,7 @@ run-server-production: ## start server in production mode (serving both the API 
 	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=.env.development yarn start:prod
 
 down-all: ## stop all (both be and fe)
-	@$(MAKE) -C backend down-v
+# 	there is nothing to stop in the backend currently 	
 	@$(MAKE) -C frontend down
 
 test-e2e-playwright: ## run playwright e2e tests

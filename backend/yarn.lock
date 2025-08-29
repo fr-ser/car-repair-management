@@ -1032,7 +1032,7 @@
   dependencies:
     path-to-regexp "8.2.0"
 
-"@nestjs/testing@^11.0.1":
+"@nestjs/testing@^11.1.6":
   version "11.1.6"
   resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-11.1.6.tgz#7f172a8024948dee4cb318acccfff31c1356f338"
   integrity sha512-srYzzDNxGvVCe1j0SpTS9/ix75PKt6Sn6iMaH1rpJ6nj2g8vwNrhK0CoJJXvpCYgrnI+2WES2pprYnq8rAMYHA==
