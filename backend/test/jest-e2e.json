@@ -10,5 +10,6 @@
     "^src/(.*)$": "<rootDir>/src/$1",
     "^test/(.*)$": "<rootDir>/test/$1",
     "^generated/(.*)$": "<rootDir>/generated/$1"
-  }
+  },
+  "coveragePathIgnorePatterns": ["node_modules/", "generated/"]
 }
