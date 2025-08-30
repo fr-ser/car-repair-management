@@ -17,8 +17,13 @@ describe('Bookmark e2e', () => {
   let config: ConfigService;
   let globalUserAccessToken: string;
   beforeAll(async () => {
+    console.time('createDatabase');
     await createDatabase();
+    console.timeEnd('createDatabase');
+
+    console.time('createTestClientApp');
     [, app] = await createTestClientApp();
+    console.timeEnd('createTestClientApp');
 
     prisma = app.get(PrismaService);
     config = app.get(ConfigService);
@@ -26,7 +31,7 @@ describe('Bookmark e2e', () => {
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
 
     globalUserAccessToken = await createUser({});
-  });
+  }, 15000); // Increase timeout as previously suggested
 
   afterAll(async () => {
     await app.close();
