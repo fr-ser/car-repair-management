@@ -1,28 +1,15 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { exec } from 'child_process';
 import * as pactum from 'pactum';
 import { AppModule } from 'src/app.module';
-import { promisify } from 'util';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-const execAsync = promisify(exec);
-
-export async function applyMigrations() {
-  try {
-    await execAsync('npx prisma migrate deploy');
-  } catch (err) {
-    console.error('❌ Migration failed', err);
-  }
-}
-
-export async function createDatabase() {
-  // we don't need to do anything for now, db is automatically created
-  await applyMigrations();
-}
-
-export async function dropDatabase() {
-  await execAsync('rm ./test.db');
+export async function resetDatabase(prisma: PrismaService) {
+  return prisma.$transaction([
+    prisma.bookmark.deleteMany(),
+    prisma.user.deleteMany(),
+  ]);
 }
 
 export async function createTestClientApp(): Promise<

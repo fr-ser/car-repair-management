@@ -11,5 +11,6 @@
     "^test/(.*)$": "<rootDir>/test/$1",
     "^generated/(.*)$": "<rootDir>/generated/$1"
   },
+  "globalSetup": "<rootDir>/test/setup.ts",
   "coveragePathIgnorePatterns": ["node_modules/", "generated/"]
 }

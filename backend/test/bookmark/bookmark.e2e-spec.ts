@@ -4,30 +4,20 @@ import { Bookmark } from 'generated/prisma';
 import * as pactum from 'pactum';
 import { CreateBookmarkDto, EditBookmarkDto } from 'src/bookmark/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  createDatabase,
-  createTestClientApp,
-  createUser,
-  dropDatabase,
-} from 'test/helpers';
+import { createTestClientApp, createUser, resetDatabase } from 'test/helpers';
 
 describe('Bookmark e2e', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let config: ConfigService;
   let globalUserAccessToken: string;
-  beforeAll(async () => {
-    console.time('createDatabase');
-    await createDatabase();
-    console.timeEnd('createDatabase');
 
-    console.time('createTestClientApp');
+  beforeAll(async () => {
     [, app] = await createTestClientApp();
-    console.timeEnd('createTestClientApp');
 
     prisma = app.get(PrismaService);
     config = app.get(ConfigService);
-    await prisma.cleanDb();
+    await resetDatabase(prisma);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
 
     globalUserAccessToken = await createUser({});
@@ -36,7 +26,6 @@ describe('Bookmark e2e', () => {
   afterAll(async () => {
     await app.close();
     await prisma.$disconnect();
-    await dropDatabase();
   });
 
   describe('Bookmarks', () => {

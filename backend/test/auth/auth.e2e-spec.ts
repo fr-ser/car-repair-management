@@ -3,30 +3,25 @@ import { ConfigService } from '@nestjs/config';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  createDatabase,
-  createTestClientApp,
-  dropDatabase,
-} from 'test/helpers';
+import { createTestClientApp, resetDatabase } from 'test/helpers';
 
 describe('Auth e2e', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let config: ConfigService;
+
   beforeAll(async () => {
-    await createDatabase();
     [, app] = await createTestClientApp();
 
     prisma = app.get(PrismaService);
     config = app.get(ConfigService);
-    await prisma.cleanDb();
+    await resetDatabase(prisma);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
   });
 
   afterAll(async () => {
     await app.close();
     await prisma.$disconnect();
-    await dropDatabase();
   });
 
   describe('Auth', () => {
