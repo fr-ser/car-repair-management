@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = process.env.PLAYWRIGHT_PORT || 1001;
+const PORT = process.env.PLAYWRIGHT_PORT || 8001;
 
 export default defineConfig({
   testDir: './tests/e2e',
