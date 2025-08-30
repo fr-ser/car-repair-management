@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import './App.css';
+import styles from './App.module.css';
 
 function App() {
   const redirect = useNavigate();
@@ -15,7 +15,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className={styles.root}>
       <div>App home screen</div>
       {!token ? (
         <div>
@@ -26,15 +26,15 @@ function App() {
         <button onClick={handleLogout}>Logout</button>
       )}
 
-      <br></br>
-      <br></br>
+      <br />
+      <br />
 
       {!token ? (
         <p>You are not logged in, LOL!</p>
       ) : (
         <p>You are logged in, CONGRATS!</p>
       )}
-    </>
+    </div>
   );
 }
 

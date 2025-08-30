@@ -1,19 +1,20 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { API_URL } from './global/config';
+import * as apiService from '../../services/backend-service';
+import * as Errors from '../../types/errors';
 
 type Errors = {
   email?: string;
   password?: string;
+  other?: string;
 };
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const redirect = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [errors, setErrors] = useState<Errors>({});
 
   const validate = () => {
@@ -41,25 +42,17 @@ export default function RegisterPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      const response = await fetch(`${API_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Optional: Include auth token if needed
-          // "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-      const responseStatus = await response.status;
-      if (responseStatus !== 201) {
-        console.error('error user not created');
+      try {
+        const authResponse = await apiService.signin({ email, password });
+        const token = authResponse.access_token; // ← replace with actual API response
+        sessionStorage.setItem('authToken', token);
+        // Proceed with login logic
+        redirect('/');
+      } catch (err: unknown) {
+        if (err instanceof Errors.AuthError) {
+          setErrors({ other: err.message });
+        }
       }
-      setErrors({});
-      // Proceed with login logic
-      redirect('/');
     }
   };
 
@@ -69,7 +62,8 @@ export default function RegisterPage() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-2xl shadow-md w-80"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+        {errors.other && <p className="error">{errors.other}</p>}
         <input
           type="email"
           placeholder="Email"
@@ -80,15 +74,6 @@ export default function RegisterPage() {
           data-testid="user-email-input"
         />
         {errors.email && <p className="error">{errors.email}</p>}
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-2 mb-3 border rounded-xl"
-          required
-          data-testid="user-username-input"
-        />
         <input
           type="password"
           placeholder="Password"
@@ -104,9 +89,9 @@ export default function RegisterPage() {
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
-          data-testid="user-register-button"
+          data-testid="user-login-button"
         >
-          Register
+          Login
         </button>
       </form>
     </div>
