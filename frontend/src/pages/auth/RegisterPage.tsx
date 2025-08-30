@@ -1,25 +1,35 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import * as apiService from '../../services/backend-service';
+import * as Errors from '../../types/errors';
+
 type Errors = {
   email?: string;
   password?: string;
+  username?: string;
   other?: string;
 };
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const redirect = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [errors, setErrors] = useState<Errors>({});
 
   const validate = () => {
     const newErrors: Errors = {};
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!email.trim()) {
       newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Enter a valid email';
     }
+
     if (!password) {
       newErrors.password = 'Password is required';
     }
@@ -34,15 +44,16 @@ export default function LoginPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      const response = await fetch(`/api/auth/sign-in`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userName: email, password: password }),
-      });
-      if (!response.ok) {
-        setErrors({ other: 'Invalid credentials' });
-      } else {
+      try {
+        await apiService.signup({ email, password });
+        // Proceed with login logic
         redirect('/');
+      } catch (err: unknown) {
+        if (err instanceof Errors.AuthError) {
+          setErrors({ other: err.message });
+        } else {
+          console.error('Unexpected error', err);
+        }
       }
     }
   };
@@ -53,11 +64,11 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-2xl shadow-md w-80"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
         {errors.other && <p className="error">{errors.other}</p>}
         <input
-          type="text"
-          placeholder="User Name"
+          type="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 mb-3 border rounded-xl"
@@ -65,6 +76,15 @@ export default function LoginPage() {
           data-testid="user-email-input"
         />
         {errors.email && <p className="error">{errors.email}</p>}
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full p-2 mb-3 border rounded-xl"
+          required
+          data-testid="user-username-input"
+        />
         <input
           type="password"
           placeholder="Password"
@@ -80,9 +100,9 @@ export default function LoginPage() {
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
-          data-testid="user-login-button"
+          data-testid="user-register-button"
         >
-          Login
+          Register
         </button>
       </form>
     </div>

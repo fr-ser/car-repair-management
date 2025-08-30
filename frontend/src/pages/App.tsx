@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import './App.css';
+import styles from './App.module.css';
 
 function App() {
   const redirect = useNavigate();
@@ -34,15 +34,15 @@ function App() {
     checkLoginStatus();
   });
   return (
-    <>
+    <div className={styles.root}>
       <div>App home screen</div>
       <div>
         <button onClick={handleLogin}>Login</button>
         <button onClick={handleRegister}>Register</button>
       </div>
 
-      <br></br>
-      <br></br>
+      <br />
+      <br />
 
       {isLoading ? (
         <p>Checking login status...</p>
@@ -51,7 +51,7 @@ function App() {
       ) : (
         <p>You are not logged in, LOL!</p>
       )}
-    </>
+    </div>
   );
 }
 

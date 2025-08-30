@@ -38,5 +38,5 @@ db-create-migration: ## create prisma client and migrate DB
 
 db-init: ## initialise an empty database
 	rm -f ./dev.db
-	yarn run dotenv -e .env.development prisma migrate deploy
+	yarn run dotenv -e .env.development prisma migrate dev
 	yarn run dotenv -e .env.development ts-node prisma/seed/dev.ts
