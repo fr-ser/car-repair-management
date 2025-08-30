@@ -1,4 +1,6 @@
-import { FormEvent, useState } from 'react';
+import '@awesome.me/webawesome/dist/components/input/input.js';
+import { WaButton, WaIcon, WaInput } from '@awesome.me/webawesome/dist/react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as apiService from '../../services/backend-service';
@@ -35,8 +37,7 @@ export default function LoginPage() {
     return newErrors;
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const validationErrors = validate();
 
     if (Object.keys(validationErrors).length > 0) {
@@ -58,42 +59,43 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-2xl shadow-md w-80"
+      <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+      {errors.other && <p className="error">{errors.other}</p>}
+      <WaInput
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
+        className="w-full p-2 mb-3 border rounded-xl"
+        required
+        data-testid="user-email-input"
+      ></WaInput>
+      {errors.email && <p className="error">{errors.email}</p>}
+      <WaInput
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) =>
+          setPassword((e.target as unknown as HTMLInputElement).value)
+        }
+        className="w-full p-2 mb-4 border rounded-xl"
+        required
+        data-testid="user-password-input"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
-        {errors.other && <p className="error">{errors.other}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-3 border rounded-xl"
-          required
-          data-testid="user-email-input"
-        />
-        {errors.email && <p className="error">{errors.email}</p>}
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 mb-4 border rounded-xl"
-          required
-          data-testid="user-password-input"
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm mb-4">{errors.password}</p>
-        )}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
-          data-testid="user-login-button"
-        >
-          Login
-        </button>
-      </form>
+        <WaIcon name="lock" slot="start"></WaIcon>
+      </WaInput>
+      {errors.password && (
+        <p className="text-red-500 text-sm mb-4">{errors.password}</p>
+      )}
+      <WaButton
+        type="submit"
+        className="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
+        data-testid="user-login-button"
+        onClick={handleSubmit}
+      >
+        <WaIcon name="lock" slot="start"></WaIcon>
+        Login
+      </WaButton>
     </div>
   );
 }
