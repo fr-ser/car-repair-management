@@ -9,35 +9,34 @@ help: ## Show help
 	
 	@echo ""
 	@echo "[backend]"
-	@$(MAKE) -C backend help
+	@$(MAKE) --directory backend help
 
 	@echo ""
 	@echo "[frontend]"
-	@$(MAKE) -C frontend help
+	@$(MAKE) --directory frontend help
 
-install: ## install all the dependencies for both BE and FE
+install: ## install all the dependencies for both BE and FE and setup local database
 	./check-prereqs.sh
 	yarn install
-	@$(MAKE) -C backend install
-	@$(MAKE) -C frontend install
+	@$(MAKE) --directory backend install
+	@$(MAKE) --directory frontend install
+	@$(MAKE) --directory backend init_db
 
 up-be: ## start BE locally
-	@$(MAKE) -C backend up
+	@$(MAKE) --directory backend up
 
 up-fe: ## start FE locally
-	@$(MAKE) -C frontend up
+	@$(MAKE) --directory frontend up
 
-migrate-be-dev: ## run prisma migrate dev to create generated/ directory and migrate DB
-	@$(MAKE) -C backend migrate CONFIG_PATH=.env.development
-
-build: ## build all assets for production mode
-	@$(MAKE) -C backend build
-	@$(MAKE) -C frontend build
-
-run-server-production: ## start server in production mode (serving both the API and frontend)
-	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=.env.development yarn start:prod
+# this command is used by playwright to start all services for testing
+start-playwright-services:
+	@$(MAKE) --directory backend setup-clean-test-database
+	cd backend && yarn run dotenv -e .env.test ts-node prisma/seed/playwright.ts
+	cd backend && DISABLE_REQUEST_LOGGING=false CONFIG_PATH=.env.test node dist/src/main
 
 test-e2e-playwright: ## run playwright e2e tests
+	cd frontend && yarn run build --mode test
+	cd backend && yarn run build
 	yarn run playwright test
 
 format: ## Format files

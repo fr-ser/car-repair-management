@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT =
-  process.env.PLAYWRIGHT_BACKEND_PORT || process.env.HTTP_PORT || 8080;
+const PORT = process.env.PLAYWRIGHT_PORT || 8001;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -13,13 +12,8 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: `http://localhost:${PORT}`,
-    httpCredentials: {
-      username: 'admin',
-      password: 'local1',
-    },
     trace: 'on-first-retry',
   },
-
   projects: [
     {
       name: 'chromium',
@@ -27,9 +21,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'make install migrate-be-dev build run-server-production',
+    command: 'make start-playwright-services',
     url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
     stdout: process.env.CI ? 'pipe' : 'ignore',
   },
 });

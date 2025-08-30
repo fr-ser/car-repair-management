@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config([
   {
-    ignores: ['backend/**', 'frontend/**'],
+    ignores: ['backend/**', 'frontend/**', 'playwright-report'],
   },
   {
     languageOptions: { globals: globals.node },

@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { AuthDto } from './dto';

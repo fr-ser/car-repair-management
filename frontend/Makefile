@@ -24,6 +24,3 @@ test-cov: ## run all tests with coverage report
 	
 install: ## install all the dependencies
 	yarn install
-
-build: ## build all assets for production mode
-	yarn build-only

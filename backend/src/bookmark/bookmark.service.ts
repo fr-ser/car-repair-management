@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Bookmark } from 'generated/prisma';
+import { Bookmark } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { CreateBookmarkDto, EditBookmarkDto } from './dto';
