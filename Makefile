@@ -9,30 +9,28 @@ help: ## Show help
 	
 	@echo ""
 	@echo "[backend]"
-	@$(MAKE) -C backend help
+	@$(MAKE) --directory backend help
 
 	@echo ""
 	@echo "[frontend]"
-	@$(MAKE) -C frontend help
+	@$(MAKE) --directory frontend help
 
-install: ## install all the dependencies for both BE and FE
+install: ## install all the dependencies for both BE and FE and setup local database
 	./check-prereqs.sh
 	yarn install
-	@$(MAKE) -C backend install
-	@$(MAKE) -C frontend install
+	@$(MAKE) --directory backend install
+	@$(MAKE) --directory frontend install
+	@$(MAKE) --directory backend init_db
 
 up-be: ## start BE locally
-	@$(MAKE) -C backend up
+	@$(MAKE) --directory backend up
 
 up-fe: ## start FE locally
-	@$(MAKE) -C frontend up
-
-migrate-be-dev: ## run prisma migrate dev to create generated/ directory and migrate DB
-	@$(MAKE) -C backend migrate CONFIG_PATH=.env.development
+	@$(MAKE) --directory frontend up
 
 build: ## build all assets for production mode
-	@$(MAKE) -C backend build
-	@$(MAKE) -C frontend build
+	@$(MAKE) --directory backend build
+	@$(MAKE) --directory frontend build
 
 run-server-production: ## start server in production mode (serving both the API and frontend)
 	cd backend && STATIC_FILE_ROOT=dist/static CONFIG_PATH=.env.development yarn start:prod

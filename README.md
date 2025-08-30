@@ -57,6 +57,14 @@ Run the following commands in separate terminals:
 - Start backend: `make up-be`
 - Start frontend: `make up-fe`
 
+If not done before a local development database should also be created:
+`make --directory backend init_db`
+
+This will create also a database seed with a user:
+
+- local user: `admin@local.com`
+- local password: `local1`
+
 ## Build for Production
 
 Build backend and frontend assets:

@@ -10,9 +10,10 @@ help: ## Show help
 
 init_db: ## initialise an empty database
 	touch ./dev.db
-	yarn run dotenv -e .env.development yarn prisma migrate deploy
+	yarn run dotenv -e .env.development prisma migrate deploy
+	yarn run dotenv -e .env.development ts-node prisma/seed.ts
 
-up: init_db ## initialise an empty database and starts the BE server
+up: ## starts the BE server
 	yarn start:dev
 
 test: ## runs all tests
@@ -34,6 +35,6 @@ install: ## install all the dependencies
 build: ## build all assets for production mode
 	rm -rf dist && yarn build
 
-migrate: ## run prisma migrate dev to create generated/ directory and migrate DB
-	@echo "$${CONFIG_PATH:-.env}"
-	yarn run dotenv -e $${CONFIG_PATH:-.env} prisma migrate dev
+migrate: ## run prisma migrate dev to create prisma client and migrate DB
+	@echo "$${CONFIG_PATH:-.env.development}"
+	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
