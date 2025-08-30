@@ -1,6 +1,7 @@
+import ReactWaButton from '@awesome.me/webawesome/dist/react/button/index.js';
 import { useNavigate } from 'react-router-dom';
 
-import './App.css';
+import styles from './App.module.css';
 
 function App() {
   const redirect = useNavigate();
@@ -15,26 +16,39 @@ function App() {
   };
 
   return (
-    <>
+    <div className={styles.root}>
       <div>App home screen</div>
       {!token ? (
         <div>
-          <button onClick={handleLogin}>Login</button>
-          <button onClick={handleRegister}>Register</button>
+          <ReactWaButton
+            appearance="filled"
+            variant="brand"
+            onClick={handleLogin}
+            pill
+          >
+            Login
+          </ReactWaButton>
+          <ReactWaButton
+            appearance="accent"
+            variant="brand"
+            onClick={handleRegister}
+          >
+            Register
+          </ReactWaButton>
         </div>
       ) : (
         <button onClick={handleLogout}>Logout</button>
       )}
 
-      <br></br>
-      <br></br>
+      <br />
+      <br />
 
       {!token ? (
         <p>You are not logged in, LOL!</p>
       ) : (
         <p>You are logged in, CONGRATS!</p>
       )}
-    </>
+    </div>
   );
 }
 
