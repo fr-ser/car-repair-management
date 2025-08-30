@@ -73,12 +73,6 @@ Build backend and frontend assets:
 make build
 ```
 
-Run the server in production mode (serving both API & frontend):
-
-```bash
-make run-server-production
-```
-
 ---
 
 ## Testing
