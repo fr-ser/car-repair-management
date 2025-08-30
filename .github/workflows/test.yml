@@ -53,8 +53,17 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install backend deps
+        working-directory: backend
+        run: yarn install --frozen-lockfile
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      
       - name: Install deps
         run: yarn install --frozen-lockfile
+      
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps chromium --only-shell
 
