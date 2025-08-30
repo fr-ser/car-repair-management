@@ -56,7 +56,7 @@ jobs:
       - name: Install deps
         run: yarn install --frozen-lockfile
       - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps chromium
+        run: yarn playwright install --with-deps chromium --only-shell
 
       - name: Run tests
         run: make test
