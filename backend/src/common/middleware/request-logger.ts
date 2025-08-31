@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import morgan from 'morgan';
+
 import { DISABLE_REQUEST_LOGGING } from 'src/config';
 
 morgan.token('protocol', (req: Request) => req.protocol);

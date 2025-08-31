@@ -21,10 +21,6 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        env:
-          DATABASE_URL: file:../test.db
-          JWT_SECRET: 'secret'
-          PORT: '8080'
         run: make test-cov
 
   test-fe:

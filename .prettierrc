@@ -1,7 +1,7 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
-  "importOrder": ["^@(/.*|$)", "^[./]"],
+  "importOrder": ["^@(/.*|$)", "^src/", "^[./]"],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
   "parser": "typescript",

@@ -1,9 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as argon from 'argon2';
 import * as pactum from 'pactum';
+import { createTestClientApp, resetDatabase } from 'test/helpers';
+
 import { AuthDto } from 'src/auth/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createTestClientApp, resetDatabase } from 'test/helpers';
 
 describe('Auth e2e', () => {
   let app: INestApplication;
@@ -15,8 +17,11 @@ describe('Auth e2e', () => {
 
     prisma = app.get(PrismaService);
     config = app.get(ConfigService);
-    await resetDatabase(prisma);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
+  });
+
+  beforeEach(async () => {
+    await resetDatabase(prisma);
   });
 
   afterAll(async () => {
@@ -29,6 +34,7 @@ describe('Auth e2e', () => {
       email: 'test@test.test',
       password: '123',
     };
+
     describe('Sign Up', () => {
       it('should throw if email empty', () => {
         return pactum
@@ -74,7 +80,14 @@ describe('Auth e2e', () => {
         return pactum.spec().post('/auth/sign-in').expectStatus(400);
       });
 
-      it('should sign in', () => {
+      it('should sign in', async () => {
+        await prisma.user.create({
+          data: {
+            email: dto.email,
+            hash: await argon.hash(dto.password),
+          },
+        });
+
         return pactum
           .spec()
           .post('/auth/sign-in')
