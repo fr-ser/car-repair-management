@@ -1,10 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 
 import { AppModule } from './app.module';
+import { requestLogger } from './common/middleware/request-logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // we create a manual express server and register the request logger
+  // as otherwise the static file server logs are not present
+  const server = express();
+  server.use(requestLogger);
+
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // strips properties not in DTO
@@ -22,6 +30,8 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
+
+  app.setGlobalPrefix('api');
 
   await app.listen(process.env.PORT ?? 1111);
 }

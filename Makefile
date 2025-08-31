@@ -45,3 +45,9 @@ format: ## Format files
 test: ## run all tests
 	yarn run eslint
 	@$(MAKE) test-e2e-playwright
+
+
+test-all: ## run all tests (including backend and frontend)
+	@$(MAKE) --directory frontend test
+	@$(MAKE) --directory backend test
+	@$(MAKE) test

@@ -41,7 +41,7 @@ export default function RegisterPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      const response = await fetch(`${API_URL}/auth/signup`, {
+      const response = await fetch(`${API_URL}/auth/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

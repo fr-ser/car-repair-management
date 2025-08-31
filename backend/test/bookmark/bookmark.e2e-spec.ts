@@ -21,7 +21,7 @@ describe('Bookmark e2e', () => {
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
 
     globalUserAccessToken = await createUser({});
-  }, 15000); // Increase timeout as previously suggested
+  });
 
   afterAll(async () => {
     await app.close();

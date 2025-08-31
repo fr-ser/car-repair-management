@@ -45,7 +45,7 @@ export async function createUser({
 }): Promise<string> {
   const userAccessToken: string = await pactum
     .spec()
-    .post('/auth/signup')
+    .post('/auth/sign-up')
     .withBody({
       email,
       password,

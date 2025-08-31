@@ -41,7 +41,7 @@ export default function LoginPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      const response = await fetch(`${API_URL}/auth/signin`, {
+      const response = await fetch(`${API_URL}/api/auth/sign-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
