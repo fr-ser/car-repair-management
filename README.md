@@ -58,7 +58,7 @@ Run the following commands in separate terminals:
 - Start frontend: `make up-fe`
 
 If not done before a local development database should also be created:
-`make --directory backend init_db`
+`make --directory backend db-init`
 
 This will create also a database seed with a user:
 

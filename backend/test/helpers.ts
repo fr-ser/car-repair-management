@@ -22,7 +22,6 @@ export async function createTestClientApp(): Promise<
   }).compile();
 
   const configService = moduleRef.get(ConfigService);
-  const port = parseInt(configService.get('PORT') || '1111');
 
   const app: INestApplication = moduleRef.createNestApplication();
   app.useGlobalPipes(
@@ -36,7 +35,7 @@ export async function createTestClientApp(): Promise<
     }),
   );
   await app.init();
-  await app.listen(port);
+  await app.listen(configService.getOrThrow<number>('PORT'));
 
   return [moduleRef, app];
 }
@@ -54,5 +53,5 @@ export async function createUser(
   });
 
   const auth = app.get(AuthService);
-  return (await auth.signToken(user.id, user.email)).access_token;
+  return await auth.getSignedToken(user.id, user.email);
 }

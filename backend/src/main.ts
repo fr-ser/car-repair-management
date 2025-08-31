@@ -1,10 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 
 import { AppModule } from './app.module';
 import { requestLogger } from './common/middleware/request-logger';
+import { GLOBAL_API_PREFIX } from './config';
 
 async function bootstrap() {
   // we create a manual express server and register the request logger
@@ -31,9 +33,10 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(GLOBAL_API_PREFIX);
 
-  await app.listen(process.env.PORT ?? 1111);
+  const configService = app.get(ConfigService);
+  await app.listen(configService.getOrThrow<number>('PORT'));
 }
 
 bootstrap().catch((err) => {
