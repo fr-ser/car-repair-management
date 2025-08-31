@@ -1,14 +1,16 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as pactum from 'pactum';
+import * as argon from 'argon2';
+
 import { AppModule } from 'src/app.module';
+import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export async function resetDatabase(prisma: PrismaService) {
   return prisma.$transaction([
-    prisma.bookmark.deleteMany(),
     prisma.user.deleteMany(),
+    prisma.article.deleteMany(),
   ]);
 }
 
@@ -39,19 +41,18 @@ export async function createTestClientApp(): Promise<
   return [moduleRef, app];
 }
 
-export async function createUser({
-  email = 'test@test.test',
-  password = '123',
-}): Promise<string> {
-  const userAccessToken: string = await pactum
-    .spec()
-    .post('/auth/sign-up')
-    .withBody({
+export async function createUser(
+  app: INestApplication,
+  { email = 'test@test.test', password = '123' },
+): Promise<string> {
+  const prisma = app.get(PrismaService);
+  const user = await prisma.user.create({
+    data: {
       email,
-      password,
-    })
-    .expectStatus(201)
-    .returns('access_token');
+      hash: await argon.hash(password),
+    },
+  });
 
-  return userAccessToken;
+  const auth = app.get(AuthService);
+  return (await auth.signToken(user.id, user.email)).access_token;
 }

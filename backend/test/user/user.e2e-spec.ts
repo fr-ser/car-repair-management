@@ -1,9 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as pactum from 'pactum';
+import { createTestClientApp, createUser, resetDatabase } from 'test/helpers';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EditUserDto } from 'src/user/dto';
-import { createTestClientApp, createUser, resetDatabase } from 'test/helpers';
 
 describe('User e2e', () => {
   let app: INestApplication;
@@ -16,10 +17,12 @@ describe('User e2e', () => {
 
     prisma = app.get(PrismaService);
     config = app.get(ConfigService);
-    await resetDatabase(prisma);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
+  });
 
-    globalUserAccessToken = await createUser({});
+  beforeEach(async () => {
+    await resetDatabase(prisma);
+    globalUserAccessToken = await createUser(app, {});
   });
 
   afterAll(async () => {

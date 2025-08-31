@@ -8,11 +8,6 @@ help: ## Show help
 	@echo "Available npm/yarn commands:"
 	@npm run
 
-init-db: ## initialise an empty database
-	touch ./dev.db
-	yarn run dotenv -e .env.development prisma migrate deploy
-	yarn run dotenv -e .env.development ts-node prisma/seed/dev.ts
-
 up: ## starts the BE server
 	yarn start:dev
 
@@ -21,7 +16,7 @@ setup-clean-test-database: ## (re)create a clean test database
 	yarn run dotenv -e .env.test prisma migrate dev
 
 test: ## runs all tests
-	yarn run test
+	yarn run test:unit
 	yarn run lint
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e
@@ -38,6 +33,10 @@ run-prisma-studio: ## start prisma studio
 install: ## install all the dependencies
 	yarn install
 
-migrate: ## run prisma migrate dev to create prisma client and migrate DB
-	@echo "$${CONFIG_PATH:-.env.development}"
-	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate deploy
+db-create-migration: ## create prisma client and migrate DB
+	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
+
+db-init: ## initialise an empty database
+	rm -f ./dev.db
+	yarn run dotenv -e .env.development prisma migrate deploy
+	yarn run dotenv -e .env.development ts-node prisma/seed/dev.ts
