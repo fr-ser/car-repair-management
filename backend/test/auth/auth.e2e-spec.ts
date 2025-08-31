@@ -29,55 +29,55 @@ describe('Auth e2e', () => {
       email: 'test@test.test',
       password: '123',
     };
-    describe('Signup', () => {
+    describe('Sign Up', () => {
       it('should throw if email empty', () => {
         return pactum
           .spec()
-          .post('/auth/signup')
+          .post('/auth/sign-up')
           .withBody({ passport: dto.password })
           .expectStatus(400);
       });
       it('should throw if password empty', () => {
         return pactum
           .spec()
-          .post('/auth/signup')
+          .post('/auth/sign-up')
           .withBody({ email: dto.email })
           .expectStatus(400);
       });
       it('should throw if no body provided', () => {
-        return pactum.spec().post('/auth/signup').expectStatus(400);
+        return pactum.spec().post('/auth/sign-up').expectStatus(400);
       });
       it('should signup', () => {
         return pactum
           .spec()
-          .post('/auth/signup')
+          .post('/auth/sign-up')
           .withBody(dto)
           .expectStatus(201);
       });
     });
-    describe('Signin', () => {
+    describe('Sign In', () => {
       it('should throw if email empty', () => {
         return pactum
           .spec()
-          .post('/auth/signin')
+          .post('/auth/sign-in')
           .withBody({ passport: dto.password })
           .expectStatus(400);
       });
       it('should throw if password empty', () => {
         return pactum
           .spec()
-          .post('/auth/signin')
+          .post('/auth/sign-in')
           .withBody({ email: dto.email })
           .expectStatus(400);
       });
       it('should throw if no body provided', () => {
-        return pactum.spec().post('/auth/signin').expectStatus(400);
+        return pactum.spec().post('/auth/sign-in').expectStatus(400);
       });
 
-      it('should signin', () => {
+      it('should sign in', () => {
         return pactum
           .spec()
-          .post('/auth/signin')
+          .post('/auth/sign-in')
           .withBody(dto)
           .expectStatus(200);
       });
