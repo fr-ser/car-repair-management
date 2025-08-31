@@ -54,8 +54,7 @@ export default function LoginPage() {
         }),
       });
       const responseJson = await response.json();
-      const responseStatus = response.status;
-      if (responseStatus !== 200) {
+      if (!response.ok) {
         setErrors({
           other: 'Invalid credentials',
         });
