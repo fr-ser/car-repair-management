@@ -22,7 +22,7 @@ test: ## runs all tests
 	yarn run test:e2e
 
 test-cov: ## runs all tests once with coverage report
-	yarn run test
+	yarn run test:unit
 	yarn run lint
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e:cov
