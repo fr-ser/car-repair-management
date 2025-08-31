@@ -10,3 +10,5 @@ export const STATIC_FILE_ROOT = process.env.STATIC_FILE_ROOT as string;
 
 export const DISABLE_REQUEST_LOGGING =
   process.env.DISABLE_REQUEST_LOGGING === 'true';
+
+export const GLOBAL_API_PREFIX = 'api';

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthDto } from './auth.dto';
 
 export interface UserWithoutHash {
   id: number;
@@ -16,10 +16,7 @@ export interface UserWithoutHash {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(
-    config: ConfigService,
-    private prisma: PrismaService,
-  ) {
+  constructor(config: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -27,23 +24,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: {
-    sub: number;
-    email: string;
-  }): Promise<UserWithoutHash | null> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: payload.sub,
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-    return user;
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async validate(payload: AuthDto) {
+    return payload;
   }
 }

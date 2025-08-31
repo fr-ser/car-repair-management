@@ -9,6 +9,14 @@ const seed = async () => {
   await prisma.user.create({
     data: { email: 'admin@local.com', hash: await argon.hash('local1') },
   });
+
+  await prisma.article.deleteMany();
+  await prisma.article.createMany({
+    data: [
+      { id: 'foo1', description: 'bar1', price: '1.4' },
+      { id: 'foo2', description: 'bar2', price: '2.4', amount: '293' },
+    ],
+  });
 };
 
 seed().catch(console.error);

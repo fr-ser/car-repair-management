@@ -54,5 +54,5 @@ export async function createUser(
   });
 
   const auth = app.get(AuthService);
-  return (await auth.signToken(user.id, user.email)).access_token;
+  return await auth.getSignedToken(user.id, user.email);
 }

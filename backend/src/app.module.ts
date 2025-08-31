@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { cwd } from 'process';
 
 import { ArticlesModule } from './articles/articles.module';
+import { JwtAuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { ENV_FILE_PATH, STATIC_FILE_ROOT } from './config';
 import { PaginationModule } from './pagination/pagination.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -22,8 +23,13 @@ import { UserModule } from './user/user.module';
     PaginationModule,
     PrismaModule,
     // the modules below represent domain entities
-    UserModule,
     ArticlesModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}
