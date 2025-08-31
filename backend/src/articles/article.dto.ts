@@ -10,10 +10,10 @@ export class CreateArticleDto {
   @IsString()
   id: string;
 
-  @IsNotEmpty()
   @IsString()
   description: string;
 
+  @IsNotEmpty()
   @IsNumberString()
   price: string;
 

@@ -13,13 +13,13 @@ type PrismaOperations<ModelName extends ModelNames> =
 export class PaginationService {
   constructor(private prisma: PrismaService) {}
 
-  async paginate<ModelName extends ModelNames>(
+  async paginate<ModelName extends ModelNames, ResponseDataType>(
     model: ModelName,
     query: PaginationQueryDto,
     orderBy: PrismaOperations<ModelName>['findMany']['args']['orderBy'] = {
       id: 'asc',
     },
-  ): Promise<PaginatedResponseDto<ModelName>> {
+  ): Promise<PaginatedResponseDto<ResponseDataType>> {
     const { page = 1, limit = 10 } = query;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const db = this.prisma[model as string] as any;
@@ -32,9 +32,12 @@ export class PaginationService {
         orderBy,
         skip: query.skip,
         take: limit,
-      }) as Promise<ModelName[]>,
+      }) as Promise<ResponseDataType[]>,
     ]);
 
-    return new PaginatedResponseDto<ModelName>(data, total, { page, limit });
+    return new PaginatedResponseDto<ResponseDataType>(data, total, {
+      page,
+      limit,
+    });
   }
 }
