@@ -10,13 +10,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 describe('Auth e2e', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let config: ConfigService;
 
   beforeAll(async () => {
     [, app] = await createTestClientApp();
 
     prisma = app.get(PrismaService);
-    config = app.get(ConfigService);
+    const config = app.get(ConfigService);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
   });
 

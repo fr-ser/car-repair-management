@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
@@ -34,7 +35,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix(GLOBAL_API_PREFIX);
 
-  await app.listen(process.env.PORT ?? 1111);
+  const configService = app.get(ConfigService);
+  await app.listen(configService.getOrThrow<number>('PORT'));
 }
 
 bootstrap().catch((err) => {

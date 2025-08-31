@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -8,16 +8,26 @@ import { cwd } from 'process';
 import { ArticlesModule } from './articles/articles.module';
 import { JwtAuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
-import { ENV_FILE_PATH, STATIC_FILE_ROOT } from './config';
+import { ENV_FILE_PATH, validate } from './config';
 import { PaginationModule } from './pagination/pagination.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ENV_FILE_PATH }),
-    ServeStaticModule.forRoot({
-      rootPath: join(cwd(), STATIC_FILE_ROOT),
-      exclude: ['/api/*anywhere'],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ENV_FILE_PATH,
+      validate,
+    }),
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
+        {
+          rootPath: join(cwd(), configService.getOrThrow('STATIC_FILE_ROOT')),
+          exclude: ['/api/*anywhere'],
+        },
+      ],
     }),
     AuthModule,
     PaginationModule,

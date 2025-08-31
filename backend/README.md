@@ -22,7 +22,6 @@ src/
 └── config.ts                     # Configuration
 ```
 
-<!-- TODO: remove all port fallbacks across the code and use config -->
 <!-- TODO: move towards vitest to use same test framework as frontend -->
 
 ## Authentication

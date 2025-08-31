@@ -1,14 +1,33 @@
-import dotenv from 'dotenv';
-import path from 'path';
+import { plainToInstance } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+  validateSync,
+} from 'class-validator';
 
-// needs to be loaded at the top level for prisma
 export const ENV_FILE_PATH = process.env.CONFIG_PATH || '.env';
-dotenv.config({ path: path.resolve(ENV_FILE_PATH) });
-
-// needs to be loaded at the top level for the nest static file server to initiate
-export const STATIC_FILE_ROOT = process.env.STATIC_FILE_ROOT as string;
-
-export const DISABLE_REQUEST_LOGGING =
-  process.env.DISABLE_REQUEST_LOGGING === 'true';
-
 export const GLOBAL_API_PREFIX = 'api';
+
+class EnvironmentVariables {
+  @IsNumber()
+  @Min(1000)
+  PORT: number;
+
+  @IsNotEmpty()
+  @IsString()
+  STATIC_FILE_ROOT: string;
+}
+
+export function validate(config: Record<string, unknown>) {
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig);
+
+  if (errors.length > 0) {
+    throw new Error(errors.toString());
+  }
+  return validatedConfig;
+}
