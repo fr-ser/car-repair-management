@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       src: path.resolve(__dirname, './src'),
+      test: path.resolve(__dirname, './test'),
     },
   },
   // the swc part is required for nest e2e tests
