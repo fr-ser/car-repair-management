@@ -18,6 +18,10 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   STATIC_FILE_ROOT: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_SECRET: string;
 }
 
 export function validate(config: Record<string, unknown>) {

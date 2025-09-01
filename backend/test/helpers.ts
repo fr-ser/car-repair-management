@@ -21,8 +21,6 @@ export async function createTestClientApp(): Promise<
     imports: [AppModule],
   }).compile();
 
-  const configService = moduleRef.get(ConfigService);
-
   const app: INestApplication = moduleRef.createNestApplication();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -34,6 +32,7 @@ export async function createTestClientApp(): Promise<
       },
     }),
   );
+  const configService = app.get(ConfigService);
   await app.init();
   await app.listen(configService.getOrThrow<number>('PORT'));
 
