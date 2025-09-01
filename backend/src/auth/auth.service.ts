@@ -24,7 +24,7 @@ export class AuthService {
     const pwMatches = await this.checkPassword(user.hash, dto.password);
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
 
-    return { access_token: await this.getSignedToken(user.id, user.email) };
+    return this.getSignedToken(user.id, user.email);
   }
 
   async checkPassword(hash: string, password: string) {

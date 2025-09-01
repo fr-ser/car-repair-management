@@ -9,6 +9,7 @@ import {
 
 export const ENV_FILE_PATH = process.env.CONFIG_PATH || '.env';
 export const GLOBAL_API_PREFIX = 'api';
+export const AUTH_JWT_COOKIE_KEY = 'car_app_jwt';
 
 class EnvironmentVariables {
   @IsNumber()

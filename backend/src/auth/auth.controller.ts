@@ -1,4 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
+
+import { AUTH_JWT_COOKIE_KEY } from 'src/config';
 
 import { Public } from './auth.decorator';
 import { AuthDto } from './auth.dto';
@@ -10,7 +13,11 @@ export class AuthController {
 
   @Public()
   @Post('sign-in')
-  signIn(@Body() dto: AuthDto) {
-    return this.authService.signIn(dto);
+  async signIn(
+    @Body() dto: AuthDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const token = await this.authService.signIn(dto);
+    response.cookie(AUTH_JWT_COOKIE_KEY, token, { httpOnly: true });
   }
 }
