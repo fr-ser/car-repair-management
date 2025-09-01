@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
@@ -9,6 +9,8 @@ import { AuthDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
@@ -17,14 +19,22 @@ export class AuthService {
 
   async signIn(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { userName: dto.userName },
     });
-    if (!user) throw new ForbiddenException('Credentials incorrect');
+
+    if (!user) {
+      this.logger.debug(`No user found for userName: ${dto.userName}`);
+      throw new ForbiddenException('Credentials incorrect');
+    }
 
     const pwMatches = await this.checkPassword(user.hash, dto.password);
-    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
 
-    return this.getSignedToken(user.id, user.email);
+    if (!pwMatches) {
+      this.logger.debug(`Password mismatch`);
+      throw new ForbiddenException('Credentials incorrect');
+    }
+
+    return this.getSignedToken(user.id, user.userName);
   }
 
   async checkPassword(hash: string, password: string) {
@@ -35,10 +45,10 @@ export class AuthService {
     return argon.hash(password);
   }
 
-  async getSignedToken(userId: number, email: string): Promise<string> {
+  async getSignedToken(userId: number, userName: string): Promise<string> {
     const payload = {
       sub: userId,
-      email,
+      userName,
     };
     const secret: string | undefined = this.config.get('JWT_SECRET');
 

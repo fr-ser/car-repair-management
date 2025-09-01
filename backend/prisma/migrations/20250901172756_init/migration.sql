@@ -1,12 +1,10 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "email" TEXT NOT NULL,
+    "userName" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
-    "firstName" TEXT,
-    "lastName" TEXT
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -20,4 +18,4 @@ CREATE TABLE "Article" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_userName_key" ON "User"("userName");
