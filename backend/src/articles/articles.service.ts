@@ -4,7 +4,7 @@ import { PaginationQueryDto } from 'src/pagination/pagination.dto';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-import { CreateArticleDto } from './article.dto';
+import { CreateArticleDto, UpdateArticleDto } from './article.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -21,5 +21,12 @@ export class ArticlesService {
 
   findAll(query: PaginationQueryDto) {
     return this.pagination.paginate('Article', query);
+  }
+
+  update(id: string, updateArticleDto: UpdateArticleDto) {
+    return this.prisma.article.update({
+      where: { id },
+      data: updateArticleDto,
+    });
   }
 }
