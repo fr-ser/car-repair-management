@@ -11,7 +11,6 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import MenuBar from './components/MenuBar.tsx';
 import './globals.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
-import RegisterPage from './pages/auth/RegisterPage.tsx';
 import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
 import _OLD_ClientDetailsPage from './pages/clients/_OLD_ClientDetailsPage.tsx';
 import theme from './theme.ts';
@@ -24,10 +23,6 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />,
   },
   {
     path: '/clients',

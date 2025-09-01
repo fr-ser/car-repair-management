@@ -24,7 +24,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import 'dayjs/locale/de';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import MenuBar from '../../components/MenuBar';
 import { Car } from '../../types/cars';
@@ -59,18 +58,6 @@ export function ClientDetailsPage() {
     value: string | Date | null,
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // TODO: all below should be deleted
-  const redirect = useNavigate();
-
-  const token = sessionStorage.getItem('authToken');
-  const handleLogin = () => redirect('/login');
-  const handleRegister = () => redirect('/register');
-  const handleLogout = () => {
-    sessionStorage.removeItem('authToken');
-    console.log('Logged out');
-    redirect('/login');
   };
 
   return (
@@ -391,33 +378,6 @@ export function ClientDetailsPage() {
         />
         {/* end car modal */}
       </Box>
-      {/* TODO: all below should be deleted */}
-      <Container maxWidth="lg">
-        <div>
-          <div>App home screen</div>
-          {!token ? (
-            <div>
-              <Button variant="outlined" onClick={handleLogin}>
-                Login
-              </Button>
-              <Button variant="contained" onClick={handleRegister}>
-                Register
-              </Button>
-            </div>
-          ) : (
-            <button onClick={handleLogout}>Logout</button>
-          )}
-
-          <br />
-          <br />
-
-          {!token ? (
-            <p>You are not logged in, LOL!</p>
-          ) : (
-            <p>You are logged in, CONGRATS!</p>
-          )}
-        </div>
-      </Container>
     </LocalizationProvider>
   );
 }

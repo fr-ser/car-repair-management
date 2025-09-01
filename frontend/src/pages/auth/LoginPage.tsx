@@ -1,11 +1,11 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as apiService from '../../services/backend-service';
 import * as Errors from '../../types/errors';
 
 type Errors = {
-  email?: string;
+  userName?: string;
   password?: string;
   other?: string;
 };
@@ -13,15 +13,49 @@ type Errors = {
 export default function LoginPage() {
   const redirect = useNavigate();
 
-  const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>({});
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleLogin = () => redirect('/login');
+  const handleLogout = () => {
+    sessionStorage.removeItem('authToken');
+    console.log('Logged out');
+    redirect('/login');
+  };
+
+  useEffect(() => {
+    console.log('yo!!');
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch(`/api/articles`, {
+          credentials: 'include', // Important for sending cookies
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkLoginStatus();
+  });
 
   const validate = () => {
     const newErrors: Errors = {};
 
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
+    if (!userName.trim()) {
+      newErrors.userName = 'User Name is required';
     }
     if (!password) {
       newErrors.password = 'Password is required';
@@ -38,9 +72,10 @@ export default function LoginPage() {
       setErrors(validationErrors);
     } else {
       try {
-        await apiService.signin({ email, password });
+        await apiService.signin({ userName, password });
         // Proceed with login logic
-        redirect('/');
+        // redirect('/login');
+        setIsLoggedIn(true);
       } catch (err: unknown) {
         if (err instanceof Errors.AuthError) {
           setErrors({ other: err.message });
@@ -62,13 +97,13 @@ export default function LoginPage() {
         <input
           type="text"
           placeholder="User Name"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
           className="w-full p-2 mb-3 border rounded-xl"
           required
-          data-testid="user-email-input"
+          data-testid="user-name-input"
         />
-        {errors.email && <p className="error">{errors.email}</p>}
+        {errors.userName && <p className="error">{errors.userName}</p>}
         <input
           type="password"
           placeholder="Password"
@@ -89,6 +124,20 @@ export default function LoginPage() {
           Login
         </button>
       </form>
+      <div>App home screen</div>
+      <div>
+        <button onClick={handleLogin}>Login</button>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
+      <br></br>
+      <br></br>
+      {isLoading ? (
+        <p>Checking login status...</p>
+      ) : isLoggedIn ? (
+        <p>You are logged in, CONGRATS!</p>
+      ) : (
+        <p>You are not logged in, LOL!</p>
+      )}
     </div>
   );
 }
