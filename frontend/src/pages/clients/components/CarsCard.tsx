@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import 'dayjs/locale/de';
 
-import { Car } from '../../../types/cars';
+import { Car } from '@/types/cars';
 
 type CarsCardProps = {
   cars: Car[]; // List of cars
