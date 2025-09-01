@@ -1,10 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as pactum from 'pactum';
-import { createTestClientApp, resetDatabase } from 'test/helpers';
+import { createTestClientApp, getValidJwt, resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 import { CreateArticleDto } from 'src/articles/article.dto';
+import { AUTH_JWT_COOKIE_KEY } from 'src/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('Articles e2e', () => {
@@ -37,7 +38,8 @@ describe('Articles e2e', () => {
 
     await pactum
       .spec()
-      .post('/articles')
+      .post('/api/articles')
+      .withCookies(AUTH_JWT_COOKIE_KEY, await getValidJwt(app))
       .withBody(article)
       .expectStatus(201)
       .expectJsonLike(article);
@@ -54,7 +56,8 @@ describe('Articles e2e', () => {
 
     await pactum
       .spec()
-      .get('/articles')
+      .get('/api/articles')
+      .withCookies(AUTH_JWT_COOKIE_KEY, await getValidJwt(app))
       .withQueryParams({ page: 1, limit: 10 })
       .expectStatus(200)
       .expectJsonLike({
