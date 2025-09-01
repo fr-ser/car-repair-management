@@ -25,7 +25,6 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/de';
 import { useState } from 'react';
 
-import MenuBar from '../../components/MenuBar';
 import { Car } from '../../types/cars';
 import { ClientForm } from '../../types/clients';
 import { AddCarsModal } from './components/AddCarsModal';
@@ -62,7 +61,6 @@ export function ClientDetailsPage() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
-      <MenuBar current="/clients" />
       <Box
         sx={{
           flexGrow: 1,

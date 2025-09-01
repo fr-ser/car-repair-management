@@ -9,12 +9,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
-import MenuBar from '../../components/MenuBar';
-
 export default function _OLD_ClientDetailsPage() {
   return (
     <Box>
-      <MenuBar current="/cars" />
       <Stack direction="column" spacing={2} margin={'16px 0'}>
         <Typography
           variant="h5"

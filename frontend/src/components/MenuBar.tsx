@@ -25,11 +25,10 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 export interface NavigationItem {
   label: string;
   icon: React.ReactNode;
-  active: boolean;
   link: string;
 }
 
-function MenuBar({ current }: { current: string }) {
+function MenuBar() {
   const redirect = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null,
@@ -37,46 +36,35 @@ function MenuBar({ current }: { current: string }) {
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
+  const [currentLink, setCurrentLink] = React.useState(location.pathname);
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
   const navigationItems: NavigationItem[] = [
-    { label: 'Kunden', icon: <PeopleIcon />, active: true, link: '/clients' },
-    { label: 'Autos', icon: <CarIcon />, active: false, link: '/cars' },
+    { label: 'Kunden', icon: <PeopleIcon />, link: '/clients' },
+    { label: 'Autos', icon: <CarIcon />, link: '/cars' },
     {
       label: 'Aufträge',
       icon: <DescriptionIcon />,
-      active: false,
       link: '/orders',
     },
     {
       label: 'Übersicht',
       icon: <BarChartIcon />,
-      active: false,
       link: '/overview',
     },
     {
       label: 'Dokumente',
       icon: <AssignmentIcon />,
-      active: false,
       link: '/documents',
     },
     {
       label: 'Artikel',
       icon: <ArticleIcon />,
-      active: false,
       link: '/articles',
     },
   ];
-
-  for (const item of navigationItems) {
-    if (item.link === current) {
-      item.active = true;
-    } else {
-      item.active = false;
-    }
-  }
 
   return (
     <AppBar
@@ -107,19 +95,25 @@ function MenuBar({ current }: { current: string }) {
               <Button
                 key={item.label}
                 startIcon={item.icon}
-                variant={item.active ? 'contained' : 'text'}
+                variant={item.link === currentLink ? 'contained' : 'text'}
                 size="small"
                 onClick={() => {
                   // Handle navigation or other actions here
+                  setCurrentLink(item.link);
                   redirect(item.link);
                 }}
                 sx={{
-                  color: item.active
-                    ? 'primary.contrastText'
-                    : 'text.secondary',
-                  bgcolor: item.active ? 'primary.main' : 'transparent',
+                  color:
+                    item.link === currentLink
+                      ? 'primary.contrastText'
+                      : 'text.secondary',
+                  bgcolor:
+                    item.link === currentLink ? 'primary.main' : 'transparent',
                   '&:hover': {
-                    bgcolor: item.active ? 'primary.dark' : 'action.hover',
+                    bgcolor:
+                      item.link === currentLink
+                        ? 'primary.dark'
+                        : 'action.hover',
                   },
                 }}
               >

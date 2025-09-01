@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import MenuBar from './components/MenuBar.tsx';
 import './globals.css';
@@ -15,38 +15,33 @@ import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
 import _OLD_ClientDetailsPage from './pages/clients/_OLD_ClientDetailsPage.tsx';
 import theme from './theme.ts';
 
+function Layout() {
+  return (
+    <div>
+      <MenuBar></MenuBar>
+
+      {/* Page content (children get rendered here) */}
+      <main className="p-4">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <ClientDetailsPage />,
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/clients',
-    element: <ClientDetailsPage />,
-  },
-  {
-    path: '/cars',
-    element: <_OLD_ClientDetailsPage />,
-  },
-  {
-    path: '/orders',
-    element: <MenuBar current={'/orders'} />,
-  },
-  {
-    path: '/overview',
-    element: <MenuBar current={'/overview'} />,
-  },
-  {
-    path: '/documents',
-    element: <MenuBar current={'/documents'} />,
-  },
-  {
-    path: '/articles',
-    element: <MenuBar current={'/articles'} />,
+    element: <Layout />,
+    children: [
+      { index: true, element: <div></div> },
+      { path: '/clients', element: <ClientDetailsPage /> },
+      { path: '/cars', element: <_OLD_ClientDetailsPage /> },
+      { path: '/orders', element: <div>/orders</div> },
+      { path: '/overview', element: <div>/overview</div> },
+      { path: '/documents', element: <div>/documents</div> },
+      { path: '/articles', element: <div>/articles</div> },
+      { path: '/login', element: <LoginPage /> },
+    ],
   },
 ]);
 
