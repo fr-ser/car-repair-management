@@ -62,8 +62,8 @@ If not done before a local development database should also be created:
 
 This will create also a database seed with a user:
 
-- local user: `admin@local.com`
-- local password: `local1`
+- local user: `admin`
+- local password: `local`
 
 ## Build for Production
 

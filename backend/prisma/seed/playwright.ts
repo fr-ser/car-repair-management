@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const seed = async () => {
   await prisma.user.deleteMany();
   await prisma.user.create({
-    data: { email: 'test@test.test', hash: await argon.hash('test') },
+    data: { userName: 'test-user', hash: await argon.hash('test-pass') },
   });
 };
 

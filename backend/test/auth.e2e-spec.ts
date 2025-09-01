@@ -32,12 +32,12 @@ describe('Auth e2e', () => {
   describe('Auth', () => {
     it('should sign in with right credentials', async () => {
       const testCredentials: AuthDto = {
-        email: 'test@test.test',
-        password: '123',
+        userName: 'test-user',
+        password: 'test-pass',
       };
       await prisma.user.create({
         data: {
-          email: testCredentials.email,
+          userName: testCredentials.userName,
           hash: await argon.hash(testCredentials.password),
         },
       });
@@ -51,12 +51,12 @@ describe('Auth e2e', () => {
 
     it('should not sign in with wrong credentials', async () => {
       const testCredentials: AuthDto = {
-        email: 'test@test.test',
-        password: '123',
+        userName: 'test-user',
+        password: 'test-pass-wrong',
       };
       await prisma.user.create({
         data: {
-          email: testCredentials.email,
+          userName: testCredentials.userName,
           hash: await argon.hash(testCredentials.password),
         },
       });

@@ -11,15 +11,12 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
+  userName String @unique
+  hash     String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  email String @unique
-  hash  String
-
-  firstName String?
-  lastName  String?
 }
 
 model Article {

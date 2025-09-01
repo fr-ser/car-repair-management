@@ -17,14 +17,9 @@ export default function LoginPage() {
   const validate = () => {
     const newErrors: Errors = {};
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Enter a valid email';
     }
-
     if (!password) {
       newErrors.password = 'Password is required';
     }
@@ -42,7 +37,7 @@ export default function LoginPage() {
       const response = await fetch(`/api/auth/sign-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password }),
+        body: JSON.stringify({ userName: email, password: password }),
       });
       if (!response.ok) {
         setErrors({ other: 'Invalid credentials' });
@@ -61,8 +56,8 @@ export default function LoginPage() {
         <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
         {errors.other && <p className="error">{errors.other}</p>}
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="User Name"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 mb-3 border rounded-xl"
