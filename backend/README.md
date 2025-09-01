@@ -22,8 +22,6 @@ src/
 └── config.ts                     # Configuration
 ```
 
-<!-- TODO: move towards vitest to use same test framework as frontend -->
-
 ## Authentication
 
 Most endpoints are authenticated and require a JWT to access them.

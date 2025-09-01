@@ -1,3 +1,5 @@
+import { expect, test } from 'vitest';
+
 import { formatIsoDateString, formatNumber, round } from './helpers';
 
 test('formatNumber', () => {

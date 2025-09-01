@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
 import * as pactum from 'pactum';
 import { createTestClientApp, resetDatabase } from 'test/helpers';
+import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 import { AuthDto } from 'src/auth/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -41,7 +42,7 @@ describe('Auth e2e', () => {
         },
       });
 
-      return pactum
+      await pactum
         .spec()
         .post('/auth/sign-in')
         .withBody(testCredentials)
@@ -60,7 +61,7 @@ describe('Auth e2e', () => {
         },
       });
 
-      return pactum
+      await pactum
         .spec()
         .post('/auth/sign-in')
         .withBody({ ...testCredentials, password: 'wrong' })

@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { resetDatabase } from 'test/helpers';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { CreateArticleDto } from 'src/articles/article.dto';
 import { PaginationQueryDto } from 'src/pagination/pagination.dto';
@@ -20,7 +21,7 @@ describe('PaginationService', () => {
   ];
 
   const mockConfigService = {
-    get: jest.fn().mockImplementation((key: string) => {
+    get: vi.fn().mockImplementation((key: string) => {
       if (key === 'DATABASE_URL') {
         return process.env.DATABASE_URL;
       }
