@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -10,6 +10,8 @@ import { requestLogger } from './common/middleware/request-logger';
 import { GLOBAL_API_PREFIX } from './config';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
   // we create a manual express server and register the request logger
   // as otherwise the static file server logs are not present
   const server = express();
@@ -34,6 +36,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   await app.listen(configService.getOrThrow<number>('PORT'));
+  logger.log(`Server is running on: ${await app.getUrl()}`);
 }
 
 bootstrap().catch((err) => {
