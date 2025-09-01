@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+
+import { AUTH_JWT_COOKIE_KEY } from 'src/config';
 
 import { AuthDto } from './auth.dto';
 
@@ -18,9 +21,11 @@ export interface UserWithoutHash {
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(config: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req.cookies?.[AUTH_JWT_COOKIE_KEY] as string | null,
+      ]),
       ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET') || '',
+      secretOrKey: config.getOrThrow('JWT_SECRET'),
     });
   }
 

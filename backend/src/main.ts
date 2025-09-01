@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 
 import { AppModule } from './app.module';
@@ -15,6 +16,9 @@ async function bootstrap() {
   server.use(requestLogger);
 
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+
+  app.use(cookieParser());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // strips properties not in DTO
@@ -25,13 +29,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  });
 
   app.setGlobalPrefix(GLOBAL_API_PREFIX);
 

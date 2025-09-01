@@ -1,8 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { API_URL } from './global/config';
-
 type Errors = {
   email?: string;
   password?: string;
@@ -41,27 +39,14 @@ export default function LoginPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      const response = await fetch(`${API_URL}/api/auth/sign-in`, {
+      const response = await fetch(`/api/auth/sign-in`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Optional: Include auth token if needed
-          // "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password }),
       });
-      const responseJson = await response.json();
       if (!response.ok) {
-        setErrors({
-          other: 'Invalid credentials',
-        });
+        setErrors({ other: 'Invalid credentials' });
       } else {
-        const token = responseJson.access_token; // ← replace with actual API response
-        sessionStorage.setItem('authToken', token);
-        // Proceed with login logic
         redirect('/');
       }
     }
