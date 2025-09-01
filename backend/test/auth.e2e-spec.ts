@@ -42,7 +42,7 @@ describe('Auth e2e', () => {
         },
       });
 
-      return pactum
+      await pactum
         .spec()
         .post('/auth/sign-in')
         .withBody(testCredentials)
@@ -61,7 +61,7 @@ describe('Auth e2e', () => {
         },
       });
 
-      return pactum
+      await pactum
         .spec()
         .post('/auth/sign-in')
         .withBody({ ...testCredentials, password: 'wrong' })
