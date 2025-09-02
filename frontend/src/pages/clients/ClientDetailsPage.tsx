@@ -25,11 +25,11 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/de';
 import { useState } from 'react';
 
-import { AddCarsModal } from '@/pages/clients/components/AddCarsModal';
-import { CarsCard } from '@/pages/clients/components/CarsCard';
-import { Car } from '@/types/cars';
-import { ClientForm, IClientForm } from '@/types/clients';
-import { FormItem } from '@/types/common';
+import { AddCarsModal } from '@/src/pages/clients/components/AddCarsModal';
+import { CarsCard } from '@/src/pages/clients/components/CarsCard';
+import { Car } from '@/src/types/cars';
+import { ClientForm, IClientForm } from '@/src/types/clients';
+import { FormItem } from '@/src/types/common';
 
 import * as apiService from '../../services/backend-service';
 

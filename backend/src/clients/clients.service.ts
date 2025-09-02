@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { PaginationQueryDto } from 'src/pagination/pagination.dto';
-import { PaginationService } from 'src/pagination/pagination.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
+import { PaginationService } from '@/src/pagination/pagination.service';
+import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateClientDto, UpdateClientDto } from './client.dto';
 

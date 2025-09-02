@@ -1,4 +1,4 @@
-import { CreateClientRequest, CreateClientResponse } from '@/types/clients';
+import { CreateClientRequest, CreateClientResponse } from '@/src/types/clients';
 
 import { AuthUser } from '../types/auth';
 import * as Errors from '../types/errors';

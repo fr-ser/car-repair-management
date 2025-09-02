@@ -8,7 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from 'src/pagination/pagination.dto';
+import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
 
 import { CreateArticleDto, UpdateArticleDto } from './article.dto';
 import { ArticlesService } from './articles.service';

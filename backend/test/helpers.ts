@@ -4,9 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import cookieParser from 'cookie-parser';
 
-import { AppModule } from 'src/app.module';
-import { GLOBAL_API_PREFIX } from 'src/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { AppModule } from '@/src/app.module';
+import { GLOBAL_API_PREFIX } from '@/src/config';
+import { PrismaService } from '@/src/prisma/prisma.service';
 
 export async function resetDatabase(prisma: PrismaService) {
   return prisma.$transaction([

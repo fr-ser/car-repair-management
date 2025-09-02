@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AUTH_JWT_COOKIE_KEY } from 'src/config';
+import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
 
 import { AuthDto } from './auth.dto';
 

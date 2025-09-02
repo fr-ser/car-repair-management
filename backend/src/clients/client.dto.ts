@@ -8,7 +8,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-import { RequireOneOf } from 'src/common/class-validators';
+import { RequireOneOf } from '@/src/common/class-validators';
 
 export class CreateClientDto {
   @IsOptional()

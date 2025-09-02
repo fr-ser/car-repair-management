@@ -21,11 +21,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+      "@/src/*": ["src/*"],
+      "@/test/*": ["test/*"]
+    },
   },
   "include": [
     "src",

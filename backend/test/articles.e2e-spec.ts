@@ -4,9 +4,9 @@ import * as pactum from 'pactum';
 import { createTestClientApp, getValidJwt, resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
-import { CreateArticleDto, UpdateArticleDto } from 'src/articles/article.dto';
-import { AUTH_JWT_COOKIE_KEY } from 'src/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateArticleDto, UpdateArticleDto } from '@/src/articles/article.dto';
+import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
+import { PrismaService } from '@/src/prisma/prisma.service';
 
 describe('Articles e2e', () => {
   let app: INestApplication;

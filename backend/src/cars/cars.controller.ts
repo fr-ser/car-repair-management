@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from 'src/pagination/pagination.dto';
+import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
 
 import { CreateCarDto, UpdateCarDto } from './cars.dto';
 import { CarsService } from './cars.service';
