@@ -1,18 +1,16 @@
 import { DirectionsCar as CarIcon } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-} from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import 'dayjs/locale/de';
 import { useState } from 'react';
 
-import { Car } from '../../../types/cars';
+import { Car } from '@/types/cars';
 
 type AddCarsModalProps = {
   isOpen: boolean; // Controls whether modal is shown

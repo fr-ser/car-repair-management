@@ -6,27 +6,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-import MenuBar from './components/MenuBar.tsx';
+import { Layout } from './App.tsx';
 import './globals.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
 import _OLD_ClientDetailsPage from './pages/clients/_OLD_ClientDetailsPage.tsx';
 import theme from './theme.ts';
-
-function Layout() {
-  return (
-    <div>
-      <MenuBar></MenuBar>
-
-      {/* Page content (children get rendered here) */}
-      <main className="p-4">
-        <Outlet />
-      </main>
-    </div>
-  );
-}
 
 const router = createBrowserRouter([
   {
