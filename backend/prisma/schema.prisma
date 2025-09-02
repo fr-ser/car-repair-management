@@ -30,14 +30,15 @@ model Article {
 }
 
 model Client {
-  id String @id
+  id           Int     @id @default(autoincrement())
+  clientNumber String? @unique // this is a human-readable identifier for the car based on the ID
 
   firstName   String
   lastName    String
   email       String?
   landline    String?
   company     String?
-  birthday    DateTime?
+  birthday    String? // there is no "Date" type in SQLite
   comment     String?
   phoneNumber String?
   postalCode  String?

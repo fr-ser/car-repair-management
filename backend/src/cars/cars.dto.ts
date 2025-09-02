@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsDateString,
   IsNotEmpty,
@@ -58,7 +59,7 @@ export class CreateCarDto {
   @IsOptional()
   tires?: string;
 
-  @MaxLength(10)
+  @MaxLength(10) // a date time string with a length of 10 is a date
   @IsDateString()
   @IsOptional()
   inspectionDate?: string;
@@ -85,4 +86,4 @@ export class CreateCarDto {
   documentField3?: string;
 }
 
-export class UpdateCarDto extends CreateCarDto {}
+export class UpdateCarDto extends PartialType(CreateCarDto) {}

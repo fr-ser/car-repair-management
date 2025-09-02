@@ -1,23 +1,23 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
-  IsDate,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
-  IsPostalCode,
   IsString,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateClientDto {
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   firstName: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   lastName: string;
-
-  // optional properties
 
   @IsOptional()
   @IsEmail()
@@ -25,7 +25,6 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
-  @IsPostalCode('DE', { message: 'Invalid DE postal code' })
   postalCode: string;
 
   @IsOptional()
@@ -45,8 +44,9 @@ export class CreateClientDto {
   company: string;
 
   @IsOptional()
-  @IsDate()
-  birthday: Date;
+  @MaxLength(10) // a date time string with a length of 10 is a date
+  @IsDateString()
+  birthday: string;
 
   @IsOptional()
   @IsString()
@@ -54,8 +54,6 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
-  @IsPhoneNumber(undefined, {
-    message: 'Phone number must be valid E.164 format',
-  })
   phoneNumber: string;
 }
+export class UpdateClientDto extends PartialType(CreateClientDto) {}
