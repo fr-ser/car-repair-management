@@ -3,11 +3,11 @@ import { expect, test } from '@playwright/test';
 test('register-login', async ({ page }) => {
   await page.goto('login');
 
-  await page.getByTestId('user-name-input').fill('test-user');
-  await page.getByTestId('user-password-input').fill('test-pass');
+  await page.getByLabel('Benutzername').fill('test-user');
+  await page.getByLabel('Passwort').fill('test-pass');
 
-  await page.getByTestId('user-login-button').click();
+  await page.getByTestId('login-button').click();
 
-  const loggedInText = page.getByText('You are logged in, CONGRATS!');
-  await expect(loggedInText).toBeVisible();
+  // not visible because of a redirect
+  await expect(page.getByTestId('login-button')).not.toBeVisible();
 });

@@ -73,6 +73,7 @@ export default function LoginPage() {
             variant="contained"
             sx={{ mt: 3 }}
             disabled={isSubmitting}
+            data-testid="login-button"
           >
             {isSubmitting ? 'Einloggen...' : 'Einloggen'}
           </Button>

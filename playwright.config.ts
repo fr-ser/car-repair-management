@@ -23,6 +23,7 @@ export default defineConfig({
   webServer: {
     command: 'make start-playwright-services',
     url: `http://localhost:${PORT}`,
+    reuseExistingServer: !process.env.CI,
     stdout: process.env.CI ? 'pipe' : 'ignore',
   },
 });
