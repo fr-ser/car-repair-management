@@ -4,20 +4,18 @@ import {
   Save as SaveIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  Container,
-  Divider,
-  Grid,
-  InputAdornment,
-  TextField,
-  Typography,
-} from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -25,11 +23,10 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/de';
 import { useState } from 'react';
 
-import MenuBar from '../../components/MenuBar';
-import { Car } from '../../types/cars';
-import { ClientForm } from '../../types/clients';
-import { AddCarsModal } from './components/AddCarsModal';
-import { CarsCard } from './components/CarsCard';
+import { AddCarsModal } from '@/pages/clients/components/AddCarsModal';
+import { CarsCard } from '@/pages/clients/components/CarsCard';
+import { Car } from '@/types/cars';
+import { ClientForm } from '@/types/clients';
 
 export function ClientDetailsPage() {
   // cars
@@ -62,7 +59,6 @@ export function ClientDetailsPage() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
-      <MenuBar current="/clients" />
       <Box
         sx={{
           flexGrow: 1,

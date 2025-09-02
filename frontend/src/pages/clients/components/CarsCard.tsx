@@ -3,22 +3,20 @@ import {
   DirectionsCar as CarIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
 import 'dayjs/locale/de';
 
-import { Car } from '../../../types/cars';
+import { Car } from '@/types/cars';
 
 type CarsCardProps = {
   cars: Car[]; // List of cars

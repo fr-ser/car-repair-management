@@ -8,7 +8,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-import MenuBar from './components/MenuBar.tsx';
+import { Layout } from './App.tsx';
 import './globals.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
@@ -18,35 +18,17 @@ import theme from './theme.ts';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <ClientDetailsPage />,
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/clients',
-    element: <ClientDetailsPage />,
-  },
-  {
-    path: '/cars',
-    element: <_OLD_ClientDetailsPage />,
-  },
-  {
-    path: '/orders',
-    element: <MenuBar current={'/orders'} />,
-  },
-  {
-    path: '/overview',
-    element: <MenuBar current={'/overview'} />,
-  },
-  {
-    path: '/documents',
-    element: <MenuBar current={'/documents'} />,
-  },
-  {
-    path: '/articles',
-    element: <MenuBar current={'/articles'} />,
+    element: <Layout />,
+    children: [
+      { index: true, element: <div></div> },
+      { path: '/clients', element: <ClientDetailsPage /> },
+      { path: '/cars', element: <_OLD_ClientDetailsPage /> },
+      { path: '/orders', element: <div>/orders</div> },
+      { path: '/overview', element: <div>/overview</div> },
+      { path: '/documents', element: <div>/documents</div> },
+      { path: '/articles', element: <div>/articles</div> },
+      { path: '/login', element: <LoginPage /> },
+    ],
   },
 ]);
 
