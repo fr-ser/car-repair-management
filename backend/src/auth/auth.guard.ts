@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
-import { GLOBAL_API_PREFIX } from 'src/config';
+import { GLOBAL_API_PREFIX } from '@/src/config';
 
 import { IS_PUBLIC_KEY } from './auth.decorator';
 

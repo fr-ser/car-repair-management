@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolve } from 'path';
 import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
@@ -12,8 +12,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      src: path.resolve(__dirname, './src'),
-      test: path.resolve(__dirname, './test'),
+      '@': resolve(__dirname, '.'),
     },
   },
   // the swc part is required for nest e2e tests

@@ -4,9 +4,9 @@ import * as pactum from 'pactum';
 import { createTestClientApp, getValidJwt, resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
-import { CreateArticleDto } from 'src/articles/article.dto';
-import { AUTH_JWT_COOKIE_KEY } from 'src/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateArticleDto, UpdateArticleDto } from '@/src/articles/article.dto';
+import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
+import { PrismaService } from '@/src/prisma/prisma.service';
 
 describe('Articles e2e', () => {
   let app: INestApplication;
@@ -64,5 +64,28 @@ describe('Articles e2e', () => {
         data: articleDtos,
         meta: { totalItems: articleDtos.length },
       });
+  });
+
+  it('can edit an article', async () => {
+    const previousArticle: CreateArticleDto = {
+      id: 'foo1',
+      description: 'bar1',
+      price: '1.4',
+    };
+
+    await prisma.article.create({ data: previousArticle });
+
+    const newFields: UpdateArticleDto = {
+      description: 'baz',
+      price: '2.4',
+    };
+
+    await pactum
+      .spec()
+      .patch(`/api/articles/${previousArticle.id}`)
+      .withCookies(AUTH_JWT_COOKIE_KEY, await getValidJwt(app))
+      .withBody(newFields)
+      .expectStatus(200)
+      .expectJsonLike({ ...previousArticle, ...newFields });
   });
 });

@@ -16,7 +16,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import 'dayjs/locale/de';
 
-import { Car } from '@/types/cars';
+import { Car } from '@/src/types/cars';
 
 type CarsCardProps = {
   cars: Car[]; // List of cars

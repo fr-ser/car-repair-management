@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
-import { AUTH_JWT_COOKIE_KEY } from 'src/config';
+import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
 
 import { Public } from './auth.decorator';
 import { AuthDto } from './auth.dto';

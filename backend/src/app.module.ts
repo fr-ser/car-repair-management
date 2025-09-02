@@ -8,6 +8,7 @@ import { cwd } from 'process';
 import { ArticlesModule } from './articles/articles.module';
 import { JwtAuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
+import { CarsModule } from './cars/cars.module';
 import { ClientsModule } from './clients/clients.module';
 import { ENV_FILE_PATH, validate } from './config';
 import { PaginationModule } from './pagination/pagination.module';
@@ -36,6 +37,7 @@ import { PrismaModule } from './prisma/prisma.module';
     // the modules below represent domain entities
     ArticlesModule,
     ClientsModule,
+    CarsModule,
   ],
   providers: [
     {

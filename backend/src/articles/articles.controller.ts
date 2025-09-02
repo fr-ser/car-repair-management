@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 
-import { PaginationQueryDto } from 'src/pagination/pagination.dto';
+import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
 
-import { CreateArticleDto } from './article.dto';
+import { CreateArticleDto, UpdateArticleDto } from './article.dto';
 import { ArticlesService } from './articles.service';
 
 @Controller('articles')
@@ -17,5 +25,10 @@ export class ArticlesController {
   @Get()
   findAll(@Query() query: PaginationQueryDto) {
     return this.articlesService.findAll(query);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCarDto: UpdateArticleDto) {
+    return this.articlesService.update(id, updateCarDto);
   }
 }

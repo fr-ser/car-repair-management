@@ -30,22 +30,47 @@ model Article {
 }
 
 model Client {
-  id String @id
+  id           Int     @id @default(autoincrement())
+  clientNumber String? @unique // this is a human-readable identifier for the car based on the ID
 
   firstName   String
   lastName    String
   email       String?
   landline    String?
   company     String?
-  birthday    DateTime?
+  birthday    String? // there is no "Date" type in SQLite
   comment     String?
   phoneNumber String?
   postalCode  String?
   city        String?
   street      String?
 
-  // orders String // should be a relateion probably
-  // cars   String // should be a relateion probably
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  id        Int     @id @default(autoincrement())
+  carNumber String? @unique // this is a human-readable identifier for the car based on the ID
+
+  licensePlate      String
+  model             String
+  manufacturer      String
+  firstRegistration String? // there is no "Date" type in SQLite
+  color             String?
+  engineCapacity    String?
+  comment           String?
+  fuelType          String?
+  enginePower       String?
+  oilChangeDate     String? // there is no "Date" type in SQLite
+  oilChangeKm       Float?
+  tires             String?
+  inspectionDate    String? // there is no "Date" type in SQLite
+  vin               String?
+  timingBeltKm      Float?
+  timingBeltDate    String? // there is no "Date" type in SQLite
+  documentField2    String?
+  documentField3    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

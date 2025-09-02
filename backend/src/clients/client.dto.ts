@@ -1,31 +1,35 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
-  IsDate,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
-  IsPostalCode,
   IsString,
+  MaxLength,
 } from 'class-validator';
 
+import { RequireOneOf } from '@/src/common/class-validators';
+
 export class CreateClientDto {
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   firstName: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   lastName: string;
-
-  // optional properties
 
   @IsOptional()
   @IsEmail()
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   email: string;
 
   @IsOptional()
   @IsString()
-  @IsPostalCode('DE', { message: 'Invalid DE postal code' })
   postalCode: string;
 
   @IsOptional()
@@ -38,15 +42,18 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   landline: string;
 
   @IsOptional()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   company: string;
 
   @IsOptional()
-  @IsDate()
-  birthday: Date;
+  @MaxLength(10) // a date time string with a length of 10 is a date
+  @IsDateString()
+  birthday: string;
 
   @IsOptional()
   @IsString()
@@ -54,8 +61,7 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
-  @IsPhoneNumber(undefined, {
-    message: 'Phone number must be valid E.164 format',
-  })
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   phoneNumber: string;
 }
+export class UpdateClientDto extends PartialType(CreateClientDto) {}

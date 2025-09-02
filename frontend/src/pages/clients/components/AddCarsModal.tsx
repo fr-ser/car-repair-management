@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import 'dayjs/locale/de';
 import { useState } from 'react';
 
-import { Car } from '@/types/cars';
+import { Car } from '@/src/types/cars';
 
 type AddCarsModalProps = {
   isOpen: boolean; // Controls whether modal is shown

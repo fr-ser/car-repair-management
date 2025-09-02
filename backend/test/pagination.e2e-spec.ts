@@ -3,10 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { CreateArticleDto } from 'src/articles/article.dto';
-import { PaginationQueryDto } from 'src/pagination/pagination.dto';
-import { PaginationService } from 'src/pagination/pagination.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateArticleDto } from '@/src/articles/article.dto';
+import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
+import { PaginationService } from '@/src/pagination/pagination.service';
+import { PrismaService } from '@/src/prisma/prisma.service';
 
 describe('PaginationService', () => {
   let paginationService: PaginationService;
