@@ -6,7 +6,29 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  Validate,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
+
+@ValidatorConstraint({ name: 'tireFormat', async: false })
+export class TireFormat implements ValidatorConstraintInterface {
+  validate(text: string) {
+    if (text.length < 14) return false;
+
+    const positionsToCheck = [0, 1, 2, 4, 5, 8, 9];
+    for (const pos of positionsToCheck) {
+      if (!RegExp('\\d').test(text.charAt(pos))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  defaultMessage() {
+    return 'Must be at least 14 characters long and positions 0, 1, 2, 4, 5, 8, and 9 must be digits';
+  }
+}
 
 export class CreateCarDto {
   @IsString()
@@ -57,6 +79,7 @@ export class CreateCarDto {
 
   @IsString()
   @IsOptional()
+  @Validate(TireFormat)
   tires?: string;
 
   @MaxLength(10) // a date time string with a length of 10 is a date

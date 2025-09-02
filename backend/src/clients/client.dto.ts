@@ -8,19 +8,24 @@ import {
   MaxLength,
 } from 'class-validator';
 
+import { RequireOneOf } from 'src/common/class-validators';
+
 export class CreateClientDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   firstName: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   lastName: string;
 
   @IsOptional()
   @IsEmail()
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   email: string;
 
   @IsOptional()
@@ -37,10 +42,12 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   landline: string;
 
   @IsOptional()
   @IsString()
+  @RequireOneOf(['firstName', 'lastName', 'company'])
   company: string;
 
   @IsOptional()
@@ -54,6 +61,7 @@ export class CreateClientDto {
 
   @IsOptional()
   @IsString()
+  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   phoneNumber: string;
 }
 export class UpdateClientDto extends PartialType(CreateClientDto) {}
