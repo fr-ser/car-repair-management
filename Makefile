@@ -39,6 +39,9 @@ test-e2e-playwright: ## run playwright e2e tests
 	cd backend && yarn run build
 	yarn run playwright test
 
+test-e2e-playwright-dev: ## run playwright UI tests against the running development instance
+	PLAYWRIGHT_PORT=5173 yarn run playwright test --ui
+
 format: ## Format files
 	yarn run eslint --fix
 
