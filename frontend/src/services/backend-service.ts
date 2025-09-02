@@ -1,19 +1,15 @@
 import { CreateClientRequest, CreateClientResponse } from '@/src/types/clients';
 
-import { AuthUser } from '../types/auth';
 import * as Errors from '../types/errors';
 
-export async function signin(authUser: AuthUser) {
+export async function signIn(userName: string, password: string) {
   const response = await fetch(`/api/auth/sign-in`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(authUser),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userName, password }),
   });
   if (!response.ok) {
-    // TODO: Handle different error statuses
-    throw new Errors.AuthError('Invalid credentials');
+    throw new Error('login failed');
   }
 }
 

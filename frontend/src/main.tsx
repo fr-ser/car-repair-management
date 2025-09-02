@@ -6,7 +6,11 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
 
 import { Layout } from './App.tsx';
 import './globals.css';
@@ -20,7 +24,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-      { index: true, element: <div></div> },
+      { index: true, element: <Navigate to="/documents" replace /> },
       { path: '/clients', element: <ClientDetailsPage /> },
       { path: '/cars', element: <_OLD_ClientDetailsPage /> },
       { path: '/orders', element: <div>/orders</div> },
