@@ -4,6 +4,7 @@ import {
   Save as SaveIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -14,6 +15,7 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -26,39 +28,82 @@ import { useState } from 'react';
 import { AddCarsModal } from '@/pages/clients/components/AddCarsModal';
 import { CarsCard } from '@/pages/clients/components/CarsCard';
 import { Car } from '@/types/cars';
-import { ClientForm } from '@/types/clients';
+import { ClientForm, IClientForm } from '@/types/clients';
+import { FormItem } from '@/types/common';
+
+import * as apiService from '../../services/backend-service';
 
 export function ClientDetailsPage() {
-  // cars
+  const [errorSnackBarOpen, setErrorSnackBarOpen] = useState(false);
+  const [snackBarMessage, setsnackBarMessage] = useState('');
+  const [snackBarLevel, setsnackBarLevel] = useState<AlertColor | undefined>(
+    undefined,
+  );
+  const handleErrorSnackBarClose = (
+    _?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setErrorSnackBarOpen(false);
+  };
+
   const [cars, setCars] = useState<Car[]>([]);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
 
-  //end cars
-
-  const [formData, setFormData] = useState<ClientForm>({
-    // TODO: improve this form to also have errorMessage
-    vorname: '',
-    nachname: '',
-    firma: '',
-    strasse: '',
-    plz: '',
-    stadt: '',
-    festnetz: '',
-    mobil: '',
-    email: '',
-    geburtstag: new Date(),
-    kommentar: '',
-  });
+  const [formData, setFormData] = useState<IClientForm>(() => new ClientForm());
 
   const handleInputChange = (
-    field: keyof ClientForm,
+    field: keyof IClientForm,
     value: string | Date | null,
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) =>
+      prev.withUpdate({
+        [field]: {
+          value: value as string,
+          errorMessage: value ? null : 'Should not be empty',
+          required: (prev[field] as FormItem).required,
+        },
+      }),
+    );
+  };
+
+  const handleSaveClient = async () => {
+    try {
+      await apiService.createClient((formData as ClientForm).getReqest());
+      setsnackBarLevel('success');
+      setsnackBarMessage('Client created!');
+      setErrorSnackBarOpen(true);
+      setFormData(new ClientForm());
+    } catch (err: unknown) {
+      console.error(err);
+      setsnackBarLevel('error');
+      setsnackBarMessage(
+        err instanceof Error ? err.message : 'An unknown error occurred',
+      );
+      setErrorSnackBarOpen(true);
+    }
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
+      <Snackbar
+        open={errorSnackBarOpen}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackBarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleErrorSnackBarClose}
+          severity={snackBarLevel}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackBarMessage}
+        </Alert>
+      </Snackbar>
       <Box
         sx={{
           flexGrow: 1,
@@ -133,10 +178,13 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Vorname"
                           placeholder="Max"
-                          value={formData.vorname}
+                          value={formData.firstName.value}
                           onChange={(e) =>
-                            handleInputChange('vorname', e.target.value)
+                            handleInputChange('firstName', e.target.value)
                           }
+                          required
+                          error={!!formData.firstName.errorMessage}
+                          helperText={formData.firstName.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -144,10 +192,13 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Nachname"
                           placeholder="Mustermann"
-                          value={formData.nachname}
+                          value={formData.lastName.value}
                           onChange={(e) =>
-                            handleInputChange('nachname', e.target.value)
+                            handleInputChange('lastName', e.target.value)
                           }
+                          required
+                          error={!!formData.lastName.errorMessage}
+                          helperText={formData.lastName.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -155,10 +206,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Firma"
                           placeholder="Musterfirma GmbH"
-                          value={formData.firma}
+                          value={formData.company.value}
                           onChange={(e) =>
-                            handleInputChange('firma', e.target.value)
+                            handleInputChange('company', e.target.value)
                           }
+                          error={!!formData.company.errorMessage}
+                          helperText={formData.company.errorMessage}
                         />
                       </Grid>
                     </Grid>
@@ -186,10 +239,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Straße und Nr."
                           placeholder="Musterstraße 123"
-                          value={formData.strasse}
+                          value={formData.street.value}
                           onChange={(e) =>
-                            handleInputChange('strasse', e.target.value)
+                            handleInputChange('street', e.target.value)
                           }
+                          error={!!formData.street.errorMessage}
+                          helperText={formData.street.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -197,10 +252,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="PLZ"
                           placeholder="12345"
-                          value={formData.plz}
+                          value={formData.postalCode.value}
                           onChange={(e) =>
-                            handleInputChange('plz', e.target.value)
+                            handleInputChange('postalCode', e.target.value)
                           }
+                          error={!!formData.postalCode.errorMessage}
+                          helperText={formData.postalCode.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -208,10 +265,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Stadt"
                           placeholder="Musterstadt"
-                          value={formData.stadt}
+                          value={formData.city.value}
                           onChange={(e) =>
-                            handleInputChange('stadt', e.target.value)
+                            handleInputChange('city', e.target.value)
                           }
+                          error={!!formData.city.errorMessage}
+                          helperText={formData.city.errorMessage}
                         />
                       </Grid>
                     </Grid>
@@ -239,10 +298,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Festnetz"
                           placeholder="+49 123 456789"
-                          value={formData.festnetz}
+                          value={formData.landline.value}
                           onChange={(e) =>
-                            handleInputChange('festnetz', e.target.value)
+                            handleInputChange('landline', e.target.value)
                           }
+                          error={!!formData.landline.errorMessage}
+                          helperText={formData.landline.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -250,10 +311,12 @@ export function ClientDetailsPage() {
                           fullWidth
                           label="Mobil"
                           placeholder="+49 170 1234567"
-                          value={formData.mobil}
+                          value={formData.phoneNumber.value}
                           onChange={(e) =>
-                            handleInputChange('mobil', e.target.value)
+                            handleInputChange('phoneNumber', e.target.value)
                           }
+                          error={!!formData.phoneNumber.errorMessage}
+                          helperText={formData.phoneNumber.errorMessage}
                         />
                       </Grid>
                       <Grid sx={{ xs: 12, md: 4 }}>
@@ -262,10 +325,12 @@ export function ClientDetailsPage() {
                           label="E-Mail"
                           type="email"
                           placeholder="max@musterfirma.de"
-                          value={formData.email}
+                          value={formData.email.value}
                           onChange={(e) =>
                             handleInputChange('email', e.target.value)
                           }
+                          error={!!formData.email.errorMessage}
+                          helperText={formData.email.errorMessage}
                         />
                       </Grid>
                     </Grid>
@@ -291,10 +356,10 @@ export function ClientDetailsPage() {
                       <Grid sx={{ xs: 12, md: 6 }}>
                         <DatePicker
                           label="Geburtstag"
-                          value={dayjs(formData.geburtstag)}
+                          value={dayjs(formData.birthday.value || new Date())}
                           onChange={(newValue) =>
                             handleInputChange(
-                              'geburtstag',
+                              'birthday',
                               newValue?.toDate() || null,
                             )
                           }
@@ -319,10 +384,12 @@ export function ClientDetailsPage() {
                           placeholder="Zusätzliche Notizen zum Kunden..."
                           multiline
                           rows={3}
-                          value={formData.kommentar}
+                          value={formData.comment.value}
                           onChange={(e) =>
-                            handleInputChange('kommentar', e.target.value)
+                            handleInputChange('comment', e.target.value)
                           }
+                          error={!!formData.comment.errorMessage}
+                          helperText={formData.comment.errorMessage}
                         />
                       </Grid>
                     </Grid>
@@ -342,6 +409,7 @@ export function ClientDetailsPage() {
                       variant="contained"
                       startIcon={<SaveIcon />}
                       size="large"
+                      onClick={handleSaveClient}
                       sx={{ flex: { xs: 1, sm: 'none' } }}
                     >
                       Kunden Speichern

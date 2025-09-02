@@ -28,3 +28,25 @@ model Article {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Client {
+  id String @id
+
+  firstName   String
+  lastName    String
+  email       String?
+  landline    String?
+  company     String?
+  birthday    DateTime?
+  comment     String?
+  phoneNumber String?
+  postalCode  String?
+  city        String?
+  street      String?
+
+  // orders String // should be a relateion probably
+  // cars   String // should be a relateion probably
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
