@@ -8,40 +8,20 @@ import {
   People as PeopleIcon,
 } from '@mui/icons-material';
 import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-export interface NavigationItem {
-  label: string;
-  icon: React.ReactNode;
-  link: string;
-}
-
 function MenuBar() {
   const redirect = useNavigate();
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null,
-  );
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
+
   const [currentLink, setCurrentLink] = React.useState(location.pathname);
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-  const navigationItems: NavigationItem[] = [
+  const navigationItems = [
     { label: 'Kunden', icon: <PeopleIcon />, link: '/clients' },
     { label: 'Autos', icon: <CarIcon />, link: '/cars' },
     {
@@ -68,89 +48,44 @@ function MenuBar() {
 
   return (
     <AppBar
-      position="sticky"
+      position="relative"
       elevation={1}
       sx={{ bgcolor: 'background.paper', color: 'text.primary' }}
     >
-      <Toolbar sx={{ px: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            flexGrow: 1,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton sx={{ display: { md: 'none' } }}>
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" component="h1" sx={{ fontWeight: 600 }}>
-              Web-Verwaltung
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5 }}>
-            {navigationItems.map((item) => (
-              <Button
-                key={item.label}
-                startIcon={item.icon}
-                variant={item.link === currentLink ? 'contained' : 'text'}
-                size="small"
-                onClick={() => {
-                  // Handle navigation or other actions here
-                  setCurrentLink(item.link);
-                  redirect(item.link);
-                }}
-                sx={{
-                  color:
-                    item.link === currentLink
-                      ? 'primary.contrastText'
-                      : 'text.secondary',
-                  bgcolor:
-                    item.link === currentLink ? 'primary.main' : 'transparent',
-                  '&:hover': {
-                    bgcolor:
-                      item.link === currentLink
-                        ? 'primary.dark'
-                        : 'action.hover',
-                  },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </Box>
+      <Toolbar>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton sx={{ display: { md: 'none' } }}>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6">Web-Verwaltung v2</Typography>
         </Box>
+        <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ flexGrow: 0 }}>
-          <Tooltip title="Open settings">
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="Remy Sharp" src="src/assets/react.svg" />
-            </IconButton>
-          </Tooltip>
-          <Menu
-            sx={{ mt: '45px' }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            {settings.map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-              </MenuItem>
-            ))}
-          </Menu>
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+          {navigationItems.map((item) => (
+            <Button
+              key={item.label}
+              startIcon={item.icon}
+              variant={item.link === currentLink ? 'contained' : 'text'}
+              size="small"
+              onClick={() => {
+                setCurrentLink(item.link);
+                redirect(item.link);
+              }}
+              sx={{
+                color:
+                  item.link === currentLink
+                    ? 'primary.contrastText'
+                    : 'text.secondary',
+                '&:hover': {
+                  bgcolor:
+                    item.link === currentLink ? 'primary.dark' : 'action.hover',
+                },
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
         </Box>
       </Toolbar>
     </AppBar>

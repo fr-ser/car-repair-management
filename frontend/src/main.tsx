@@ -12,21 +12,21 @@ import {
   createBrowserRouter,
 } from 'react-router-dom';
 
-import { Layout } from './App.tsx';
+import { App } from './App.tsx';
 import './globals.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
+import { CarDetailsPage } from './pages/cars/CarDetailsPage.tsx';
 import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
-import _OLD_ClientDetailsPage from './pages/clients/_OLD_ClientDetailsPage.tsx';
 import theme from './theme.ts';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <App />,
     children: [
       { index: true, element: <Navigate to="/documents" replace /> },
       { path: '/clients', element: <ClientDetailsPage /> },
-      { path: '/cars', element: <_OLD_ClientDetailsPage /> },
+      { path: '/cars', element: <CarDetailsPage /> },
       { path: '/orders', element: <div>/orders</div> },
       { path: '/overview', element: <div>/overview</div> },
       { path: '/documents', element: <div>/documents</div> },
