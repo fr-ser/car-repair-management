@@ -15,53 +15,53 @@ export class CreateClientDto {
   @IsNotEmpty()
   @IsString()
   @RequireOneOf(['firstName', 'lastName', 'company'])
-  firstName: string;
+  firstName?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
   @RequireOneOf(['firstName', 'lastName', 'company'])
-  lastName: string;
+  lastName?: string;
 
   @IsOptional()
   @IsEmail()
   @RequireOneOf(['email', 'landline', 'phoneNumber'])
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsString()
-  postalCode: string;
+  postalCode?: string;
 
   @IsOptional()
   @IsString()
-  city: string;
+  city?: string;
 
   @IsOptional()
   @IsString()
-  street: string;
+  street?: string;
 
   @IsOptional()
   @IsString()
   @RequireOneOf(['email', 'landline', 'phoneNumber'])
-  landline: string;
+  landline?: string;
 
   @IsOptional()
   @IsString()
   @RequireOneOf(['firstName', 'lastName', 'company'])
-  company: string;
+  company?: string;
 
   @IsOptional()
   @MaxLength(10) // a date time string with a length of 10 is a date
   @IsDateString()
-  birthday: string;
+  birthday?: string;
 
   @IsOptional()
   @IsString()
-  comment: string;
+  comment?: string;
 
   @IsOptional()
   @IsString()
   @RequireOneOf(['email', 'landline', 'phoneNumber'])
-  phoneNumber: string;
+  phoneNumber?: string;
 }
 export class UpdateClientDto extends PartialType(CreateClientDto) {}
