@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -33,5 +34,10 @@ export class ClientsController {
     @Body() updateClientDto: UpdateClientDto,
   ) {
     return await this.clientService.update(id, updateClientDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    return await this.clientService.remove(id);
   }
 }

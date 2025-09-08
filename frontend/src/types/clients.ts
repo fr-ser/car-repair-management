@@ -1,3 +1,5 @@
+import { BEClient, BEPaginatedResponse } from './be-contracts';
+
 export interface CreateClientRequest {
   firstName: string;
   lastName: string;
@@ -12,11 +14,17 @@ export interface CreateClientRequest {
   comment?: string;
 }
 
-export interface CreateClientResponse extends CreateClientRequest {
+export interface ErrorResponsePart {
   message?: string[] | string;
   error?: string;
   statusCode?: number;
 }
+
+export interface GetSingleClientResponse extends BEClient, ErrorResponsePart {}
+
+export interface GetClientsResponse
+  extends BEPaginatedResponse<BEClient>,
+    ErrorResponsePart {}
 
 export interface IClientForm {
   firstName: {

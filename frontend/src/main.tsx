@@ -16,7 +16,7 @@ import { App } from './App.tsx';
 import './globals.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import { CarDetailsPage } from './pages/cars/CarDetailsPage.tsx';
-import { ClientDetailsPage } from './pages/clients/ClientDetailsPage.tsx';
+import { ClientListPage } from './pages/clients/ClientListPage.tsx';
 import theme from './theme.ts';
 
 const router = createBrowserRouter([
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Navigate to="/documents" replace /> },
-      { path: '/clients', element: <ClientDetailsPage /> },
+      { path: '/clients', element: <ClientListPage /> },
       { path: '/cars', element: <CarDetailsPage /> },
       { path: '/orders', element: <div>/orders</div> },
       { path: '/overview', element: <div>/overview</div> },
