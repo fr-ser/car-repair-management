@@ -31,7 +31,7 @@ export class ClientsService {
   }
 
   findAll(query: PaginationQueryDto) {
-    return this.pagination.paginate('Client', query);
+    return this.pagination.paginate('Client', query, { createdAt: 'desc' });
   }
 
   findOne(id: number) {
