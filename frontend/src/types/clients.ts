@@ -82,6 +82,7 @@ export interface IClientForm {
     value: string;
     errorMessage: string | null;
   };
+  validate(): boolean;
   getReqest(): CreateClientRequest;
   withUpdate(fields: Partial<IClientForm>): IClientForm;
 }
@@ -111,6 +112,52 @@ export class ClientForm implements IClientForm {
     });
 
     return result;
+  }
+
+  validate(): boolean {
+    let errors = false;
+    Object.entries(this).forEach(([fieldName, field]) => {
+      switch (fieldName) {
+        case 'firstName':
+        case 'lastName':
+          if (field.required && (field.value === null || field.value === '')) {
+            field.errorMessage = 'This field is required';
+            errors = true;
+          } else {
+            field.errorMessage = null;
+          }
+          break;
+        case 'email':
+          if (
+            field.value &&
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(field.value)
+          ) {
+            field.errorMessage = 'Invalid email address';
+            errors = true;
+          } else {
+            field.errorMessage = null;
+          }
+          break;
+        case 'birthday':
+          if (field.value && isNaN(Date.parse(field.value))) {
+            field.errorMessage = 'Invalid date';
+            errors = true;
+          } else {
+            field.errorMessage = null;
+          }
+          break;
+        case 'company':
+        case 'street':
+        case 'postalCode':
+        case 'city':
+        case 'landline':
+        case 'phoneNumber':
+        case 'comment':
+        default:
+          break;
+      }
+    });
+    return !errors;
   }
 
   withUpdate(fields: Partial<ClientForm>): ClientForm {

@@ -82,17 +82,23 @@ export function ClientDetailsModal({
     setCars([]);
   }
 
+  async function handleSubmit() {
+    const isValid = (formData as ClientForm).validate();
+    if (!isValid) {
+      throw new Error('Please fix validation errors before submitting');
+    }
+    if (selectedClient !== undefined) {
+      await apiService.updateClient(
+        selectedClient.id,
+        (formData as ClientForm).getReqest(),
+      );
+    } else {
+      await apiService.createClient((formData as ClientForm).getReqest());
+    }
+  }
+
   const mutation = useMutation({
-    mutationFn: async () => {
-      if (selectedClient !== undefined) {
-        await apiService.updateClient(
-          selectedClient.id,
-          (formData as ClientForm).getReqest(),
-        );
-      } else {
-        await apiService.createClient((formData as ClientForm).getReqest());
-      }
-    },
+    mutationFn: handleSubmit,
     onSuccess: () => {
       // Invalidate cache to refetch clients table
       setSnackBarLevel('success');
@@ -104,7 +110,6 @@ export function ClientDetailsModal({
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     onError: (error: unknown) => {
-      console.error(error);
       setSnackBarLevel('error');
       setSnackBarMessage(
         error instanceof Error ? error.message : 'An unknown error occurred',
