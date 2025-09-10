@@ -43,6 +43,8 @@ test('get-create-delete-clients', async ({ page }) => {
     'test.client@example.com',
   );
 
+  // hover the row first to see the delete button
+  await lastClient.hover();
   // delete this client
   await lastClient.getByTestId(/button-client-delete-.*/).click();
   await page.getByTestId('button-client-delete-confirm').click();

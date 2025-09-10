@@ -133,6 +133,17 @@ export function ClientsTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const styles = {
+    tableRowStyles: {
+      '& .deleteButton': {
+        visibility: 'hidden',
+      },
+      '&:hover .deleteButton': {
+        visibility: 'visible',
+      },
+    },
+  };
+
   return (
     <Grid sx={{ xs: 12, lg: 4 }}>
       <Card elevation={2}>
@@ -190,6 +201,9 @@ export function ClientsTable({
                       <TableCell>Vorname</TableCell>
                       <TableCell>Nachname</TableCell>
                       <TableCell>Email</TableCell>
+                      <TableCell>
+                        {/* placeholder for actions, e.g. delete */}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -200,6 +214,7 @@ export function ClientsTable({
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleRowClick(client)}
                         data-testid={`client-row-${client.id}`}
+                        sx={styles.tableRowStyles}
                       >
                         <TableCell data-testid={`client-number-${client.id}`}>
                           {client.clientNumber}
@@ -217,19 +232,22 @@ export function ClientsTable({
                         <TableCell data-testid={`client-email-${client.id}`}>
                           {client.email}
                         </TableCell>
-                        <IconButton
-                          edge="end"
-                          size="small"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setIsOpenedDeleteClientDialog(true);
-                            setClientToBeDeleted(client.id);
-                          }}
-                          color="error"
-                          data-testid={`button-client-delete-${client.id}`}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <TableCell>
+                          <IconButton
+                            className="deleteButton"
+                            edge="end"
+                            size="small"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setIsOpenedDeleteClientDialog(true);
+                              setClientToBeDeleted(client.id);
+                            }}
+                            color="error"
+                            data-testid={`button-client-delete-${client.id}`}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
