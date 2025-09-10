@@ -26,96 +26,22 @@ export interface GetClientsResponse
   extends BEPaginatedResponse<BEClient>,
     ErrorResponsePart {}
 
-export interface IClientForm {
-  firstName: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  lastName: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  company: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  street: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  postalCode: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  city: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  landline: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  phoneNumber: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  email: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  birthday: {
-    required: boolean;
-    value: string | null;
-    errorMessage: string | null;
-  };
-  comment: {
-    required: boolean;
-    value: string;
-    errorMessage: string | null;
-  };
-  getReqest(): CreateClientRequest;
-  withUpdate(fields: Partial<IClientForm>): IClientForm;
-}
+type ClientFormField<V = string> = {
+  required: boolean;
+  value: V;
+  errorMessage: string | null;
+};
 
-export class ClientForm implements IClientForm {
-  firstName = { required: true, value: '', errorMessage: null };
-  lastName = { required: true, value: '', errorMessage: null };
-  company = { required: false, value: '', errorMessage: null };
-  street = { required: false, value: '', errorMessage: null };
-  postalCode = { required: false, value: '', errorMessage: null };
-  city = { required: false, value: '', errorMessage: null };
-  landline = { required: false, value: '', errorMessage: null };
-  phoneNumber = { required: false, value: '', errorMessage: null };
-  email = { required: false, value: '', errorMessage: null };
-  birthday = { required: false, value: '', errorMessage: null };
-  comment = { required: false, value: '', errorMessage: null };
-
-  // custom method
-  getReqest(): CreateClientRequest {
-    const result: CreateClientRequest = { firstName: '', lastName: '' };
-
-    Object.entries(this).forEach(([key, field]) => {
-      if (field.value) {
-        (result as CreateClientRequest)[key as keyof CreateClientRequest] =
-          field.value;
-      }
-    });
-
-    return result;
-  }
-
-  withUpdate(fields: Partial<ClientForm>): ClientForm {
-    const copy = new ClientForm();
-    Object.assign(copy, this, fields);
-    return copy;
-  }
+export interface ClientForm {
+  firstName: ClientFormField;
+  lastName: ClientFormField;
+  company: ClientFormField;
+  street: ClientFormField;
+  postalCode: ClientFormField;
+  city: ClientFormField;
+  landline: ClientFormField;
+  phoneNumber: ClientFormField;
+  email: ClientFormField;
+  birthday: ClientFormField;
+  comment: ClientFormField;
 }
