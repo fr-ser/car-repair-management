@@ -24,7 +24,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import 'dayjs/locale/de';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 
 import { NotificationSnackBar } from '@/src/components/NotificationSnackBar';
@@ -33,8 +33,8 @@ import { AddCarsModal } from '@/src/pages/clients/components/modals/AddCarsModal
 import * as apiService from '@/src/services/backend-service';
 import { BEClient } from '@/src/types/be-contracts';
 import { Car } from '@/src/types/cars';
-import { ClientForm, IClientForm } from '@/src/types/clients';
-import { FormItem } from '@/src/types/common';
+
+import useClientForm from '../../hooks/useClientForm';
 
 type ClientDetailsPageProps = {
   selectedClient?: BEClient;
@@ -47,6 +47,9 @@ export function ClientDetailsModal({
   isOpen,
   onClose,
 }: ClientDetailsPageProps) {
+  const { formData, reloadForm, onFormInputChange, getPayload } = useClientForm(
+    selectedClient ?? ({} as BEClient),
+  );
   // Snack bar state
   const [snackBarOpen, setSnackBarOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = React.useState('');
@@ -57,43 +60,19 @@ export function ClientDetailsModal({
   const [cars, setCars] = useState<Car[]>([]);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
 
-  const [formData, setFormData] = useState<IClientForm>(() => new ClientForm());
-
   const queryClient = useQueryClient();
-
-  const handleInputChange = (
-    field: keyof IClientForm,
-    value: string | Date | null,
-  ) => {
-    setFormData((prev) =>
-      prev.withUpdate({
-        [field]: {
-          value: value as string,
-          errorMessage: value ? null : 'Should not be empty',
-          required: (prev[field] as FormItem).required,
-        },
-      }),
-    );
-  };
 
   function closeSelf() {
     onClose();
-    setFormData(() => new ClientForm());
+    reloadForm(selectedClient ?? ({} as BEClient));
     setCars([]);
   }
 
   async function handleSubmit() {
-    const isValid = (formData as ClientForm).validate();
-    if (!isValid) {
-      throw new Error('Please fix validation errors before submitting');
-    }
     if (selectedClient !== undefined) {
-      await apiService.updateClient(
-        selectedClient.id,
-        (formData as ClientForm).getReqest(),
-      );
+      await apiService.updateClient(selectedClient.id, getPayload());
     } else {
-      await apiService.createClient((formData as ClientForm).getReqest());
+      await apiService.createClient(getPayload());
     }
   }
 
@@ -118,24 +97,8 @@ export function ClientDetailsModal({
     },
   });
 
-  useEffect(() => {
-    const FormKeys = Object.keys(formData) as (keyof IClientForm)[];
-    if (selectedClient !== undefined) {
-      for (const field in selectedClient) {
-        if (!FormKeys.includes(field as keyof IClientForm)) continue;
-        setFormData((prev) =>
-          prev.withUpdate({
-            [field]: {
-              value: (selectedClient[field as keyof BEClient] as string) || '',
-              errorMessage: null,
-              required:
-                (prev[field as keyof IClientForm] as FormItem)?.required ||
-                false,
-            },
-          }),
-        );
-      }
-    }
+  React.useEffect(() => {
+    reloadForm(selectedClient ?? ({} as BEClient));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClient]);
 
@@ -148,7 +111,12 @@ export function ClientDetailsModal({
           level={snackBarLevel}
           setOpen={setSnackBarOpen}
         />
-        <Dialog open={isOpen} onClose={() => closeSelf()} maxWidth="lg">
+        <Dialog
+          open={isOpen}
+          onClose={() => closeSelf()}
+          maxWidth="lg"
+          keepMounted={false}
+        >
           <DialogTitle>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <PersonIcon />
@@ -195,7 +163,7 @@ export function ClientDetailsModal({
                             placeholder="Max"
                             value={formData.firstName.value}
                             onChange={(e) =>
-                              handleInputChange('firstName', e.target.value)
+                              onFormInputChange('firstName', e.target.value)
                             }
                             required
                             error={!!formData.firstName.errorMessage}
@@ -209,7 +177,7 @@ export function ClientDetailsModal({
                             placeholder="Mustermann"
                             value={formData.lastName.value}
                             onChange={(e) =>
-                              handleInputChange('lastName', e.target.value)
+                              onFormInputChange('lastName', e.target.value)
                             }
                             required
                             error={!!formData.lastName.errorMessage}
@@ -223,7 +191,7 @@ export function ClientDetailsModal({
                             placeholder="Musterfirma GmbH"
                             value={formData.company.value}
                             onChange={(e) =>
-                              handleInputChange('company', e.target.value)
+                              onFormInputChange('company', e.target.value)
                             }
                             error={!!formData.company.errorMessage}
                             helperText={formData.company.errorMessage}
@@ -256,7 +224,7 @@ export function ClientDetailsModal({
                             placeholder="Musterstraße 123"
                             value={formData.street.value}
                             onChange={(e) =>
-                              handleInputChange('street', e.target.value)
+                              onFormInputChange('street', e.target.value)
                             }
                             error={!!formData.street.errorMessage}
                             helperText={formData.street.errorMessage}
@@ -269,7 +237,7 @@ export function ClientDetailsModal({
                             placeholder="12345"
                             value={formData.postalCode.value}
                             onChange={(e) =>
-                              handleInputChange('postalCode', e.target.value)
+                              onFormInputChange('postalCode', e.target.value)
                             }
                             error={!!formData.postalCode.errorMessage}
                             helperText={formData.postalCode.errorMessage}
@@ -282,7 +250,7 @@ export function ClientDetailsModal({
                             placeholder="Musterstadt"
                             value={formData.city.value}
                             onChange={(e) =>
-                              handleInputChange('city', e.target.value)
+                              onFormInputChange('city', e.target.value)
                             }
                             error={!!formData.city.errorMessage}
                             helperText={formData.city.errorMessage}
@@ -315,7 +283,7 @@ export function ClientDetailsModal({
                             placeholder="+49 123 456789"
                             value={formData.landline.value}
                             onChange={(e) =>
-                              handleInputChange('landline', e.target.value)
+                              onFormInputChange('landline', e.target.value)
                             }
                             error={!!formData.landline.errorMessage}
                             helperText={formData.landline.errorMessage}
@@ -328,7 +296,7 @@ export function ClientDetailsModal({
                             placeholder="+49 170 1234567"
                             value={formData.phoneNumber.value}
                             onChange={(e) =>
-                              handleInputChange('phoneNumber', e.target.value)
+                              onFormInputChange('phoneNumber', e.target.value)
                             }
                             error={!!formData.phoneNumber.errorMessage}
                             helperText={formData.phoneNumber.errorMessage}
@@ -342,7 +310,7 @@ export function ClientDetailsModal({
                             placeholder="max@musterfirma.de"
                             value={formData.email.value}
                             onChange={(e) =>
-                              handleInputChange('email', e.target.value)
+                              onFormInputChange('email', e.target.value)
                             }
                             error={!!formData.email.errorMessage}
                             helperText={formData.email.errorMessage}
@@ -373,7 +341,7 @@ export function ClientDetailsModal({
                             label="Geburtstag"
                             value={dayjs(formData.birthday.value || new Date())}
                             onChange={(newValue) =>
-                              handleInputChange(
+                              onFormInputChange(
                                 'birthday',
                                 newValue?.toDate() || null,
                               )
@@ -401,7 +369,7 @@ export function ClientDetailsModal({
                             rows={3}
                             value={formData.comment.value}
                             onChange={(e) =>
-                              handleInputChange('comment', e.target.value)
+                              onFormInputChange('comment', e.target.value)
                             }
                             error={!!formData.comment.errorMessage}
                             helperText={formData.comment.errorMessage}
