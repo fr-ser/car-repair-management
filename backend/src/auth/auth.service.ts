@@ -2,10 +2,12 @@ import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
+import { Response } from 'express';
 
+import { AUTH_JWT_COOKIE_KEY, JWT_LIFETIME } from '@/src/config';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
-import { AuthDto } from './auth.dto';
+import { LoginDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,7 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signIn(dto: AuthDto) {
+  async signIn(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { userName: dto.userName },
     });
@@ -53,8 +55,12 @@ export class AuthService {
     const secret: string | undefined = this.config.get('JWT_SECRET');
 
     return this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: JWT_LIFETIME,
       secret: secret,
     });
+  }
+
+  setAuthCookie(response: Response, token: string) {
+    response.cookie(AUTH_JWT_COOKIE_KEY, token, { httpOnly: true });
   }
 }

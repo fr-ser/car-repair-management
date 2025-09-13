@@ -6,7 +6,7 @@ import pactum from 'pactum';
 import { createTestClientApp, resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { AuthDto } from '@/src/auth/auth.dto';
+import { LoginDto } from '@/src/auth/auth.dto';
 import { AuthService } from '@/src/auth/auth.service';
 import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
 import { PrismaService } from '@/src/prisma/prisma.service';
@@ -34,7 +34,7 @@ describe('Auth e2e', () => {
   });
 
   describe('Authentication', () => {
-    const testCredentials: AuthDto = {
+    const testCredentials: LoginDto = {
       userName: 'test-user',
       password: 'test-pass',
     };
