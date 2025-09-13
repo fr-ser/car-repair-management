@@ -7,7 +7,10 @@ const prisma = new PrismaClient();
 const seed = async () => {
   await prisma.user.deleteMany();
   await prisma.user.create({
-    data: { userName: 'test-user', hash: await argon.hash('test-pass') },
+    data: {
+      userName: process.env.USERNAME as string,
+      hash: await argon.hash(process.env.PASSWORD as string),
+    },
   });
   await prisma.client.deleteMany();
   await prisma.client.createMany({

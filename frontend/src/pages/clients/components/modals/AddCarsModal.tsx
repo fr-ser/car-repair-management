@@ -7,7 +7,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import 'dayjs/locale/de';
 import { useState } from 'react';
 
 import { Car } from '@/src/types/cars';

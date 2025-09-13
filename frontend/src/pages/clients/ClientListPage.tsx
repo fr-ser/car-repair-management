@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as React from 'react';
 
 import { NotificationSnackBar } from '@/src/components/NotificationSnackBar';
-import { BEClient } from '@/src/types/be-contracts';
+import { BackendClient } from '@/src/types/backend-contracts';
 
 import { ClientsTable } from './components/ClientsTable';
 import { ClientDetailsModal } from './components/modals/ClientDetailsModal';
@@ -21,7 +21,7 @@ export function ClientListPage() {
   // Snack bar end
 
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<BEClient | null>(null);
+  const [selected, setSelected] = React.useState<BackendClient | null>(null);
 
   function setError(message: string) {
     setSnackBarMessage(message);
@@ -32,31 +32,28 @@ export function ClientListPage() {
   const handleClose = async () => {
     setOpen(false);
     setSelected(null);
-    // await fetchData();
   };
 
   return (
-    <>
-      <Box>
-        <NotificationSnackBar
-          open={snackBarOpen}
-          message={snackBarMessage}
-          level={snackBarLevel}
-          setOpen={setSnackBarOpen}
+    <Box>
+      <NotificationSnackBar
+        open={snackBarOpen}
+        message={snackBarMessage}
+        level={snackBarLevel}
+        setOpen={setSnackBarOpen}
+      />
+      <QueryClientProvider client={queryClient}>
+        <ClientsTable
+          setOpenClientModal={setOpen}
+          setSelectedClient={setSelected}
+          setError={setError}
         />
-        <QueryClientProvider client={queryClient}>
-          <ClientsTable
-            setOpenClientModal={setOpen}
-            setSelectedClient={setSelected}
-            setError={setError}
-          />
-          <ClientDetailsModal
-            selectedClient={selected ?? undefined}
-            isOpen={open}
-            onClose={handleClose}
-          />
-        </QueryClientProvider>
-      </Box>
-    </>
+        <ClientDetailsModal
+          selectedClient={selected ?? undefined}
+          isOpen={open}
+          onClose={handleClose}
+        />
+      </QueryClientProvider>
+    </Box>
   );
 }

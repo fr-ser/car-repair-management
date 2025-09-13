@@ -82,14 +82,18 @@ export async function fetchClients(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleErrorResponse(response: Response, responseData: any) {
-  if (!response.ok) {
-    // TODO: Handle different error statuses
-    let errorMessage: string;
-    if (typeof responseData.message === 'string') {
-      errorMessage = responseData.message || 'Unknown error';
-    } else {
-      errorMessage = responseData.message?.[0] || 'Unknown error';
-    }
-    throw new Errors.RequestError(`Error! ${errorMessage}`);
+  if (response.ok) return;
+
+  if (response.status === 401) {
+    window.location.href = '/login';
+    return;
   }
+
+  let errorMessage: string;
+  if (typeof responseData.message === 'string') {
+    errorMessage = responseData.message || 'Unknown error';
+  } else {
+    errorMessage = responseData.message?.[0] || 'Unknown error';
+  }
+  throw new Errors.RequestError(`Error! ${errorMessage}`);
 }

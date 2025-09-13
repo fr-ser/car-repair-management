@@ -23,21 +23,18 @@ import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import 'dayjs/locale/de';
-import { useState } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { NotificationSnackBar } from '@/src/components/NotificationSnackBar';
 import { CarsCard } from '@/src/pages/clients/components/CarsCard';
 import { AddCarsModal } from '@/src/pages/clients/components/modals/AddCarsModal';
+import useClientForm from '@/src/pages/clients/hooks/useClientForm';
 import * as apiService from '@/src/services/backend-service';
-import { BEClient } from '@/src/types/be-contracts';
+import { BackendClient } from '@/src/types/backend-contracts';
 import { Car } from '@/src/types/cars';
 
-import useClientForm from '../../hooks/useClientForm';
-
 type ClientDetailsPageProps = {
-  selectedClient?: BEClient;
+  selectedClient?: BackendClient;
   isOpen: boolean; // Controls whether modal is shown
   onClose: () => void; // Close callback
 };
@@ -48,7 +45,7 @@ export function ClientDetailsModal({
   onClose,
 }: ClientDetailsPageProps) {
   const { formData, reloadForm, onFormInputChange, getPayload } = useClientForm(
-    selectedClient ?? ({} as BEClient),
+    selectedClient ?? ({} as BackendClient),
   );
   // Snack bar state
   const [snackBarOpen, setSnackBarOpen] = React.useState(false);
@@ -64,7 +61,7 @@ export function ClientDetailsModal({
 
   function closeSelf() {
     onClose();
-    reloadForm(selectedClient ?? ({} as BEClient));
+    reloadForm(selectedClient ?? ({} as BackendClient));
     setCars([]);
   }
 
@@ -98,7 +95,7 @@ export function ClientDetailsModal({
   });
 
   React.useEffect(() => {
-    reloadForm(selectedClient ?? ({} as BEClient));
+    reloadForm(selectedClient ?? ({} as BackendClient));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClient]);
 

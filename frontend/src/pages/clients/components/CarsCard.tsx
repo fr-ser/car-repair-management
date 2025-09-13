@@ -14,7 +14,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import 'dayjs/locale/de';
 
 import { Car } from '@/src/types/cars';
 

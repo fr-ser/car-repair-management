@@ -10,6 +10,8 @@ import {
 export const ENV_FILE_PATH = process.env.CONFIG_PATH || '.env';
 export const GLOBAL_API_PREFIX = 'api';
 export const AUTH_JWT_COOKIE_KEY = 'car_app_jwt';
+export const JWT_LIFETIME = '12h';
+export const JWT_RENEW_THRESHOLD_S = 60 * 60 * 6; // 6 hours in seconds
 
 class EnvironmentVariables {
   @IsNumber()

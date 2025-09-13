@@ -4,6 +4,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
+import 'dayjs/locale/de';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
