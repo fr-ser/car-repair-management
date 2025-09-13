@@ -1,4 +1,4 @@
-import { BEClient, BEPaginatedResponse } from './be-contracts';
+import { BackendClient, BackendPaginatedResponse } from './backend-contracts';
 
 export interface CreateClientRequest {
   firstName: string;
@@ -20,10 +20,12 @@ export interface ErrorResponsePart {
   statusCode?: number;
 }
 
-export interface GetSingleClientResponse extends BEClient, ErrorResponsePart {}
+export interface GetSingleClientResponse
+  extends BackendClient,
+    ErrorResponsePart {}
 
 export interface GetClientsResponse
-  extends BEPaginatedResponse<BEClient>,
+  extends BackendPaginatedResponse<BackendClient>,
     ErrorResponsePart {}
 
 type ClientFormField<V = string> = {

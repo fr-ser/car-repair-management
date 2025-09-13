@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+import { PASS_WORD, USER_NAME } from './config';
+
 test('register-login', async ({ page }) => {
   await page.goto('login');
 
-  await page.getByLabel('Benutzername').fill('test-user');
-  await page.getByLabel('Passwort').fill('test-pass');
+  await page.getByLabel('Benutzername').fill(USER_NAME);
+  await page.getByLabel('Passwort').fill(PASS_WORD);
 
   await page.getByTestId('login-button').click();
 
