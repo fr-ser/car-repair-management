@@ -1,12 +1,5 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  TextField,
-} from '@mui/material';
+import { Alert, Avatar, Box, Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,57 +27,56 @@ export default function LoginPage() {
   };
 
   return (
-    <Container>
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          {' '}
-          <LockOutlinedIcon />{' '}
-        </Avatar>
-        <Box sx={{ mt: 1 }}>
-          <TextField
-            fullWidth
-            id="user-name"
-            label="Benutzername"
-            autoFocus
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Passwort"
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          />
-          <Button
-            onClick={handleSubmit}
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3 }}
-            disabled={isSubmitting}
-            data-testid="login-button"
-          >
-            {isSubmitting ? 'Einloggen...' : 'Einloggen'}
-          </Button>
+    <Box
+      sx={{
+        marginTop: 8,
+        padding: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+        {' '}
+        <LockOutlinedIcon />{' '}
+      </Avatar>
+      <Box sx={{ mt: 1 }}>
+        <TextField
+          fullWidth
+          id="user-name"
+          label="Benutzername"
+          autoFocus
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+        />
+        <TextField
+          margin="normal"
+          fullWidth
+          label="Passwort"
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+        />
+        <Button
+          onClick={handleSubmit}
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3 }}
+          disabled={isSubmitting}
+          data-testid="login-button"
+        >
+          {isSubmitting ? 'Einloggen...' : 'Einloggen'}
+        </Button>
 
-          {loginError && (
-            <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-              {loginError}
-            </Alert>
-          )}
-        </Box>
+        {loginError && (
+          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+            {loginError}
+          </Alert>
+        )}
       </Box>
-    </Container>
+    </Box>
   );
 }
