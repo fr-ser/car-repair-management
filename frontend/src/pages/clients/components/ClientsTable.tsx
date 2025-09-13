@@ -1,7 +1,7 @@
 import {
   Delete as DeleteIcon,
+  People as PeopleIcon,
   PersonAdd as PersonAddIcon,
-  Person as PersonIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -29,12 +29,12 @@ import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
 import * as apiClient from '@/src/services/backend-service';
-import { BEClient } from '@/src/types/be-contracts';
+import { BackendClient } from '@/src/types/backend-contracts';
 import { GetClientsResponse } from '@/src/types/clients';
 
 type ClientsTableProps = {
   setOpenClientModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedClient: React.Dispatch<React.SetStateAction<BEClient | null>>;
+  setSelectedClient: React.Dispatch<React.SetStateAction<BackendClient | null>>;
   setError: (message: string) => void;
 };
 
@@ -46,7 +46,7 @@ export function ClientsTable({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
-  const [clients, setClients] = React.useState<BEClient[]>([]);
+  const [clients, setClients] = React.useState<BackendClient[]>([]);
   const [totalItems, setTotalItems] = React.useState<number>(0);
   const [clientToBeDeleted, setClientToBeDeleted] = React.useState<
     number | null
@@ -57,7 +57,7 @@ export function ClientsTable({
   async function fetchData(
     _page: number = 0,
     _limit: number = 10,
-  ): Promise<BEClient[]> {
+  ): Promise<BackendClient[]> {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
     try {
@@ -65,7 +65,7 @@ export function ClientsTable({
         _page,
         _limit,
       );
-      const data: BEClient[] = response.data;
+      const data: BackendClient[] = response.data;
       setClients(data);
       setTotalItems(response.meta.totalItems);
       return data;
@@ -123,7 +123,7 @@ export function ClientsTable({
     await fetchData(0, +event.target.value);
   };
 
-  const handleRowClick = (row: BEClient) => {
+  const handleRowClick = (row: BackendClient) => {
     setSelectedClient(row);
     setOpenClientModal(true);
   };
@@ -150,7 +150,7 @@ export function ClientsTable({
         <CardHeader
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <PersonIcon />
+              <PeopleIcon />
               <Typography
                 variant="h6"
                 component="h3"
@@ -169,7 +169,7 @@ export function ClientsTable({
               onClick={() => setOpenClientModal(true)}
               data-testid="button-client-create"
             >
-              Kunde Zuordnen
+              Kunde erstellen
             </Button>
           }
           sx={{ pb: 1 }}
@@ -179,28 +179,15 @@ export function ClientsTable({
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <CircularProgress />
             </div>
-          ) : clients.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <PersonIcon
-                sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                Noch keine Kunden zugeordnet
-              </Typography>
-              <Typography variant="caption" color="text.disabled">
-                Klicken Sie auf "Kunde Zuordnen" um einen Kunden hinzuzufügen
-              </Typography>
-            </Box>
           ) : (
             <Box>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Kunden Nummer</TableCell>
-                      <TableCell>Vorname</TableCell>
-                      <TableCell>Nachname</TableCell>
-                      <TableCell>Email</TableCell>
+                      <TableCell>Kundennummer</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Firma</TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
@@ -219,18 +206,12 @@ export function ClientsTable({
                         <TableCell data-testid={`client-number-${client.id}`}>
                           {client.clientNumber}
                         </TableCell>
-                        <TableCell
-                          data-testid={`client-first-name-${client.id}`}
-                        >
-                          {client.firstName}
-                        </TableCell>
-                        <TableCell
-                          data-testid={`client-last-name-${client.id}`}
-                        >
+                        <TableCell data-testid={`client-name-${client.id}`}>
+                          {client.firstName}&nbsp;
                           {client.lastName}
                         </TableCell>
-                        <TableCell data-testid={`client-email-${client.id}`}>
-                          {client.email}
+                        <TableCell data-testid={`client-company-${client.id}`}>
+                          {client.company}
                         </TableCell>
                         <TableCell>
                           <IconButton

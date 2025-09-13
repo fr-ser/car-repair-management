@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { BEClient } from '@/src/types/be-contracts';
+import { BackendClient } from '@/src/types/backend-contracts';
 import { ClientForm, CreateClientRequest } from '@/src/types/clients';
 
-export default (data: BEClient) => {
-  function loadForm(data: BEClient): ClientForm {
+export default (data: BackendClient) => {
+  function loadForm(data: BackendClient): ClientForm {
     return {
       firstName: {
         required: true,
@@ -65,7 +65,7 @@ export default (data: BEClient) => {
   }
   const [formData, setFormData] = React.useState<ClientForm>(loadForm(data));
 
-  function reloadForm(data: BEClient) {
+  function reloadForm(data: BackendClient) {
     setFormData(loadForm(data));
   }
 

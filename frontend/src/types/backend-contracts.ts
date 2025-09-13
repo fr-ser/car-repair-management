@@ -7,9 +7,9 @@
 import { Client } from '@/../../backend/node_modules/@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BEClient extends Client {}
+export interface BackendClient extends Client {}
 
-export interface BEPaginatedResponse<T> {
+export interface BackendPaginatedResponse<T> {
   data: T[];
   meta: {
     totalItems: number;
