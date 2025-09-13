@@ -30,7 +30,6 @@ import * as React from 'react';
 
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
-import { GetClientsResponse } from '@/src/types/clients';
 
 type ClientsTableProps = {
   setOpenClientModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -59,13 +58,9 @@ export function ClientsTable({
     _limit: number = 10,
   ): Promise<BackendClient[]> {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
     try {
-      const response: GetClientsResponse = await apiClient.fetchClients(
-        _page,
-        _limit,
-      );
-      const data: BackendClient[] = response.data;
+      const response = await apiClient.fetchClients(_page, _limit);
+      const data = response.data;
       setClients(data);
       setTotalItems(response.meta.totalItems);
       return data;
@@ -128,11 +123,6 @@ export function ClientsTable({
     setOpenClientModal(true);
   };
 
-  React.useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const styles = {
     tableRowStyles: {
       '& .deleteButton': {
@@ -169,7 +159,7 @@ export function ClientsTable({
               onClick={() => setOpenClientModal(true)}
               data-testid="button-client-create"
             >
-              Kunde erstellen
+              Kunden erstellen
             </Button>
           }
           sx={{ pb: 1 }}
