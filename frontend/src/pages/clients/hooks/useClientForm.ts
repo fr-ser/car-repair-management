@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React from 'react';
 
 import { BackendClient } from '@/src/types/backend-contracts';
@@ -33,7 +34,7 @@ function getFromFromClient(data?: BackendClient): ClientForm {
       value: data?.email ?? '',
     },
     birthday: {
-      value: data?.birthday ?? '',
+      value: data?.birthday ? dayjs(data.birthday) : null,
     },
     comment: {
       value: data?.comment ?? '',
@@ -52,7 +53,17 @@ export default (data?: BackendClient) => {
 
   const onFormInputChange = React.useCallback(
     (field: keyof ClientForm, value: string | Date | null) => {
-      setFormData((prev) => ({ ...prev, [field]: { ...prev[field], value } }));
+      let formattedValue;
+      if (value instanceof Date) {
+        formattedValue = dayjs(value);
+      } else {
+        formattedValue = value;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [field]: { ...prev[field], value: formattedValue },
+      }));
     },
     [],
   );
@@ -88,7 +99,12 @@ export default (data?: BackendClient) => {
 
     Object.entries(formData).forEach(([key, field]) => {
       if (field.value) {
-        result[key as keyof CreateClientRequest] = field.value;
+        if (key === 'birthday') {
+          result[key as keyof CreateClientRequest] =
+            field.value.format('YYYY-MM-DD');
+        } else {
+          result[key as keyof CreateClientRequest] = field.value;
+        }
       }
     });
 

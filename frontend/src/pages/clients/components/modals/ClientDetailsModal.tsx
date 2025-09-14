@@ -21,7 +21,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import { NotificationSnackBar } from '@/src/components/NotificationSnackBar';
@@ -302,7 +301,7 @@ export function ClientDetailsModal({
                         <Grid size={{ xs: 12, md: 6 }}>
                           <DatePicker
                             label="Geburtstag"
-                            value={dayjs(formData.birthday.value || new Date())}
+                            value={formData.birthday.value}
                             onChange={(newValue) =>
                               onFormInputChange(
                                 'birthday',
