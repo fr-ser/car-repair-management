@@ -18,7 +18,7 @@ import './globals.css';
 import { ConfirmationProvider } from './hooks/confirmation/ConfirmationProvider.tsx';
 import { NotificationProvider } from './hooks/notification/NotificationProvider.tsx';
 import LoginPage from './pages/auth/LoginPage.tsx';
-import { CarDetailsPage } from './pages/cars/CarDetailsPage.tsx';
+import { CarListPage } from './pages/cars/CarListPage.tsx';
 import { ClientListPage } from './pages/clients/ClientListPage.tsx';
 import theme from './theme.ts';
 
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/documents" replace /> },
       { path: '/clients', element: <ClientListPage /> },
-      { path: '/cars', element: <CarDetailsPage /> },
+      { path: '/cars', element: <CarListPage /> },
       { path: '/orders', element: <div>/orders</div> },
       { path: '/overview', element: <div>/overview</div> },
       { path: '/documents', element: <div>/documents</div> },

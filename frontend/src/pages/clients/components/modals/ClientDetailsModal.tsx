@@ -1,8 +1,4 @@
-import {
-  CalendarToday as CalendarIcon,
-  Person as PersonIcon,
-  Save as SaveIcon,
-} from '@mui/icons-material';
+import { Person as PersonIcon, Save as SaveIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -14,7 +10,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -24,10 +19,9 @@ import React, { useState } from 'react';
 import { useNotification } from '@/src/hooks/notification/useNotification';
 import { CarsCard } from '@/src/pages/clients/components/CarsCard';
 import { AddCarsModal } from '@/src/pages/clients/components/modals/AddCarsModal';
-import useClientForm from '@/src/pages/clients/hooks/useClientForm';
+import useClientForm from '@/src/pages/clients/useClientForm.hook';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
-import { Car } from '@/src/types/cars';
 
 type ClientDetailsPageProps = {
   selectedClient?: BackendClient;
@@ -45,7 +39,7 @@ export function ClientDetailsModal({
   const { formData, reloadForm, onFormInputChange, getPayload } =
     useClientForm(selectedClient);
 
-  const [cars, setCars] = useState<Car[]>([]);
+  const [cars, setCars] = useState<any[]>([]);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
 
   const queryClient = useQueryClient();
@@ -295,18 +289,7 @@ export function ClientDetailsModal({
                             newValue?.toDate() || null,
                           )
                         }
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            InputProps: {
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <CalendarIcon fontSize="small" />
-                                </InputAdornment>
-                              ),
-                            },
-                          },
-                        }}
+                        slotProps={{ textField: { fullWidth: true } }}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>

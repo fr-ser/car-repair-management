@@ -1,7 +1,5 @@
 import dayjs from 'dayjs';
 
-import { BackendClient, BackendPaginatedResponse } from './backend-contracts';
-
 export interface CreateClientRequest {
   firstName?: string;
   lastName?: string;
@@ -15,20 +13,6 @@ export interface CreateClientRequest {
   birthday?: Date;
   comment?: string;
 }
-
-export interface ErrorResponsePart {
-  message?: string[] | string;
-  error?: string;
-  statusCode?: number;
-}
-
-export interface GetSingleClientResponse
-  extends BackendClient,
-    ErrorResponsePart {}
-
-export interface GetClientsResponse
-  extends BackendPaginatedResponse<BackendClient>,
-    ErrorResponsePart {}
 
 type ClientFormField<V = string | dayjs.Dayjs | null> = {
   value: V;
