@@ -1,8 +1,8 @@
 import { BackendClient, BackendPaginatedResponse } from './backend-contracts';
 
 export interface CreateClientRequest {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   company?: string;
   street?: string;
   postalCode?: string;
@@ -28,10 +28,9 @@ export interface GetClientsResponse
   extends BackendPaginatedResponse<BackendClient>,
     ErrorResponsePart {}
 
-type ClientFormField<V = string> = {
-  required: boolean;
+type ClientFormField<V = any> = {
   value: V;
-  errorMessage: string | null;
+  errorMessage?: string;
 };
 
 export interface ClientForm {

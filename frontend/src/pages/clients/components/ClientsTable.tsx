@@ -28,14 +28,14 @@ import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
 type ClientsTableProps = {
-  setOpenClientModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedClient: React.Dispatch<React.SetStateAction<BackendClient | null>>;
+  handleEditClient: (client: BackendClient) => void;
+  handleCreateClient: () => void;
   setError: (message: string) => void;
 };
 
 export function ClientsTable({
-  setOpenClientModal,
-  setSelectedClient,
+  handleCreateClient,
+  handleEditClient,
   setError,
 }: ClientsTableProps) {
   const [page, setPage] = React.useState(0);
@@ -76,7 +76,7 @@ export function ClientsTable({
   });
 
   async function handleDeleteClient(client: BackendClient) {
-    const clientText = `${client.firstName} ${client.lastName} ${client.company}`;
+    const clientText = `${client.firstName ?? ''} ${client.lastName ?? ''} ${client.company ?? ''}`;
     const isConfirmed = await confirm({
       title: `Bestätigung - Kunden löschen - ${clientText}`,
       message:
@@ -100,14 +100,8 @@ export function ClientsTable({
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-    console.log(+event.target.value);
 
     await fetchData(0, +event.target.value);
-  };
-
-  const handleRowClick = (row: BackendClient) => {
-    setSelectedClient(row);
-    setOpenClientModal(true);
   };
 
   const styles = {
@@ -143,7 +137,7 @@ export function ClientsTable({
               color="secondary"
               startIcon={<PersonAddIcon />}
               size="small"
-              onClick={() => setOpenClientModal(true)}
+              onClick={handleCreateClient}
               data-testid="button-client-create"
             >
               Kunden erstellen
@@ -176,7 +170,7 @@ export function ClientsTable({
                         key={client.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleRowClick(client)}
+                        onClick={() => handleEditClient(client)}
                         data-testid={`client-row-${client.id}`}
                         sx={styles.tableRowStyles}
                       >

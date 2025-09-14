@@ -10,23 +10,34 @@ import {
 
 import { RequireOneOf } from '@/src/common/class-validators';
 
+@RequireOneOf(['firstName', 'lastName', 'company'])
+@RequireOneOf(['email', 'landline', 'phoneNumber'])
 export class CreateClientDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  @RequireOneOf(['firstName', 'lastName', 'company'])
   firstName?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  @RequireOneOf(['firstName', 'lastName', 'company'])
   lastName?: string;
 
   @IsOptional()
+  @IsString()
+  company?: string;
+
+  @IsOptional()
   @IsEmail()
-  @RequireOneOf(['email', 'landline', 'phoneNumber'])
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  landline?: string;
+
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
 
   @IsOptional()
   @IsString()
@@ -41,16 +52,6 @@ export class CreateClientDto {
   street?: string;
 
   @IsOptional()
-  @IsString()
-  @RequireOneOf(['email', 'landline', 'phoneNumber'])
-  landline?: string;
-
-  @IsOptional()
-  @IsString()
-  @RequireOneOf(['firstName', 'lastName', 'company'])
-  company?: string;
-
-  @IsOptional()
   @MaxLength(10) // a date time string with a length of 10 is a date
   @IsDateString()
   birthday?: string;
@@ -58,10 +59,6 @@ export class CreateClientDto {
   @IsOptional()
   @IsString()
   comment?: string;
-
-  @IsOptional()
-  @IsString()
-  @RequireOneOf(['email', 'landline', 'phoneNumber'])
-  phoneNumber?: string;
 }
+
 export class UpdateClientDto extends PartialType(CreateClientDto) {}

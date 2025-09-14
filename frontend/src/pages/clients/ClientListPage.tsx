@@ -21,7 +21,9 @@ export function ClientListPage() {
   // Snack bar end
 
   const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<BackendClient | null>(null);
+  const [selected, setSelected] = React.useState<BackendClient | undefined>(
+    undefined,
+  );
 
   function setError(message: string) {
     setSnackBarMessage(message);
@@ -31,7 +33,17 @@ export function ClientListPage() {
 
   const handleClose = async () => {
     setOpen(false);
-    setSelected(null);
+    setSelected(undefined);
+  };
+
+  const handleEditClient = (client: BackendClient) => {
+    setSelected(client);
+    setOpen(true);
+  };
+
+  const handleCreateClient = () => {
+    setSelected(undefined);
+    setOpen(true);
   };
 
   return (
@@ -44,12 +56,12 @@ export function ClientListPage() {
       />
       <QueryClientProvider client={queryClient}>
         <ClientsTable
-          setOpenClientModal={setOpen}
-          setSelectedClient={setSelected}
+          handleEditClient={handleEditClient}
+          handleCreateClient={handleCreateClient}
           setError={setError}
         />
         <ClientDetailsModal
-          selectedClient={selected ?? undefined}
+          selectedClient={selected}
           isOpen={open}
           onClose={handleClose}
         />

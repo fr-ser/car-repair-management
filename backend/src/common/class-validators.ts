@@ -33,10 +33,11 @@ export function RequireOneOf(
   fields: string[],
   validationOptions?: ValidationOptions,
 ) {
-  return function (target: object, propertyName: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function (target: any) {
     registerDecorator({
-      target: target.constructor,
-      propertyName: propertyName,
+      target: target,
+      propertyName: 'requireOneOfValidation',
       options: validationOptions,
       constraints: fields,
       validator: RequireOneOfConstraint,
