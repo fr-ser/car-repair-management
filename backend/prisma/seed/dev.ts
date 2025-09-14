@@ -97,6 +97,37 @@ const seed = async () => {
       },
     ],
   });
+  await prisma.car.deleteMany();
+  await prisma.car.createMany({
+    data: [
+      // order matters because we want to see the results ordered by createdAt,
+      // so the newest are on the very top of the list
+      {
+        carNumber: 'A4',
+        licensePlate: 'license-A4',
+        model: 'Model A4',
+        manufacturer: 'Manufacturer A4',
+      },
+      {
+        carNumber: 'A3',
+        licensePlate: 'license-A3',
+        model: 'Model A3',
+        manufacturer: 'Manufacturer A3',
+      },
+      {
+        carNumber: 'A2',
+        licensePlate: 'license-A2',
+        model: 'Model A2',
+        manufacturer: 'Manufacturer A2',
+      },
+      {
+        carNumber: 'A1',
+        licensePlate: 'license-A1',
+        model: 'Model A1',
+        manufacturer: 'Manufacturer A1',
+      },
+    ],
+  });
 };
 
 seed().catch(console.error);

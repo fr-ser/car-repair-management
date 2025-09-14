@@ -1,7 +1,7 @@
 import {
   AddBox as AddBoxIcon,
+  DirectionsCar as CarIcon,
   Delete as DeleteIcon,
-  People as PeopleIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -26,21 +26,18 @@ import * as React from 'react';
 import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
 import { useNotification } from '@/src/hooks/notification/useNotification';
 import * as apiClient from '@/src/services/backend-service';
-import { BackendClient } from '@/src/types/backend-contracts';
+import { BackendCar } from '@/src/types/backend-contracts';
 
-type ClientsTableProps = {
-  handleEditClient: (client: BackendClient) => void;
-  handleCreateClient: () => void;
+type CarsTableProps = {
+  handleEditCar: (car: BackendCar) => void;
+  handleCreateCar: () => void;
 };
 
-export function ClientsTable({
-  handleCreateClient,
-  handleEditClient,
-}: ClientsTableProps) {
+export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
-  const [clients, setClients] = React.useState<BackendClient[]>([]);
+  const [cars, setCars] = React.useState<BackendCar[]>([]);
   const [totalItems, setTotalItems] = React.useState<number>(0);
 
   const { confirm } = useConfirmation();
@@ -49,12 +46,12 @@ export function ClientsTable({
   async function fetchData(
     _page: number = 0,
     _limit: number = 10,
-  ): Promise<BackendClient[]> {
+  ): Promise<BackendCar[]> {
     setLoading(true);
     try {
-      const response = await apiClient.fetchClients(_page, _limit);
+      const response = await apiClient.fetchCars(_page, _limit);
       const data = response.data;
-      setClients(data);
+      setCars(data);
       setTotalItems(response.meta.totalItems);
       return data;
     } catch (err: unknown) {
@@ -73,23 +70,23 @@ export function ClientsTable({
   }
 
   useQuery({
-    queryKey: ['clients', page, rowsPerPage],
+    queryKey: ['cars', page, rowsPerPage],
     queryFn: () => fetchData(page, rowsPerPage),
     placeholderData: [],
   });
 
-  async function handleDeleteClient(client: BackendClient) {
-    const clientText = `${client.firstName ?? ''} ${client.lastName ?? ''} ${client.company ?? ''}`;
+  async function handleDelete(car: BackendCar) {
+    const carText = `${car.licensePlate} ${car.manufacturer}`;
     const isConfirmed = await confirm({
-      title: `Bestätigung - Kunden löschen - ${clientText}`,
+      title: `Bestätigung - Auto löschen - ${carText}`,
       message:
-        `Möchten Sie den Kunden "${clientText}" wirklich löschen? ` +
+        `Möchten Sie das Auto "${carText}" wirklich löschen? ` +
         'Diese Aktion kann nicht rückgängig gemacht werden.',
     });
     if (!isConfirmed) return;
 
-    await apiClient.deleteClient(client.id);
-    showNotification({ message: `Kunde wurde gelöscht` });
+    await apiClient.deleteCar(car.id);
+    showNotification({ message: `Auto wurde gelöscht` });
     await fetchData(page, rowsPerPage);
   }
 
@@ -125,13 +122,13 @@ export function ClientsTable({
         <CardHeader
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <PeopleIcon />
+              <CarIcon />
               <Typography
                 variant="h6"
                 component="h3"
                 sx={{ fontWeight: 500, pr: 14 }}
               >
-                Kunden
+                Autos
               </Typography>
             </Box>
           }
@@ -141,10 +138,10 @@ export function ClientsTable({
               color="secondary"
               startIcon={<AddBoxIcon />}
               size="small"
-              onClick={handleCreateClient}
-              data-testid="button-client-create"
+              onClick={handleCreateCar}
+              data-testid="button-car-create"
             >
-              Kunden erstellen
+              Auto erstellen
             </Button>
           }
           sx={{ pb: 1 }}
@@ -160,33 +157,32 @@ export function ClientsTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Kundennummer</TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Firma</TableCell>
+                      <TableCell>Autonummer</TableCell>
+                      <TableCell>Kennzeichen</TableCell>
+                      <TableCell>Hersteller</TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {clients.map((client) => (
+                    {cars.map((car) => (
                       <TableRow
-                        key={client.id}
+                        key={car.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditClient(client)}
-                        data-testid={`client-row-${client.id}`}
+                        onClick={() => handleEditCar(car)}
+                        data-testid={`car-row-${car.id}`}
                         sx={styles.tableRowStyles}
                       >
-                        <TableCell data-testid={`client-number-${client.id}`}>
-                          {client.clientNumber}
+                        <TableCell data-testid={`car-number-${car.id}`}>
+                          {car.carNumber}
                         </TableCell>
-                        <TableCell data-testid={`client-name-${client.id}`}>
-                          {client.firstName}&nbsp;
-                          {client.lastName}
+                        <TableCell data-testid={`car-license-plate-${car.id}`}>
+                          {car.licensePlate}
                         </TableCell>
-                        <TableCell data-testid={`client-company-${client.id}`}>
-                          {client.company}
+                        <TableCell data-testid={`car-manufacturer-${car.id}`}>
+                          {car.manufacturer}
                         </TableCell>
                         <TableCell>
                           <IconButton
@@ -195,10 +191,10 @@ export function ClientsTable({
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleDeleteClient(client);
+                              handleDelete(car);
                             }}
                             color="error"
-                            data-testid={`button-client-delete-${client.id}`}
+                            data-testid={`button-car-delete-${car.id}`}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>

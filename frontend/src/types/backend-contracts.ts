@@ -4,10 +4,12 @@
 // or just to remove this dependency for some other reason
 // The only thing necessary will be to define these interfaces in this file,
 // no need to go all over the codebase changing those imports
-import { Client } from '@/../../backend/node_modules/@prisma/client';
+import type { Car, Client } from '@/../../backend/node_modules/@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BackendClient extends Client {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface BackendCar extends Car {}
 
 export interface BackendPaginatedResponse<T> {
   data: T[];
@@ -18,4 +20,10 @@ export interface BackendPaginatedResponse<T> {
     totalPages: number;
     hasNextPage: boolean;
   };
+}
+
+export interface ErrorResponse {
+  message?: string[] | string;
+  error?: string;
+  statusCode?: number;
 }

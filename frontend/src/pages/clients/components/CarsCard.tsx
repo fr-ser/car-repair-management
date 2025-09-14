@@ -15,16 +15,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 
-import { Car } from '@/src/types/cars';
+import { BackendCar } from '@/src/types/backend-contracts';
 
 type CarsCardProps = {
-  cars: Car[]; // List of cars
-  setCars: React.Dispatch<React.SetStateAction<Car[]>>; // Callback to set cars
-  setCarModalOpen: React.Dispatch<React.SetStateAction<boolean>>; // Callback to open car modal
+  cars: BackendCar[];
+  setCars: React.Dispatch<React.SetStateAction<BackendCar[]>>;
+  setCarModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export function CarsCard({ cars, setCars, setCarModalOpen }: CarsCardProps) {
-  const handleRemoveCar = (carId: string) => {
+  const handleRemoveCar = (carId: number) => {
     setCars((prev) => prev.filter((car) => car.id !== carId));
   };
 
@@ -86,15 +86,15 @@ export function CarsCard({ cars, setCars, setCarModalOpen }: CarsCardProps) {
                   }
                 >
                   <ListItemText
-                    primary={`${car.marke} ${car.modell}`}
+                    primary={`${car.manufacturer} ${car.model}`}
                     secondary={
                       <Box>
                         <Typography variant="caption" display="block">
-                          Kennzeichen: {car.kennzeichen}
+                          Kennzeichen: {car.licensePlate}
                         </Typography>
-                        {car.baujahr && (
+                        {car.firstRegistration && (
                           <Typography variant="caption" display="block">
-                            Baujahr: {car.baujahr}
+                            Erstzulassung: {car.firstRegistration}
                           </Typography>
                         )}
                       </Box>

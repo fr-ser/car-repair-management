@@ -17,7 +17,7 @@ export class PaginationService {
     model: ModelName,
     query: PaginationQueryDto,
     orderBy: PrismaOperations<ModelName>['findMany']['args']['orderBy'] = {
-      id: 'asc',
+      createdAt: 'desc',
     },
   ): Promise<PaginatedResponseDto<ResponseDataType>> {
     const { page = 1, limit = 10 } = query;
