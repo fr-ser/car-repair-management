@@ -30,7 +30,7 @@ export interface GetClientsResponse
   extends BackendPaginatedResponse<BackendClient>,
     ErrorResponsePart {}
 
-type ClientFormField<V = string | dayjs.Dayjs | undefined> = {
+type ClientFormField<V = string | dayjs.Dayjs | null> = {
   value: V;
   errorMessage?: string;
 };
@@ -45,6 +45,6 @@ export interface ClientForm {
   landline: ClientFormField;
   phoneNumber: ClientFormField;
   email: ClientFormField;
-  birthday: ClientFormField<dayjs.Dayjs | undefined>;
+  birthday: ClientFormField<dayjs.Dayjs | null>;
   comment: ClientFormField;
 }
