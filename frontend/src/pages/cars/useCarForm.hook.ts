@@ -103,7 +103,6 @@ export default (data?: BackendCar) => {
   );
 
   const validate = React.useCallback((): boolean => {
-    // TODO: check required fields?
     let isValid = true;
     Object.entries(formData).forEach(([fieldName, field]) => {
       field.errorMessage = undefined;

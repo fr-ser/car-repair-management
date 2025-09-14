@@ -8,8 +8,6 @@ import { DECIMAL_SEPARATOR, THOUSANDS_SEPARATOR } from '@/src/utils/numbers';
 
 interface CustomProps {
   onChange: (event: { target: { value: string } }) => void;
-  // TODO: what is this name thing
-  name: string;
 }
 
 const NumberInputMask = React.forwardRef<HTMLInputElement, CustomProps>(
@@ -56,7 +54,6 @@ export default function DecimalTextField(props: DecimalTextFieldProps) {
         value={value}
         label={label}
         onChange={(e) => onChange(e.target.value)}
-        name={id}
         id={id}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         inputComponent={NumberInputMask as any}
