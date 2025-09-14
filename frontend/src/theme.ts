@@ -6,6 +6,9 @@ const theme = createTheme({
     MuiTextField: {
       defaultProps: { size: 'small' },
     },
+    MuiOutlinedInput: {
+      defaultProps: { size: 'small' },
+    },
     MuiDatePicker: {
       defaultProps: {
         slotProps: { textField: { size: 'small' } },

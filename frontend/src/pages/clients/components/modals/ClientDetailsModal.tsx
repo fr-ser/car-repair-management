@@ -39,6 +39,7 @@ export function ClientDetailsModal({
   const { formData, reloadForm, onFormInputChange, getPayload } =
     useClientForm(selectedClient);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [cars, setCars] = useState<any[]>([]);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
 

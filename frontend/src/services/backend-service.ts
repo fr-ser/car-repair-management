@@ -59,7 +59,7 @@ export async function deleteClient(clientId: number) {
       'Content-Type': 'application/json',
     },
   });
-  const responseData: {} | ErrorResponse = await response.json();
+  const responseData: object | ErrorResponse = await response.json();
 
   handleErrorResponse(response, responseData);
 }
@@ -131,7 +131,7 @@ export async function deleteCar(carId: number) {
       'Content-Type': 'application/json',
     },
   });
-  const responseData: {} | ErrorResponse = await response.json();
+  const responseData: object | ErrorResponse = await response.json();
 
   handleErrorResponse(response, responseData);
 }

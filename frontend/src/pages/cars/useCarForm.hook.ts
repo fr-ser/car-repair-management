@@ -3,6 +3,7 @@ import React from 'react';
 
 import { BackendCar } from '@/src/types/backend-contracts';
 import { CarForm, CreateCarRequest } from '@/src/types/cars';
+import { formatNumber, parseNumber } from '@/src/utils/numbers';
 
 const dateFields = [
   'firstRegistration',
@@ -10,6 +11,8 @@ const dateFields = [
   'inspectionDate',
   'timingBeltDate',
 ];
+
+const numberFields = ['timingBeltKm', 'oilChangeKm'];
 
 function getFromFromClient(data?: BackendCar): CarForm {
   return {
@@ -47,7 +50,7 @@ function getFromFromClient(data?: BackendCar): CarForm {
       value: data?.oilChangeDate ? dayjs(data.oilChangeDate) : null,
     },
     oilChangeKm: {
-      value: data?.oilChangeKm ?? '',
+      value: formatNumber(data?.oilChangeKm, { undefinedAs: '' }),
     },
     tires: {
       value: data?.tires ?? '',
@@ -59,7 +62,7 @@ function getFromFromClient(data?: BackendCar): CarForm {
       value: data?.vin ?? '',
     },
     timingBeltKm: {
-      value: data?.timingBeltKm ?? '',
+      value: formatNumber(data?.timingBeltKm, { undefinedAs: '' }),
     },
     timingBeltDate: {
       value: data?.timingBeltDate ? dayjs(data.timingBeltDate) : null,
@@ -131,8 +134,13 @@ export default (data?: BackendCar) => {
     Object.entries(formData).forEach(([key, field]) => {
       if (field.value) {
         if (dateFields.includes(key)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (result as any)[key] = field.value.format('YYYY-MM-DD');
+        } else if (numberFields.includes(key)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (result as any)[key] = parseNumber(field.value);
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (result as any)[key] = field.value;
         }
       }

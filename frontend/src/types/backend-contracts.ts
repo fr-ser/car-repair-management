@@ -8,6 +8,7 @@ import type { Car, Client } from '@/../../backend/node_modules/@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BackendClient extends Client {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BackendCar extends Car {}
 
 export interface BackendPaginatedResponse<T> {

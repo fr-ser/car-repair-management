@@ -16,6 +16,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
+import DecimalInput from '@/src/components/DecimalTextField';
 import { useNotification } from '@/src/hooks/notification/useNotification';
 import useCarForm from '@/src/pages/cars/useCarForm.hook';
 import * as apiService from '@/src/services/backend-service';
@@ -299,16 +300,13 @@ export function CarDetailsModal({
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
+                      <DecimalInput
+                        id="timingBeltKm"
                         label="Zahnriemen [km]"
-                        required={!!formData.timingBeltKm.required}
                         value={formData.timingBeltKm.value}
-                        onChange={(e) =>
-                          onFormInputChange('timingBeltKm', e.target.value)
+                        onChange={(value) =>
+                          onFormInputChange('timingBeltKm', value)
                         }
-                        error={!!formData.timingBeltKm.errorMessage}
-                        helperText={formData.timingBeltKm.errorMessage}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
@@ -340,16 +338,13 @@ export function CarDetailsModal({
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
+                      <DecimalInput
+                        id="oilChangeKm"
                         label="Ölwechsel [km]"
-                        required={!!formData.oilChangeKm.required}
                         value={formData.oilChangeKm.value}
-                        onChange={(e) =>
-                          onFormInputChange('oilChangeKm', e.target.value)
+                        onChange={(value) =>
+                          onFormInputChange('oilChangeKm', value)
                         }
-                        error={!!formData.oilChangeKm.errorMessage}
-                        helperText={formData.oilChangeKm.errorMessage}
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>

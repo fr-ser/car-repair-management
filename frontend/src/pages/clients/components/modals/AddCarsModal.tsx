@@ -9,12 +9,12 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
-import { Car } from '@/src/types/cars';
+import { BackendCar } from '@/src/types/backend-contracts';
 
 type AddCarsModalProps = {
-  isOpen: boolean; // Controls whether modal is shown
-  onClose: () => void; // Close callback
-  setCars: React.Dispatch<React.SetStateAction<Car[]>>; // Callback to set cars
+  isOpen: boolean;
+  onClose: () => void;
+  setCars: React.Dispatch<React.SetStateAction<BackendCar[]>>;
 };
 
 export function AddCarsModal({ isOpen, onClose, setCars }: AddCarsModalProps) {
@@ -26,11 +26,12 @@ export function AddCarsModal({ isOpen, onClose, setCars }: AddCarsModalProps) {
   });
   const handleAddCar = () => {
     if (newCar.marke && newCar.modell && newCar.kennzeichen) {
-      const car: Car = {
-        id: Date.now().toString(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const car: any = {
+        id: Date.now(),
         ...newCar,
       };
-      setCars((prev: Car[]) => [...prev, car]);
+      setCars((prev: BackendCar[]) => [...prev, car]);
       setNewCar({ marke: '', modell: '', kennzeichen: '', baujahr: '' });
       onClose();
     }
