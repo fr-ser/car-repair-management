@@ -41,7 +41,7 @@ export interface CarForm {
   enginePower: CarFormField;
   oilChangeDate: CarFormField<dayjs.Dayjs | null>;
   oilChangeKm: CarFormField<string>;
-  tires: CarFormField;
+  tires: CarFormField<string>;
   inspectionDate: CarFormField<dayjs.Dayjs | null>;
   vin: CarFormField;
   timingBeltKm: CarFormField<string>;

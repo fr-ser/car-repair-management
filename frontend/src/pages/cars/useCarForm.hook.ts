@@ -107,6 +107,16 @@ export default (data?: BackendCar) => {
     Object.entries(formData).forEach(([fieldName, field]) => {
       field.errorMessage = undefined;
       switch (fieldName) {
+        case 'tires':
+          if (field.value) {
+            const tirePattern = /^\d{3}\/\d{2} R\d{2} \d{3}[A-Z]$/;
+            if (!tirePattern.test(field.value)) {
+              field.errorMessage =
+                'Ungültiges Format (korrekt: 265/60 R18 110H)';
+              isValid = false;
+            }
+          }
+          break;
         default:
           if (field.required && (field.value === '' || field.value === null)) {
             field.errorMessage = 'Dieses Feld ist erforderlich';

@@ -22,6 +22,8 @@ import useCarForm from '@/src/pages/cars/useCarForm.hook';
 import * as apiService from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
+import TireTextField from './TireTextField';
+
 type CarDetailsPageProps = {
   selectedCar?: BackendCar;
   isOpen: boolean;
@@ -204,17 +206,12 @@ export function CarDetailsModal({
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Reifen"
-                        placeholder="205/60 R16 92V"
-                        required={!!formData.tires.required}
+                      <TireTextField
                         value={formData.tires.value}
-                        onChange={(e) =>
-                          onFormInputChange('tires', e.target.value)
-                        }
-                        error={!!formData.tires.errorMessage}
-                        helperText={formData.tires.errorMessage}
+                        onChange={(value) => onFormInputChange('tires', value)}
+                        id="tires"
+                        label="Reifen"
+                        error={formData.tires.errorMessage}
                       />
                     </Grid>
                   </Grid>
