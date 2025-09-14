@@ -48,7 +48,7 @@ test('get-create-delete-clients', async ({ page }) => {
   await lastClient.hover();
   // delete this client
   await lastClient.getByTestId(/button-client-delete-.*/).click();
-  await page.getByTestId('button-client-delete-confirm').click();
+  await page.getByTestId('confirm-dialog-button-confirm').click();
 
   await expect(page.getByTestId(/client-row-.*/)).toHaveCount(
     initialClientCount,

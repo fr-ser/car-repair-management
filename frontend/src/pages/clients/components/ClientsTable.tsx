@@ -9,11 +9,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -28,6 +23,7 @@ import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
+import { useConfirmation } from '@/src/hooks/useConfirmation';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
@@ -47,11 +43,8 @@ export function ClientsTable({
   const [loading, setLoading] = React.useState(false);
   const [clients, setClients] = React.useState<BackendClient[]>([]);
   const [totalItems, setTotalItems] = React.useState<number>(0);
-  const [clientToBeDeleted, setClientToBeDeleted] = React.useState<
-    number | null
-  >(null);
-  const [isOpenedDeleteClientDialog, setIsOpenedDeleteClientDialog] =
-    React.useState(false);
+
+  const { confirm } = useConfirmation();
 
   async function fetchData(
     _page: number = 0,
@@ -77,29 +70,23 @@ export function ClientsTable({
   }
 
   useQuery({
-    // to refetch on external change
-    queryKey: ['clients', page, rowsPerPage], // cache key
+    queryKey: ['clients', page, rowsPerPage],
     queryFn: () => fetchData(page, rowsPerPage),
     placeholderData: [],
   });
 
-  async function handleDeleteClient() {
-    // Implement delete client logic here
-    try {
-      if (clientToBeDeleted === null) {
-        throw new Error('No client selected for deletion');
-      }
-      await apiClient.deleteClient(clientToBeDeleted);
-      setIsOpenedDeleteClientDialog(false);
-      setClientToBeDeleted(null);
-      await fetchData(page, rowsPerPage);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    }
+  async function handleDeleteClient(client: BackendClient) {
+    const clientText = `${client.firstName} ${client.lastName} ${client.company}`;
+    const isConfirmed = await confirm({
+      title: `Bestätigung - Kunden löschen - ${clientText}`,
+      message:
+        `Möchten Sie den Kunden "${clientText}" wirklich löschen?` +
+        'Diese Aktion kann nicht rückgängig gemacht werden.',
+    });
+    if (!isConfirmed) return;
+
+    await apiClient.deleteClient(client.id);
+    await fetchData(page, rowsPerPage);
   }
 
   const handleChangePage = async (_: unknown, newPage: number) => {
@@ -210,8 +197,7 @@ export function ClientsTable({
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation();
-                              setIsOpenedDeleteClientDialog(true);
-                              setClientToBeDeleted(client.id);
+                              handleDeleteClient(client);
                             }}
                             color="error"
                             data-testid={`button-client-delete-${client.id}`}
@@ -237,43 +223,6 @@ export function ClientsTable({
           )}
         </CardContent>
       </Card>
-      <Dialog
-        open={isOpenedDeleteClientDialog}
-        onClose={() => {
-          setIsOpenedDeleteClientDialog(false);
-          setClientToBeDeleted(null);
-        }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {'Möchten Sie diesen Client wirklich löschen?'}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Es wird unmöglich sein, es zurückzubringen!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={handleDeleteClient}
-            color="error"
-            variant="outlined"
-            data-testid="button-client-delete-confirm"
-          >
-            Löschen
-          </Button>
-          <Button
-            onClick={() => {
-              setIsOpenedDeleteClientDialog(false);
-              setClientToBeDeleted(null);
-            }}
-            autoFocus
-          >
-            Abbrechen
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Grid>
   );
 }

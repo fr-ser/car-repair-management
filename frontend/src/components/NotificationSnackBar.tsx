@@ -25,7 +25,7 @@ export function NotificationSnackBar({
     _?: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason,
   ) => {
-    if (onClose !== undefined) {
+    if (onClose != undefined) {
       onClose(_, reason);
       return;
     }
