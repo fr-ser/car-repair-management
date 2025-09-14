@@ -23,7 +23,7 @@ import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
-import { useConfirmation } from '@/src/hooks/useConfirmation';
+import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 

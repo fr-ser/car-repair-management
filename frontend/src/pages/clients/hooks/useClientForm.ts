@@ -34,7 +34,7 @@ function getFromFromClient(data?: BackendClient): ClientForm {
       value: data?.email ?? '',
     },
     birthday: {
-      value: data?.birthday ? dayjs(data.birthday) : null,
+      value: data?.birthday ? dayjs(data.birthday) : undefined,
     },
     comment: {
       value: data?.comment ?? '',

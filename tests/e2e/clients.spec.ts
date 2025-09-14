@@ -29,6 +29,7 @@ test('get-create-delete-clients', async ({ page }) => {
   await page.getByLabel('Stadt').fill('Test City');
   await page.getByLabel('Straße').fill('Test St 10');
   await page.getByLabel('Firma').fill('Test Company');
+  await page.getByLabel('Festnetz').fill('123456');
   await page.getByTestId('button-client-save').click();
 
   await expect(page.getByTestId(/client-row-.*/)).toHaveCount(

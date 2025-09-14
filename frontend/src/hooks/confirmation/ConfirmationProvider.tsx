@@ -6,39 +6,21 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import React, {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-} from 'react';
+import React, { ReactNode, createContext, useCallback, useState } from 'react';
 
-interface ConfirmationOptions {
-  message: string;
-  title?: string;
-  confirmText?: string;
-  cancelText?: string;
-}
+import {
+  ConfirmationContextType,
+  ConfirmationOptions,
+  DEFAULT_OPTIONS,
+} from './types';
 
-interface ConfirmationContextType {
-  confirm: (options: ConfirmationOptions) => Promise<boolean>;
-}
-
-const ConfirmationContext = createContext<ConfirmationContextType | undefined>(
-  undefined,
-);
+export const ConfirmationContext = createContext<
+  ConfirmationContextType | undefined
+>(undefined);
 
 interface ConfirmationProviderProps {
   children: ReactNode;
 }
-
-const DEFAULT_OPTIONS = {
-  title: '', // Empty by default
-  message: '', // Will be overridden
-  confirmText: 'Bestätigen',
-  cancelText: 'Abbrechen',
-};
 
 export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
   children,
@@ -102,14 +84,4 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
       </Dialog>
     </ConfirmationContext.Provider>
   );
-};
-
-export const useConfirmation = (): ConfirmationContextType => {
-  const context = useContext(ConfirmationContext);
-  if (!context) {
-    throw new Error(
-      'useConfirmation must be used within a ConfirmationProvider',
-    );
-  }
-  return context;
 };

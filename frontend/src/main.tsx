@@ -15,7 +15,7 @@ import {
 
 import { App } from './App.tsx';
 import './globals.css';
-import { ConfirmationProvider } from './hooks/useConfirmation.tsx';
+import { ConfirmationProvider } from './hooks/confirmation/ConfirmationProvider.tsx';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import { CarDetailsPage } from './pages/cars/CarDetailsPage.tsx';
 import { ClientListPage } from './pages/clients/ClientListPage.tsx';

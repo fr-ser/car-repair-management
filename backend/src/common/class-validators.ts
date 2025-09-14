@@ -36,6 +36,7 @@ export function RequireOneOf(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function (target: any) {
     registerDecorator({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       target: target,
       propertyName: 'requireOneOfValidation',
       options: validationOptions,
