@@ -15,6 +15,7 @@ import {
 
 import { App } from './App.tsx';
 import './globals.css';
+import { ConfirmationProvider } from './hooks/confirmation/ConfirmationProvider.tsx';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import { CarDetailsPage } from './pages/cars/CarDetailsPage.tsx';
 import { ClientListPage } from './pages/clients/ClientListPage.tsx';
@@ -41,7 +42,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <RouterProvider router={router} />
+      <ConfirmationProvider>
+        <RouterProvider router={router} />
+      </ConfirmationProvider>
     </ThemeProvider>
   </StrictMode>,
 );

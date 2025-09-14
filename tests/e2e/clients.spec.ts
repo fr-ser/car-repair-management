@@ -29,6 +29,7 @@ test('get-create-delete-clients', async ({ page }) => {
   await page.getByLabel('Stadt').fill('Test City');
   await page.getByLabel('Straße').fill('Test St 10');
   await page.getByLabel('Firma').fill('Test Company');
+  await page.getByLabel('Festnetz').fill('123456');
   await page.getByTestId('button-client-save').click();
 
   await expect(page.getByTestId(/client-row-.*/)).toHaveCount(
@@ -48,7 +49,7 @@ test('get-create-delete-clients', async ({ page }) => {
   await lastClient.hover();
   // delete this client
   await lastClient.getByTestId(/button-client-delete-.*/).click();
-  await page.getByTestId('button-client-delete-confirm').click();
+  await page.getByTestId('confirm-dialog-button-confirm').click();
 
   await expect(page.getByTestId(/client-row-.*/)).toHaveCount(
     initialClientCount,

@@ -4,10 +4,9 @@ import { describe, expect, test } from 'vitest';
 import { RequireOneOf } from './class-validators';
 
 describe('RequireOneOf', () => {
+  @RequireOneOf(['email', 'phone'])
   class ContactDto {
-    @RequireOneOf(['email', 'phone'])
     email?: string;
-    @RequireOneOf(['email', 'phone'])
     phone?: string;
     name?: string;
   }

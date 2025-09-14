@@ -1,5 +1,9 @@
+# Frontend
 
-# Structure
+This is the frontend documentation.
+Please also refer to the overall project documentation for guidance.
+
+## Structure
 
 ```text
 src/
@@ -22,7 +26,3 @@ src/
 ├── utils/            # General utility functions (date formatters, validators, etc.)
 └── main.tsx          # App entry point with routes (or index.tsx)
 ```
-
-## Components lib
-
-we use https://webawesome.com/

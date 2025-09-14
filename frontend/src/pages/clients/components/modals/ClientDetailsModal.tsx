@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Dialog from '@mui/material/Dialog';
@@ -22,7 +21,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import { NotificationSnackBar } from '@/src/components/NotificationSnackBar';
@@ -35,8 +33,8 @@ import { Car } from '@/src/types/cars';
 
 type ClientDetailsPageProps = {
   selectedClient?: BackendClient;
-  isOpen: boolean; // Controls whether modal is shown
-  onClose: () => void; // Close callback
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 export function ClientDetailsModal({
@@ -44,9 +42,8 @@ export function ClientDetailsModal({
   isOpen,
   onClose,
 }: ClientDetailsPageProps) {
-  const { formData, reloadForm, onFormInputChange, getPayload } = useClientForm(
-    selectedClient ?? ({} as BackendClient),
-  );
+  const { formData, reloadForm, onFormInputChange, getPayload } =
+    useClientForm(selectedClient);
   // Snack bar state
   const [snackBarOpen, setSnackBarOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = React.useState('');
@@ -59,12 +56,6 @@ export function ClientDetailsModal({
 
   const queryClient = useQueryClient();
 
-  function closeSelf() {
-    onClose();
-    reloadForm(selectedClient ?? ({} as BackendClient));
-    setCars([]);
-  }
-
   async function handleSubmit() {
     if (selectedClient !== undefined) {
       await apiService.updateClient(selectedClient.id, getPayload());
@@ -76,28 +67,33 @@ export function ClientDetailsModal({
   const mutation = useMutation({
     mutationFn: handleSubmit,
     onSuccess: () => {
-      // Invalidate cache to refetch clients table
       setSnackBarLevel('success');
       setSnackBarMessage(
-        selectedClient !== undefined ? 'Client updated!' : 'Client created!',
+        selectedClient !== undefined
+          ? 'Kundendaten aktualisiert'
+          : 'Kunde erstellt',
       );
       setSnackBarOpen(true);
-      closeSelf();
+      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     onError: (error: unknown) => {
       setSnackBarLevel('error');
       setSnackBarMessage(
-        error instanceof Error ? error.message : 'An unknown error occurred',
+        error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten',
       );
       setSnackBarOpen(true);
     },
   });
 
+  const onCleanAndClose = () => {
+    reloadForm();
+    onClose();
+  };
+
   React.useEffect(() => {
-    reloadForm(selectedClient ?? ({} as BackendClient));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClient]);
+    reloadForm(selectedClient);
+  }, [selectedClient, reloadForm]);
 
   return (
     <>
@@ -110,82 +106,63 @@ export function ClientDetailsModal({
         />
         <Dialog
           open={isOpen}
-          onClose={() => closeSelf()}
+          onClose={onCleanAndClose}
           maxWidth="lg"
           keepMounted={false}
         >
           <DialogTitle>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <PersonIcon />
-              Kunde bearbeiten/erstellen
+              Kunden bearbeiten/erstellen
             </Box>
           </DialogTitle>
           <DialogContent>
-            <Grid container spacing={4}>
+            <Grid container spacing={4} pt={1}>
               {/* Customer Information Card */}
-              <Grid sx={{ xs: 12, lg: 8 }}>
+              <Grid size={{ xs: 12, lg: 8 }}>
                 <Card elevation={2}>
-                  <CardHeader
-                    title={
-                      <Typography
-                        variant="h6"
-                        component="h3"
-                        sx={{ fontWeight: 500 }}
-                      >
-                        Kundeninformationen
-                      </Typography>
-                    }
-                    sx={{ pb: 2 }}
-                  />
                   <CardContent sx={{ pt: 0 }}>
                     {/* Personal Information Section */}
-                    <Box sx={{ mb: 4 }}>
+                    <Box>
                       <Typography
                         variant="overline"
                         sx={{
                           color: 'text.secondary',
                           fontWeight: 600,
-                          letterSpacing: 1.2,
-                          mb: 2,
                           display: 'block',
                         }}
                       >
                         Persönliche Daten
                       </Typography>
                       <Grid container spacing={3}>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Vorname"
-                            placeholder="Max"
                             value={formData.firstName.value}
                             onChange={(e) =>
                               onFormInputChange('firstName', e.target.value)
                             }
-                            required
                             error={!!formData.firstName.errorMessage}
                             helperText={formData.firstName.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Nachname"
-                            placeholder="Mustermann"
                             value={formData.lastName.value}
                             onChange={(e) =>
                               onFormInputChange('lastName', e.target.value)
                             }
-                            required
                             error={!!formData.lastName.errorMessage}
                             helperText={formData.lastName.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Firma"
-                            placeholder="Musterfirma GmbH"
                             value={formData.company.value}
                             onChange={(e) =>
                               onFormInputChange('company', e.target.value)
@@ -197,28 +174,25 @@ export function ClientDetailsModal({
                       </Grid>
                     </Box>
 
-                    <Divider sx={{ my: 4 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
                     {/* Address Section */}
-                    <Box sx={{ mb: 4 }}>
+                    <Box>
                       <Typography
                         variant="overline"
                         sx={{
                           color: 'text.secondary',
                           fontWeight: 600,
-                          letterSpacing: 1.2,
-                          mb: 2,
                           display: 'block',
                         }}
                       >
                         Adresse
                       </Typography>
                       <Grid container spacing={3}>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Straße und Nr."
-                            placeholder="Musterstraße 123"
                             value={formData.street.value}
                             onChange={(e) =>
                               onFormInputChange('street', e.target.value)
@@ -227,11 +201,10 @@ export function ClientDetailsModal({
                             helperText={formData.street.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="PLZ"
-                            placeholder="12345"
                             value={formData.postalCode.value}
                             onChange={(e) =>
                               onFormInputChange('postalCode', e.target.value)
@@ -240,11 +213,10 @@ export function ClientDetailsModal({
                             helperText={formData.postalCode.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Stadt"
-                            placeholder="Musterstadt"
                             value={formData.city.value}
                             onChange={(e) =>
                               onFormInputChange('city', e.target.value)
@@ -256,28 +228,25 @@ export function ClientDetailsModal({
                       </Grid>
                     </Box>
 
-                    <Divider sx={{ my: 4 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
                     {/* Contact Information Section */}
-                    <Box sx={{ mb: 4 }}>
+                    <Box>
                       <Typography
                         variant="overline"
                         sx={{
                           color: 'text.secondary',
                           fontWeight: 600,
-                          letterSpacing: 1.2,
-                          mb: 2,
                           display: 'block',
                         }}
                       >
                         Kontaktdaten
                       </Typography>
                       <Grid container spacing={3}>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Festnetz"
-                            placeholder="+49 123 456789"
                             value={formData.landline.value}
                             onChange={(e) =>
                               onFormInputChange('landline', e.target.value)
@@ -286,11 +255,10 @@ export function ClientDetailsModal({
                             helperText={formData.landline.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="Mobil"
-                            placeholder="+49 170 1234567"
                             value={formData.phoneNumber.value}
                             onChange={(e) =>
                               onFormInputChange('phoneNumber', e.target.value)
@@ -299,12 +267,11 @@ export function ClientDetailsModal({
                             helperText={formData.phoneNumber.errorMessage}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             fullWidth
                             label="E-Mail"
                             type="email"
-                            placeholder="max@musterfirma.de"
                             value={formData.email.value}
                             onChange={(e) =>
                               onFormInputChange('email', e.target.value)
@@ -316,27 +283,25 @@ export function ClientDetailsModal({
                       </Grid>
                     </Box>
 
-                    <Divider sx={{ my: 4 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
                     {/* Additional Information Section */}
-                    <Box sx={{ mb: 4 }}>
+                    <Box>
                       <Typography
                         variant="overline"
                         sx={{
                           color: 'text.secondary',
                           fontWeight: 600,
-                          letterSpacing: 1.2,
-                          mb: 2,
                           display: 'block',
                         }}
                       >
                         Zusätzliche Informationen
                       </Typography>
                       <Grid container spacing={3}>
-                        <Grid sx={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                           <DatePicker
                             label="Geburtstag"
-                            value={dayjs(formData.birthday.value || new Date())}
+                            value={formData.birthday.value}
                             onChange={(newValue) =>
                               onFormInputChange(
                                 'birthday',
@@ -357,11 +322,10 @@ export function ClientDetailsModal({
                             }}
                           />
                         </Grid>
-                        <Grid sx={{ xs: 12, md: 6 }}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                           <TextField
-                            fullWidth
+                            fullWidth={true}
                             label="Kommentar"
-                            placeholder="Zusätzliche Notizen zum Kunden..."
                             multiline
                             rows={3}
                             value={formData.comment.value}
@@ -384,16 +348,14 @@ export function ClientDetailsModal({
                 setCarModalOpen={setCarDialogOpen}
               />
             </Grid>
-            {/* car modal */}
             <AddCarsModal
               isOpen={carDialogOpen}
               onClose={() => setCarDialogOpen(false)}
               setCars={setCars}
             />
-            {/* end car modal */}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => closeSelf()}>Abbrechen</Button>
+            <Button onClick={onCleanAndClose}>Abbrechen</Button>
             <Button
               variant="contained"
               startIcon={
