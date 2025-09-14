@@ -24,19 +24,18 @@ import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
 import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
+import { useNotification } from '@/src/hooks/notification/useNotification';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
 type ClientsTableProps = {
   handleEditClient: (client: BackendClient) => void;
   handleCreateClient: () => void;
-  setError: (message: string) => void;
 };
 
 export function ClientsTable({
   handleCreateClient,
   handleEditClient,
-  setError,
 }: ClientsTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -45,6 +44,7 @@ export function ClientsTable({
   const [totalItems, setTotalItems] = React.useState<number>(0);
 
   const { confirm } = useConfirmation();
+  const { showNotification } = useNotification();
 
   async function fetchData(
     _page: number = 0,
@@ -59,9 +59,12 @@ export function ClientsTable({
       return data;
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
+        showNotification({ message: err.message, level: 'error' });
       } else {
-        setError('An unknown error occurred');
+        showNotification({
+          message: 'An unknown error occurred',
+          level: 'error',
+        });
       }
     } finally {
       setLoading(false);
