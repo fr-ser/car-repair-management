@@ -191,6 +191,7 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                       <TableCell>Autonummer</TableCell>
                       <TableCell>Kennzeichen</TableCell>
                       <TableCell>Hersteller</TableCell>
+                      <TableCell>Modell</TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
@@ -214,6 +215,9 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                         </TableCell>
                         <TableCell data-testid={`car-manufacturer-${car.id}`}>
                           {car.manufacturer}
+                        </TableCell>
+                        <TableCell data-testid={`car-model-${car.id}`}>
+                          {car.model}
                         </TableCell>
                         <TableCell>
                           <IconButton
