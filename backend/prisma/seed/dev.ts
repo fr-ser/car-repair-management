@@ -113,18 +113,21 @@ const seed = async () => {
         licensePlate: 'license-A3',
         model: 'Model A3',
         manufacturer: 'Manufacturer A3',
+        clientId: 2,
       },
       {
         carNumber: 'A2',
         licensePlate: 'license-A2',
         model: 'Model A2',
         manufacturer: 'Manufacturer A2',
+        clientId: 2,
       },
       {
         carNumber: 'A1',
         licensePlate: 'license-A1',
         model: 'Model A1',
         manufacturer: 'Manufacturer A1',
+        clientId: 1,
       },
     ],
   });
