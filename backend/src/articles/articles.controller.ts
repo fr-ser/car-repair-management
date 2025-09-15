@@ -8,7 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
+import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
 
 import { CreateArticleDto, UpdateArticleDto } from './article.dto';
 import { ArticlesService } from './articles.service';
@@ -23,7 +23,7 @@ export class ArticlesController {
   }
 
   @Get()
-  findAll(@Query() query: PaginationQueryDto) {
+  findAll(@Query() query: SearchPaginationQueryDto) {
     return this.articlesService.findAll(query);
   }
 

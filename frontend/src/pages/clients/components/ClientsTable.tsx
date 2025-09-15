@@ -2,6 +2,7 @@ import {
   AddBox as AddBoxIcon,
   Delete as DeleteIcon,
   People as PeopleIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -11,6 +12,7 @@ import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,12 +21,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
 import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
 import { useNotification } from '@/src/hooks/notification/useNotification';
+import { useDebounce } from '@/src/hooks/useDebounce';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
@@ -39,9 +43,11 @@ export function ClientsTable({
 }: ClientsTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [loading, setLoading] = React.useState(false);
   const [clients, setClients] = React.useState<BackendClient[]>([]);
   const [totalItems, setTotalItems] = React.useState<number>(0);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
@@ -49,10 +55,10 @@ export function ClientsTable({
   async function fetchData(
     _page: number = 0,
     _limit: number = 10,
+    _search: string = '',
   ): Promise<BackendClient[]> {
-    setLoading(true);
     try {
-      const response = await apiClient.fetchClients(_page, _limit);
+      const response = await apiClient.fetchClients(_page, _limit, _search);
       const data = response.data;
       setClients(data);
       setTotalItems(response.meta.totalItems);
@@ -66,15 +72,13 @@ export function ClientsTable({
           level: 'error',
         });
       }
-    } finally {
-      setLoading(false);
     }
     return [];
   }
 
-  useQuery({
-    queryKey: ['clients', page, rowsPerPage],
-    queryFn: () => fetchData(page, rowsPerPage),
+  const queryResult = useQuery({
+    queryKey: ['clients', page, rowsPerPage, debouncedSearchTerm],
+    queryFn: () => fetchData(page, rowsPerPage, debouncedSearchTerm),
     placeholderData: [],
   });
 
@@ -90,13 +94,12 @@ export function ClientsTable({
 
     await apiClient.deleteClient(client.id);
     showNotification({ message: `Kunde wurde gelöscht` });
-    await fetchData(page, rowsPerPage);
+    await fetchData(page, rowsPerPage, debouncedSearchTerm);
   }
 
   const handleChangePage = async (_: unknown, newPage: number) => {
     setPage(newPage);
-
-    await fetchData(newPage, rowsPerPage);
+    await fetchData(newPage, rowsPerPage, debouncedSearchTerm);
   };
 
   const handleChangeRowsPerPage = async (
@@ -104,9 +107,20 @@ export function ClientsTable({
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-
-    await fetchData(0, +event.target.value);
+    await fetchData(0, +event.target.value, debouncedSearchTerm);
   };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    // the page is reset on the debounced search term
+  };
+
+  React.useEffect(() => {
+    if (debouncedSearchTerm !== searchTerm) {
+      setPage(0);
+    }
+  }, [debouncedSearchTerm, searchTerm]);
 
   const styles = {
     tableRowStyles: {
@@ -150,7 +164,24 @@ export function ClientsTable({
           sx={{ pb: 1 }}
         />
         <CardContent sx={{ pt: 0 }}>
-          {loading ? (
+          <TextField
+            fullWidth
+            placeholder="Suche nach Autonummer oder Kennzeichen"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{ mb: 2 }}
+          />
+
+          {queryResult.isPending ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <CircularProgress />
             </div>

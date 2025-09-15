@@ -11,8 +11,7 @@ import {
 
 import { CreateClientDto, UpdateClientDto } from '@/src/clients/client.dto';
 import { ClientsService } from '@/src/clients/clients.service';
-
-import { PaginationQueryDto } from '../pagination/pagination.dto';
+import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
 
 @Controller('clients')
 export class ClientsController {
@@ -24,7 +23,7 @@ export class ClientsController {
   }
 
   @Get()
-  async get(@Query() query: PaginationQueryDto) {
+  async get(@Query() query: SearchPaginationQueryDto) {
     return await this.clientService.findAll(query);
   }
 

@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { Car } from '@prisma/client';
 
-import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
-import { PaginationService } from '@/src/pagination/pagination.service';
+import {
+  PaginatedResponseDto,
+  SearchPaginationQueryDto,
+} from '@/src/common/dto/pagination.dto';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateCarDto, UpdateCarDto } from './cars.dto';
 
 @Injectable()
 export class CarsService {
-  constructor(
-    private prisma: PrismaService,
-    private pagination: PaginationService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createCarDto: CreateCarDto) {
     return this.prisma.$transaction(async (tx) => {
@@ -30,8 +30,29 @@ export class CarsService {
     });
   }
 
-  findAll(query: PaginationQueryDto) {
-    return this.pagination.paginate('Car', query);
+  async findAll(query: SearchPaginationQueryDto) {
+    const { page, limit, search } = query;
+
+    const where = search
+      ? {
+          OR: [
+            { carNumber: { contains: search } },
+            { licensePlate: { contains: search } },
+          ],
+        }
+      : {};
+
+    const [total, data] = await Promise.all([
+      this.prisma.car.count({ where }),
+      this.prisma.car.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: query.skip,
+        take: limit,
+      }),
+    ]);
+
+    return new PaginatedResponseDto<Car>(data, total, { page, limit });
   }
 
   findOne(id: number) {
