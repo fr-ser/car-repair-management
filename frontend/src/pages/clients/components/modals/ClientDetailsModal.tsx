@@ -85,13 +85,7 @@ export function ClientDetailsModal({
   }, [selectedClient, reloadForm]);
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={onCleanAndClose}
-      maxWidth="xl"
-      fullWidth
-      keepMounted={false}
-    >
+    <Dialog open={isOpen} onClose={onCleanAndClose} maxWidth="xl" fullWidth>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <PersonIcon />

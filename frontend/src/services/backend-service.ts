@@ -132,6 +132,18 @@ export async function fetchCars(
   return responseData as BackendPaginatedResponse<BackendCar>;
 }
 
+export async function fetchCar(carId: number) {
+  const response = await fetch(`/api/cars/${carId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: BackendCar | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendCar;
+}
+
 export async function deleteCar(carId: number) {
   const response = await fetch(`/api/cars/${carId}`, {
     method: 'DELETE',

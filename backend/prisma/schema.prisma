@@ -45,6 +45,8 @@ model Client {
   city        String?
   street      String?
 
+  cars Car[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -71,6 +73,9 @@ model Car {
   timingBeltDate    String? // there is no "Date" type in SQLite
   documentField2    String?
   documentField3    String?
+
+  clientId Int?
+  client   Client? @relation(fields: [clientId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
