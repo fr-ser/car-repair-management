@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { Client } from '@prisma/client';
 
-import { PaginationQueryDto } from '@/src/pagination/pagination.dto';
-import { PaginationService } from '@/src/pagination/pagination.service';
+import {
+  PaginatedResponseDto,
+  SearchPaginationQueryDto,
+} from '@/src/common/dto/pagination.dto';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateClientDto, UpdateClientDto } from './client.dto';
 
 @Injectable()
 export class ClientsService {
-  constructor(
-    private prisma: PrismaService,
-    private pagination: PaginationService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createClientDto: CreateClientDto) {
     return this.prisma.$transaction(async (tx) => {
@@ -30,8 +30,31 @@ export class ClientsService {
     });
   }
 
-  findAll(query: PaginationQueryDto) {
-    return this.pagination.paginate('Client', query);
+  async findAll(query: SearchPaginationQueryDto) {
+    const { page, limit, search } = query;
+
+    const where = search
+      ? {
+          OR: [
+            { clientNumber: { contains: search } },
+            { firstName: { contains: search } },
+            { lastName: { contains: search } },
+            { company: { contains: search } },
+          ],
+        }
+      : {};
+
+    const [total, data] = await Promise.all([
+      this.prisma.client.count({ where }),
+      this.prisma.client.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: query.skip,
+        take: limit,
+      }),
+    ]);
+
+    return new PaginatedResponseDto<Client>(data, total, { page, limit });
   }
 
   findOne(id: number) {

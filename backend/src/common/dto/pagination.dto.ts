@@ -1,6 +1,6 @@
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class PaginationQueryDto {
+export class SearchPaginationQueryDto {
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -15,6 +15,10 @@ export class PaginationQueryDto {
   get skip(): number {
     return (this.page - 1) * this.limit;
   }
+
+  @IsOptional()
+  @IsString()
+  search: string | undefined;
 }
 
 export class PaginationMeta {

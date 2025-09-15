@@ -11,7 +11,6 @@ import { AuthModule } from './auth/auth.module';
 import { CarsModule } from './cars/cars.module';
 import { ClientsModule } from './clients/clients.module';
 import { ENV_FILE_PATH, validate } from './config';
-import { PaginationModule } from './pagination/pagination.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -32,7 +31,6 @@ import { PrismaModule } from './prisma/prisma.module';
       ],
     }),
     AuthModule,
-    PaginationModule,
     PrismaModule,
     // the modules below represent domain entities
     ArticlesModule,
