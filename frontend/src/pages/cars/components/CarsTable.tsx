@@ -33,7 +33,7 @@ import * as apiClient from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
 type CarsTableProps = {
-  handleEditCar: (car: BackendCar) => void;
+  handleEditCar: (carId: number) => void;
   handleCreateCar: () => void;
 };
 
@@ -203,7 +203,7 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                         key={car.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditCar(car)}
+                        onClick={() => handleEditCar(car.id)}
                         data-testid={`car-row-${car.id}`}
                         sx={styles.tableRowStyles}
                       >
