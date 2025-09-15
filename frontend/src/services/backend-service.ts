@@ -22,9 +22,7 @@ export async function signIn(userName: string, password: string) {
 export async function createClient(client: CreateClientRequest) {
   const response = await fetch(`/api/clients`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client),
   });
   const responseData: BackendClient | ErrorResponse = await response.json();
@@ -40,9 +38,7 @@ export async function updateClient(
 ) {
   const response = await fetch(`/api/clients/${clientId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client),
   });
   const responseData: BackendClient | ErrorResponse = await response.json();
@@ -55,21 +51,28 @@ export async function updateClient(
 export async function deleteClient(clientId: number) {
   const response = await fetch(`/api/clients/${clientId}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
   const responseData: object | ErrorResponse = await response.json();
 
   handleErrorResponse(response, responseData);
 }
 
-export async function fetchClients(page: number = 0, limit: number = 10) {
-  const response = await fetch(`/api/clients?page=${page + 1}&limit=${limit}`, {
+export async function fetchClients(
+  page: number = 0,
+  limit: number = 10,
+  search: string = '',
+) {
+  const queryParameters = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) {
+    queryParameters.append('search', search);
+  }
+  const response = await fetch(`/api/clients?${queryParameters.toString()}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
   const responseData: BackendPaginatedResponse<BackendClient> | ErrorResponse =
     await response.json();
@@ -82,9 +85,7 @@ export async function fetchClients(page: number = 0, limit: number = 10) {
 export async function createCar(car: CreateCarRequest) {
   const response = await fetch(`/api/cars`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(car),
   });
   const responseData: BackendCar | ErrorResponse = await response.json();
@@ -97,9 +98,7 @@ export async function createCar(car: CreateCarRequest) {
 export async function updateCar(carId: number, car: UpdateCarRequest) {
   const response = await fetch(`/api/cars/${carId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(car),
   });
   const responseData: BackendCar | ErrorResponse = await response.json();
@@ -109,12 +108,21 @@ export async function updateCar(carId: number, car: UpdateCarRequest) {
   return responseData as BackendCar;
 }
 
-export async function fetchCars(page: number = 0, limit: number = 10) {
-  const response = await fetch(`/api/cars?page=${page + 1}&limit=${limit}`, {
+export async function fetchCars(
+  page: number = 0,
+  limit: number = 10,
+  search: string = '',
+) {
+  const queryParameters = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) {
+    queryParameters.append('search', search);
+  }
+  const response = await fetch(`/api/cars?${queryParameters.toString()}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
   const responseData: BackendPaginatedResponse<BackendCar> | ErrorResponse =
     await response.json();
@@ -127,9 +135,7 @@ export async function fetchCars(page: number = 0, limit: number = 10) {
 export async function deleteCar(carId: number) {
   const response = await fetch(`/api/cars/${carId}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
   const responseData: object | ErrorResponse = await response.json();
 
