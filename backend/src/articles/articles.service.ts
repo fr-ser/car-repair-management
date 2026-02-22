@@ -24,7 +24,10 @@ export class ArticlesService {
 
     const where = search
       ? {
-          OR: [{ id: { contains: search } }, { title: { contains: search } }],
+          OR: [
+            { id: { contains: search } },
+            { description: { contains: search } },
+          ],
         }
       : {};
 
@@ -45,5 +48,9 @@ export class ArticlesService {
       where: { id },
       data: updateArticleDto,
     });
+  }
+
+  remove(id: string) {
+    return this.prisma.article.delete({ where: { id } });
   }
 }

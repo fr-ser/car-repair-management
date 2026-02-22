@@ -1,4 +1,4 @@
-import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsNotEmpty,
   IsNumberString,
@@ -23,6 +23,4 @@ export class CreateArticleDto {
   amount?: string;
 }
 
-export class UpdateArticleDto extends PartialType(
-  OmitType(CreateArticleDto, ['id'] as const),
-) {}
+export class UpdateArticleDto extends PartialType(CreateArticleDto) {}
