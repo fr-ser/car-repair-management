@@ -33,7 +33,7 @@ import * as apiClient from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
 type CarsTableProps = {
-  handleEditCar: (car: BackendCar) => void;
+  handleEditCar: (carId: number) => void;
   handleCreateCar: () => void;
 };
 
@@ -191,6 +191,7 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                       <TableCell>Autonummer</TableCell>
                       <TableCell>Kennzeichen</TableCell>
                       <TableCell>Hersteller</TableCell>
+                      <TableCell>Modell</TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
@@ -202,7 +203,7 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                         key={car.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditCar(car)}
+                        onClick={() => handleEditCar(car.id)}
                         data-testid={`car-row-${car.id}`}
                         sx={styles.tableRowStyles}
                       >
@@ -214,6 +215,9 @@ export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
                         </TableCell>
                         <TableCell data-testid={`car-manufacturer-${car.id}`}>
                           {car.manufacturer}
+                        </TableCell>
+                        <TableCell data-testid={`car-model-${car.id}`}>
+                          {car.model}
                         </TableCell>
                         <TableCell>
                           <IconButton

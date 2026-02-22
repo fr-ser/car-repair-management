@@ -107,6 +107,10 @@ export class CreateCarDto {
   @IsString()
   @IsOptional()
   documentField3?: string;
+
+  @IsOptional()
+  @IsNumber()
+  clientId?: number | null;
 }
 
 export class UpdateCarDto extends PartialType(CreateCarDto) {}

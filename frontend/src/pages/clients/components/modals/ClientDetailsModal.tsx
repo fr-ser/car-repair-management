@@ -13,13 +13,13 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 
 import { useNotification } from '@/src/hooks/notification/useNotification';
 import { CarsCard } from '@/src/pages/clients/components/CarsCard';
 import { AddCarsModal } from '@/src/pages/clients/components/modals/AddCarsModal';
-import useClientForm from '@/src/pages/clients/useClientForm.hook';
+import { useClientForm } from '@/src/pages/clients/useClientForm.hook';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
@@ -39,11 +39,15 @@ export function ClientDetailsModal({
   const { formData, reloadForm, onFormInputChange, getPayload } =
     useClientForm(selectedClient);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [cars, setCars] = useState<any[]>([]);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const { data: clientWithCars } = useQuery({
+    queryKey: ['client', selectedClient?.id],
+    queryFn: () => apiService.fetchClient(selectedClient!.id),
+    enabled: !!selectedClient && isOpen,
+  });
 
   async function handleSubmit() {
     if (selectedClient !== undefined) {
@@ -85,13 +89,7 @@ export function ClientDetailsModal({
   }, [selectedClient, reloadForm]);
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={onCleanAndClose}
-      maxWidth="xl"
-      fullWidth
-      keepMounted={false}
-    >
+    <Dialog open={isOpen} onClose={onCleanAndClose} maxWidth="xl" fullWidth>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <PersonIcon />
@@ -313,17 +311,21 @@ export function ClientDetailsModal({
             </Card>
           </Grid>
 
-          <CarsCard
-            cars={cars}
-            setCars={setCars}
-            setCarModalOpen={setCarDialogOpen}
-          />
+          {selectedClient && (
+            <CarsCard
+              cars={clientWithCars?.cars ?? []}
+              clientId={selectedClient.id}
+              setCarModalOpen={setCarDialogOpen}
+            />
+          )}
         </Grid>
-        <AddCarsModal
-          isOpen={carDialogOpen}
-          onClose={() => setCarDialogOpen(false)}
-          setCars={setCars}
-        />
+        {selectedClient && (
+          <AddCarsModal
+            isOpen={carDialogOpen}
+            onClose={() => setCarDialogOpen(false)}
+            clientId={selectedClient.id}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onCleanAndClose}>Abbrechen</Button>

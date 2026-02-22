@@ -8,25 +8,43 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { useNotification } from '@/src/hooks/notification/useNotification';
+import * as apiService from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
 type CarsCardProps = {
   cars: BackendCar[];
-  setCars: React.Dispatch<React.SetStateAction<BackendCar[]>>;
+  clientId: number;
   setCarModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export function CarsCard({ cars, setCars, setCarModalOpen }: CarsCardProps) {
-  const handleRemoveCar = (carId: number) => {
-    setCars((prev) => prev.filter((car) => car.id !== carId));
-  };
+export function CarsCard({ cars, clientId, setCarModalOpen }: CarsCardProps) {
+  const { showNotification } = useNotification();
+  const queryClient = useQueryClient();
+
+  const removeMutation = useMutation({
+    mutationFn: (carId: number) =>
+      apiService.updateCar(carId, { clientId: null }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['client', clientId] });
+    },
+    onError: (error: unknown) => {
+      showNotification({
+        level: 'error',
+        message:
+          error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten',
+      });
+    },
+  });
 
   return (
     <Grid sx={{ xs: 12, lg: 4 }}>
@@ -78,10 +96,15 @@ export function CarsCard({ cars, setCars, setCarModalOpen }: CarsCardProps) {
                     <IconButton
                       edge="end"
                       size="small"
-                      onClick={() => handleRemoveCar(car.id)}
+                      onClick={() => removeMutation.mutate(car.id)}
                       color="error"
+                      disabled={removeMutation.isPending}
                     >
-                      <DeleteIcon fontSize="small" />
+                      {removeMutation.isPending ? (
+                        <CircularProgress size={16} />
+                      ) : (
+                        <DeleteIcon fontSize="small" />
+                      )}
                     </IconButton>
                   }
                 >

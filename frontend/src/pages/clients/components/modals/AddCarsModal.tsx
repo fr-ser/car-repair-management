@@ -1,44 +1,67 @@
 import { DirectionsCar as CarIcon } from '@mui/icons-material';
+import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { useNotification } from '@/src/hooks/notification/useNotification';
+import { useDebounce } from '@/src/hooks/useDebounce';
+import * as apiService from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
 type AddCarsModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  setCars: React.Dispatch<React.SetStateAction<BackendCar[]>>;
+  clientId: number;
 };
 
-export function AddCarsModal({ isOpen, onClose, setCars }: AddCarsModalProps) {
-  const [newCar, setNewCar] = useState({
-    marke: '',
-    modell: '',
-    kennzeichen: '',
-    baujahr: '',
+export function AddCarsModal({ isOpen, onClose, clientId }: AddCarsModalProps) {
+  const { showNotification } = useNotification();
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState('');
+  const [selectedCar, setSelectedCar] = useState<BackendCar | null>(null);
+  const debouncedSearch = useDebounce(search, 300);
+
+  const { data: carsData, isLoading } = useQuery({
+    queryKey: ['cars', { search: debouncedSearch }],
+    queryFn: () => apiService.fetchCars(0, 20, debouncedSearch),
+    enabled: isOpen,
   });
-  const handleAddCar = () => {
-    if (newCar.marke && newCar.modell && newCar.kennzeichen) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const car: any = {
-        id: Date.now(),
-        ...newCar,
-      };
-      setCars((prev: BackendCar[]) => [...prev, car]);
-      setNewCar({ marke: '', modell: '', kennzeichen: '', baujahr: '' });
-      onClose();
-    }
+
+  const unassignedCars = (carsData?.data ?? []).filter(
+    (car) => car.clientId == null,
+  );
+
+  const assignMutation = useMutation({
+    mutationFn: (car: BackendCar) => apiService.updateCar(car.id, { clientId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['client', clientId] });
+      handleClose();
+    },
+    onError: (error: unknown) => {
+      showNotification({
+        level: 'error',
+        message:
+          error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten',
+      });
+    },
+  });
+
+  const handleClose = () => {
+    setSearch('');
+    setSelectedCar(null);
+    onClose();
   };
 
   return (
-    <Dialog open={isOpen} onClose={() => onClose()} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <CarIcon />
@@ -46,62 +69,38 @@ export function AddCarsModal({ isOpen, onClose, setCars }: AddCarsModalProps) {
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
-          <Grid sx={{ xs: 12, sm: 6 }}>
+        <Autocomplete
+          sx={{ mt: 2 }}
+          options={unassignedCars}
+          getOptionLabel={(option) =>
+            `${option.licensePlate} – ${option.manufacturer} ${option.model}`
+          }
+          loading={isLoading}
+          value={selectedCar}
+          onChange={(_, value) => setSelectedCar(value)}
+          inputValue={search}
+          onInputChange={(_, value) => setSearch(value)}
+          filterOptions={(x) => x}
+          renderInput={(params) => (
             <TextField
-              fullWidth
-              label="Marke"
-              placeholder="BMW"
-              value={newCar.marke}
-              onChange={(e) =>
-                setNewCar((prev) => ({ ...prev, marke: e.target.value }))
-              }
+              {...params}
+              label="Fahrzeug suchen"
+              placeholder="Kennzeichen, Hersteller oder Modell"
             />
-          </Grid>
-          <Grid sx={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              label="Modell"
-              placeholder="3er"
-              value={newCar.modell}
-              onChange={(e) =>
-                setNewCar((prev) => ({ ...prev, modell: e.target.value }))
-              }
-            />
-          </Grid>
-          <Grid sx={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              label="Kennzeichen"
-              placeholder="M-AB 123"
-              value={newCar.kennzeichen}
-              onChange={(e) =>
-                setNewCar((prev) => ({
-                  ...prev,
-                  kennzeichen: e.target.value,
-                }))
-              }
-            />
-          </Grid>
-          <Grid sx={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              label="Baujahr"
-              placeholder="2020"
-              value={newCar.baujahr}
-              onChange={(e) =>
-                setNewCar((prev) => ({ ...prev, baujahr: e.target.value }))
-              }
-            />
-          </Grid>
-        </Grid>
+          )}
+        />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose()}>Abbrechen</Button>
+        <Button onClick={handleClose}>Abbrechen</Button>
         <Button
           variant="contained"
-          onClick={handleAddCar}
-          disabled={!newCar.marke || !newCar.modell || !newCar.kennzeichen}
+          onClick={() => selectedCar && assignMutation.mutate(selectedCar)}
+          disabled={!selectedCar || assignMutation.isPending}
+          startIcon={
+            assignMutation.isPending ? (
+              <CircularProgress size={18} />
+            ) : undefined
+          }
         >
           Hinzufügen
         </Button>

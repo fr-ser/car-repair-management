@@ -17,10 +17,10 @@ import { App } from './App.tsx';
 import './globals.css';
 import { ConfirmationProvider } from './hooks/confirmation/ConfirmationProvider.tsx';
 import { NotificationProvider } from './hooks/notification/NotificationProvider.tsx';
-import LoginPage from './pages/auth/LoginPage.tsx';
+import { LoginPage } from './pages/auth/LoginPage.tsx';
 import { CarListPage } from './pages/cars/CarListPage.tsx';
 import { ClientListPage } from './pages/clients/ClientListPage.tsx';
-import theme from './theme.ts';
+import { theme } from './theme.ts';
 
 const router = createBrowserRouter([
   {

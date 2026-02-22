@@ -58,7 +58,10 @@ export class ClientsService {
   }
 
   findOne(id: number) {
-    return this.prisma.client.findUniqueOrThrow({ where: { id } });
+    return this.prisma.client.findUniqueOrThrow({
+      where: { id },
+      include: { cars: true },
+    });
   }
 
   update(id: number, updateClientDto: UpdateClientDto) {

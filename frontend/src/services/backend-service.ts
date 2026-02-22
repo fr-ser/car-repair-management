@@ -1,6 +1,7 @@
 import {
   BackendCar,
   BackendClient,
+  BackendClientWithCars,
   BackendPaginatedResponse,
   ErrorResponse,
 } from '@/src/types/backend-contracts';
@@ -56,6 +57,19 @@ export async function deleteClient(clientId: number) {
   const responseData: object | ErrorResponse = await response.json();
 
   handleErrorResponse(response, responseData);
+}
+
+export async function fetchClient(clientId: number) {
+  const response = await fetch(`/api/clients/${clientId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: BackendClientWithCars | ErrorResponse =
+    await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendClientWithCars;
 }
 
 export async function fetchClients(
@@ -130,6 +144,18 @@ export async function fetchCars(
   handleErrorResponse(response, responseData);
 
   return responseData as BackendPaginatedResponse<BackendCar>;
+}
+
+export async function fetchCar(carId: number) {
+  const response = await fetch(`/api/cars/${carId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: BackendCar | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendCar;
 }
 
 export async function deleteCar(carId: number) {

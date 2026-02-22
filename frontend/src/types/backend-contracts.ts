@@ -11,6 +11,10 @@ export interface BackendClient extends Client {}
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BackendCar extends Car {}
 
+export interface BackendClientWithCars extends BackendClient {
+  cars: BackendCar[];
+}
+
 export interface BackendPaginatedResponse<T> {
   data: T[];
   meta: {

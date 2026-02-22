@@ -73,10 +73,13 @@ function getFromFromClient(data?: BackendCar): CarForm {
     documentField3: {
       value: data?.documentField3 ?? '',
     },
+    clientId: {
+      value: data?.clientId ?? null,
+    },
   };
 }
 
-export default (data?: BackendCar) => {
+export function useCarForm(data?: BackendCar) {
   const [formData, setFormData] = React.useState<CarForm>(
     getFromFromClient(data),
   );
@@ -86,7 +89,7 @@ export default (data?: BackendCar) => {
   }, []);
 
   const onFormInputChange = React.useCallback(
-    (field: keyof CarForm, value: string | Date | null) => {
+    (field: keyof CarForm, value: string | number | Date | null) => {
       let formattedValue;
       if (value instanceof Date) {
         formattedValue = dayjs(value);
@@ -141,6 +144,11 @@ export default (data?: BackendCar) => {
     };
 
     Object.entries(formData).forEach(([key, field]) => {
+      if (key === 'clientId') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (result as any)[key] = field.value as number | null;
+        return;
+      }
       if (field.value) {
         if (dateFields.includes(key)) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,4 +174,4 @@ export default (data?: BackendCar) => {
     validate,
     getPayload,
   };
-};
+}

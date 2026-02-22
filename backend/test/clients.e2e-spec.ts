@@ -74,6 +74,33 @@ describe('Clients e2e', () => {
       });
   });
 
+  it('can get a single client with cars', async () => {
+    const clientData: CreateClientDto = {
+      firstName: 'Test',
+      phoneNumber: '+49111111111',
+      email: 'test@example.com',
+    };
+    const createdClient = await prisma.client.create({ data: clientData });
+    await prisma.car.create({
+      data: {
+        licensePlate: 'AB-CD 123',
+        manufacturer: 'BMW',
+        model: 'M3',
+        clientId: createdClient.id,
+      },
+    });
+
+    await pactum
+      .spec()
+      .get(`/api/clients/${createdClient.id}`)
+      .withCookies(AUTH_JWT_COOKIE_KEY, await getValidJwt(app))
+      .expectStatus(200)
+      .expectJsonLike({
+        ...clientData,
+        cars: [{ licensePlate: 'AB-CD 123', manufacturer: 'BMW', model: 'M3' }],
+      });
+  });
+
   it('can edit a client', async () => {
     const previousClient: CreateClientDto = {
       firstName: 'Test',
