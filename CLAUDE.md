@@ -1,0 +1,100 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+A car repair shop management application — monorepo with a NestJS backend and React frontend. The backend serves frontend static assets in production. All endpoints are JWT-protected except login.
+
+## Commands
+
+### Root (Makefile)
+```bash
+make install              # Install all dependencies and set up dev database
+make up-be                # Start backend (dev mode)
+make up-fe                # Start frontend (dev mode)
+make build                # Build both for production
+make format               # Auto-fix lint issues (ESLint --fix)
+make test                 # Lint + Playwright e2e tests
+make test-all             # All tests: frontend, backend, e2e
+make test-e2e-playwright  # Playwright e2e tests only
+```
+
+### Backend (`backend/`)
+```bash
+make test                      # Lint + unit + e2e tests
+yarn run test:unit             # Unit tests only (vitest run src)
+yarn run test:e2e              # Backend e2e tests (vitest run test --no-file-parallelism)
+make db-create-migration       # Create Prisma migration
+make setup-clean-test-database # Recreate clean test DB
+make run-prisma-studio         # Open Prisma Studio
+```
+
+### Frontend (`frontend/`)
+```bash
+make test          # Lint + unit tests
+yarn run test      # Unit tests only (vitest run)
+yarn run test:cov  # With coverage
+```
+
+### Running a single test file
+```bash
+# Backend unit test
+cd backend && yarn vitest run src/path/to/file.spec.ts
+
+# Backend e2e test
+cd backend && yarn vitest run test/auth.e2e-spec.ts --no-file-parallelism
+
+# Frontend unit test
+cd frontend && yarn vitest run src/path/to/file.test.tsx
+
+# Playwright single spec
+yarn playwright test tests/e2e/clients.spec.ts
+```
+
+## Architecture
+
+### Tech Stack
+- **Backend**: NestJS 11, TypeScript, Prisma ORM, SQLite
+- **Frontend**: React 18, React Router v7, TanStack Query v5, MUI v7, Vite
+- **Auth**: JWT in cookies (argon2 password hashing), global `JwtAuthGuard` on all routes
+- **Testing**: Vitest (unit + backend e2e), Playwright (full e2e)
+- **Package manager**: Yarn
+
+### Backend structure (`backend/src/`)
+Domain modules: `auth/`, `cars/`, `clients/`, `articles/`. Each module follows NestJS convention (module, controller, service, DTOs).
+
+Key cross-cutting concerns in `common/`:
+- Global JWT auth guard applied to all endpoints
+- Global validation pipe with `transform: true`
+- Request logging via morgan middleware
+
+The backend also serves the compiled frontend as static files.
+
+### Frontend structure (`frontend/src/`)
+- `pages/` — Route-level page components
+- `components/` — Reusable UI components (e.g. `DecimalTextField`, `MaskedTextField`, `MenuBar`)
+- `services/backend-service.ts` — Centralized HTTP client for all API calls
+- `hooks/` — Custom hooks: `useNotification`, `useConfirmation`, `useDebounce`
+- `types/` — Shared TypeScript types
+- `theme.ts` — MUI theme
+
+State management uses TanStack Query for all server state. The app uses German locale (dayjs, date formats).
+
+### Data model
+**Client** — has many **Cars** (optional FK). **Car** stores extensive vehicle details (registration, engine, service dates). **Article** is inventory. **User** stores hashed credentials only.
+
+Dates are stored as strings in SQLite (no native Date type).
+
+### API conventions
+- Base path: `/api/`
+- List endpoints support `page`, `pageSize`, and `search` query params
+- Auth via JWT cookie; sign-in at `POST /api/auth/sign-in`
+
+### Environment
+- Dev DB: `backend/dev.db`, Test DB: `backend/test.db`
+- Dev env file: `backend/.env.development`; test env: `backend/.env.test`
+- Default local credentials: `admin` / `local`
+
+### Import ordering (Prettier)
+Enforced by `@trivago/prettier-plugin-sort-imports`: external packages → `@/` paths → relative imports. Single quotes throughout.
