@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { ConfirmationContext } from './ConfirmationProvider';
 import { ConfirmationContextType } from './types';
 
-export const useConfirmation = (): ConfirmationContextType => {
+const useConfirmation = (): ConfirmationContextType => {
   const context = useContext(ConfirmationContext);
   if (!context) {
     throw new Error(
@@ -12,3 +12,5 @@ export const useConfirmation = (): ConfirmationContextType => {
   }
   return context;
 };
+
+export default useConfirmation;

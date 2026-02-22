@@ -2,22 +2,26 @@ import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import useModalState from '@/src/hooks/useModalState';
+import { BackendArticle } from '@/src/types/backend-contracts';
 
-import CarDetailsModal from './components/CarDetailsModal';
-import CarsTable from './components/CarsTable';
+import ArticleDetailsModal from './components/ArticleDetailsModal';
+import ArticlesTable from './components/ArticlesTable';
 
 const queryClient = new QueryClient();
 
-export default function CarListPage() {
+export default function ArticleListPage() {
   const { open, selected, handleOpen, handleCreate, handleClose } =
-    useModalState<number>();
+    useModalState<BackendArticle>();
 
   return (
     <Box>
       <QueryClientProvider client={queryClient}>
-        <CarsTable handleEditCar={handleOpen} handleCreateCar={handleCreate} />
-        <CarDetailsModal
-          selectedCarId={selected}
+        <ArticlesTable
+          handleEditArticle={handleOpen}
+          handleCreateArticle={handleCreate}
+        />
+        <ArticleDetailsModal
+          selectedArticle={selected}
           isOpen={open}
           onClose={handleClose}
         />

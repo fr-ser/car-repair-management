@@ -13,14 +13,15 @@ import {
   createBrowserRouter,
 } from 'react-router-dom';
 
-import { App } from './App.tsx';
+import App from './App.tsx';
 import './globals.css';
 import { ConfirmationProvider } from './hooks/confirmation/ConfirmationProvider.tsx';
 import { NotificationProvider } from './hooks/notification/NotificationProvider.tsx';
-import { LoginPage } from './pages/auth/LoginPage.tsx';
-import { CarListPage } from './pages/cars/CarListPage.tsx';
-import { ClientListPage } from './pages/clients/ClientListPage.tsx';
-import { theme } from './theme.ts';
+import ArticleListPage from './pages/articles/ArticleListPage.tsx';
+import LoginPage from './pages/auth/LoginPage.tsx';
+import CarListPage from './pages/cars/CarListPage.tsx';
+import ClientListPage from './pages/clients/ClientListPage.tsx';
+import theme from './theme.ts';
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
       { path: '/orders', element: <div>/orders</div> },
       { path: '/overview', element: <div>/overview</div> },
       { path: '/documents', element: <div>/documents</div> },
-      { path: '/articles', element: <div>/articles</div> },
+      { path: '/articles', element: <ArticleListPage /> },
       { path: '/login', element: <LoginPage /> },
     ],
   },

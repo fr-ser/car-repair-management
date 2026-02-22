@@ -17,7 +17,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useNotification } from '@/src/hooks/notification/useNotification';
+import useNotification from '@/src/hooks/notification/useNotification';
 import * as apiService from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
@@ -27,7 +27,11 @@ type CarsCardProps = {
   setCarModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export function CarsCard({ cars, clientId, setCarModalOpen }: CarsCardProps) {
+export default function CarsCard({
+  cars,
+  clientId,
+  setCarModalOpen,
+}: CarsCardProps) {
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
 

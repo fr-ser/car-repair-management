@@ -16,9 +16,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 
-import { useNotification } from '@/src/hooks/notification/useNotification';
-import { CarsCard } from '@/src/pages/clients/components/CarsCard';
-import { AddCarsModal } from '@/src/pages/clients/components/modals/AddCarsModal';
+import useNotification from '@/src/hooks/notification/useNotification';
+import CarsCard from '@/src/pages/clients/components/CarsCard';
+import AddCarsModal from '@/src/pages/clients/components/modals/AddCarsModal';
 import { useClientForm } from '@/src/pages/clients/useClientForm.hook';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
@@ -29,7 +29,7 @@ type ClientDetailsPageProps = {
   onClose: () => void;
 };
 
-export function ClientDetailsModal({
+export default function ClientDetailsModal({
   selectedClient,
   isOpen,
   onClose,

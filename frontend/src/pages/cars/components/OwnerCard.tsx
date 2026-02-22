@@ -17,7 +17,7 @@ import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
-import { useDebounce } from '@/src/hooks/useDebounce';
+import useDebounce from '@/src/hooks/useDebounce';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
@@ -26,7 +26,10 @@ type OwnerCardProps = {
   onFormInputChange: (field: 'clientId', value: number | null) => void;
 };
 
-export function OwnerCard({ clientId, onFormInputChange }: OwnerCardProps) {
+export default function OwnerCard({
+  clientId,
+  onFormInputChange,
+}: OwnerCardProps) {
   const [assignDialogOpen, setAssignDialogOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [selectedOption, setSelectedOption] =

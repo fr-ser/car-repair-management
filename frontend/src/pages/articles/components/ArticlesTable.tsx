@@ -1,6 +1,6 @@
 import {
   AddBox as AddBoxIcon,
-  DirectionsCar as CarIcon,
+  Article as ArticleIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
@@ -28,11 +28,12 @@ import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
 import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
-import { BackendCar } from '@/src/types/backend-contracts';
+import { BackendArticle } from '@/src/types/backend-contracts';
+import { formatNumber } from '@/src/utils/numbers';
 
-type CarsTableProps = {
-  handleEditCar: (carId: number) => void;
-  handleCreateCar: () => void;
+type ArticlesTableProps = {
+  handleEditArticle: (article: BackendArticle) => void;
+  handleCreateArticle: () => void;
 };
 
 const tableRowStyles = {
@@ -44,12 +45,12 @@ const tableRowStyles = {
   },
 };
 
-export default function CarsTable({
-  handleCreateCar,
-  handleEditCar,
-}: CarsTableProps) {
+export default function ArticlesTable({
+  handleCreateArticle,
+  handleEditArticle,
+}: ArticlesTableProps) {
   const {
-    items: cars,
+    items: articles,
     totalItems,
     isPending,
     page,
@@ -57,25 +58,24 @@ export default function CarsTable({
     searchTerm,
     refetch,
     handlers,
-  } = useTableData<BackendCar>('cars', (p, l, s) =>
-    apiClient.fetchCars(p, l, s),
+  } = useTableData<BackendArticle>('articles', (p, l, s) =>
+    apiClient.fetchArticles(p, l, s),
   );
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
 
-  async function handleDelete(car: BackendCar) {
-    const carText = `${car.licensePlate} ${car.manufacturer}`;
+  async function handleDeleteArticle(article: BackendArticle) {
     const isConfirmed = await confirm({
-      title: `Bestätigung - Auto löschen - ${carText}`,
+      title: `Bestätigung - Artikel löschen - ${article.description}`,
       message:
-        `Möchten Sie das Auto "${carText}" wirklich löschen? ` +
+        `Möchten Sie den Artikel "${article.description}" wirklich löschen? ` +
         'Diese Aktion kann nicht rückgängig gemacht werden.',
     });
     if (!isConfirmed) return;
 
-    await apiClient.deleteCar(car.id);
-    showNotification({ message: `Auto wurde gelöscht` });
+    await apiClient.deleteArticle(article.id);
+    showNotification({ message: `Artikel wurde gelöscht` });
     await refetch();
   }
 
@@ -85,13 +85,13 @@ export default function CarsTable({
         <CardHeader
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CarIcon />
+              <ArticleIcon />
               <Typography
                 variant="h6"
                 component="h3"
                 sx={{ fontWeight: 500, pr: 14 }}
               >
-                Autos
+                Artikel
               </Typography>
             </Box>
           }
@@ -101,10 +101,10 @@ export default function CarsTable({
               color="secondary"
               startIcon={<AddBoxIcon />}
               size="small"
-              onClick={handleCreateCar}
-              data-testid="button-car-create"
+              onClick={handleCreateArticle}
+              data-testid="button-article-create"
             >
-              Auto erstellen
+              Artikel erstellen
             </Button>
           }
           sx={{ pb: 1 }}
@@ -112,7 +112,7 @@ export default function CarsTable({
         <CardContent sx={{ pt: 0 }}>
           <TextField
             fullWidth
-            placeholder="Suche nach Autonummer oder Kennzeichen"
+            placeholder="Suche nach Artikel-Nr oder Bezeichnung"
             value={searchTerm}
             onChange={handlers.onSearchChange}
             slotProps={{
@@ -137,36 +137,42 @@ export default function CarsTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Autonummer</TableCell>
-                      <TableCell>Kennzeichen</TableCell>
-                      <TableCell>Hersteller</TableCell>
-                      <TableCell>Modell</TableCell>
+                      <TableCell>Artikel-Nr</TableCell>
+                      <TableCell>Bezeichnung</TableCell>
+                      <TableCell>Preis / Einheit</TableCell>
+                      <TableCell>Menge</TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {cars.map((car) => (
+                    {articles.map((article) => (
                       <TableRow
-                        key={car.id}
+                        key={article.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditCar(car.id)}
-                        data-testid={`car-row-${car.id}`}
+                        onClick={() => handleEditArticle(article)}
+                        data-testid={`article-row-${article.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell data-testid={`car-number-${car.id}`}>
-                          {car.carNumber}
+                        <TableCell data-testid={`article-id-${article.id}`}>
+                          {article.id}
                         </TableCell>
-                        <TableCell data-testid={`car-license-plate-${car.id}`}>
-                          {car.licensePlate}
+                        <TableCell
+                          data-testid={`article-description-${article.id}`}
+                        >
+                          {article.description}
                         </TableCell>
-                        <TableCell data-testid={`car-manufacturer-${car.id}`}>
-                          {car.manufacturer}
+                        <TableCell>
+                          {formatNumber(Number(article.price), {
+                            currency: true,
+                          })}
                         </TableCell>
-                        <TableCell data-testid={`car-model-${car.id}`}>
-                          {car.model}
+                        <TableCell>
+                          {article.amount != null
+                            ? formatNumber(Number(article.amount))
+                            : '–'}
                         </TableCell>
                         <TableCell>
                           <IconButton
@@ -175,10 +181,10 @@ export default function CarsTable({
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleDelete(car);
+                              handleDeleteArticle(article);
                             }}
                             color="error"
-                            data-testid={`button-car-delete-${car.id}`}
+                            data-testid={`button-article-delete-${article.id}`}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>

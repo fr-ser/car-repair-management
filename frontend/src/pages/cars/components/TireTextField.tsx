@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IMaskInput } from 'react-imask';
 
-import { MaskedTextField } from '@/src/components/MaskedTextField';
+import MaskedTextField from '@/src/components/MaskedTextField';
 
 interface CustomProps {
   onChange: (event: { target: { value: string } }) => void;
@@ -38,7 +38,7 @@ interface InputProps {
   error?: string;
 }
 
-export function TireTextField(props: InputProps) {
+export default function TireTextField(props: InputProps) {
   const { value, onChange, id, label, error } = props;
 
   return (

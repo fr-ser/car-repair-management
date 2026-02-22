@@ -1,4 +1,9 @@
 import {
+  CreateArticleRequest,
+  UpdateArticleRequest,
+} from '@/src/types/articles';
+import {
+  BackendArticle,
   BackendCar,
   BackendClient,
   BackendClientWithCars,
@@ -160,6 +165,69 @@ export async function fetchCar(carId: number) {
 
 export async function deleteCar(carId: number) {
   const response = await fetch(`/api/cars/${carId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: object | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+}
+
+export async function fetchArticles(
+  page: number = 0,
+  limit: number = 10,
+  search: string = '',
+) {
+  const queryParameters = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) {
+    queryParameters.append('search', search);
+  }
+  const response = await fetch(`/api/articles?${queryParameters.toString()}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: BackendPaginatedResponse<BackendArticle> | ErrorResponse =
+    await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendPaginatedResponse<BackendArticle>;
+}
+
+export async function createArticle(article: CreateArticleRequest) {
+  const response = await fetch(`/api/articles`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(article),
+  });
+  const responseData: BackendArticle | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendArticle;
+}
+
+export async function updateArticle(
+  articleId: string,
+  article: UpdateArticleRequest,
+) {
+  const response = await fetch(`/api/articles/${articleId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(article),
+  });
+  const responseData: BackendArticle | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendArticle;
+}
+
+export async function deleteArticle(articleId: string) {
+  const response = await fetch(`/api/articles/${articleId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });

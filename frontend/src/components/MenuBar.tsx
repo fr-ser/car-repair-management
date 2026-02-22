@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export function MenuBar() {
+export default function MenuBar() {
   const redirect = useNavigate();
 
   const [currentLink, setCurrentLink] = React.useState(location.pathname);

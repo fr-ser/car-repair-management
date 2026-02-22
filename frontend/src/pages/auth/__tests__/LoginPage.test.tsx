@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { signIn } from '@/src/services/backend-service';
 
-import { LoginPage } from '../LoginPage';
+import LoginPage from '../LoginPage';
 
 vi.mock('@/src/services/backend-service');
 

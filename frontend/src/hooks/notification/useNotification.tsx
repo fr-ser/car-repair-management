@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { NotificationContext } from './NotificationProvider';
 import { NotificationContextType } from './types';
 
-export const useNotification = (): NotificationContextType => {
+const useNotification = (): NotificationContextType => {
   const context = useContext(NotificationContext);
   if (!context) {
     throw new Error(
@@ -12,3 +12,5 @@ export const useNotification = (): NotificationContextType => {
   }
   return context;
 };
+
+export default useNotification;

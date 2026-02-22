@@ -111,6 +111,13 @@ Dates are stored as strings in SQLite (no native Date type).
 
 Enforced by `@trivago/prettier-plugin-sort-imports`: external packages → `@/` paths → relative imports. Single quotes throughout.
 
+### Import paths (Frontend)
+
+Prefer `@/src/...` absolute imports over relative ones. Allowed exceptions:
+
+- Direct siblings in the same directory (e.g. `./utils`)
+- Test files going one level up to the file under test (e.g. `../ComponentName` from a `__tests__/` folder)
+
 ### Exports (Frontend)
 
 Use named exports throughout (`export function Foo`, `export const bar`).
