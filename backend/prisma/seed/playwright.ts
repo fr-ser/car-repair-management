@@ -64,7 +64,7 @@ const seed = async () => {
       },
       {
         clientNumber: 'K2',
-        firstName: 'FTest 2',
+        firstName: 'FTest 2 - Car Assignment',
         lastName: 'LTest 2',
         postalCode: '22222',
         city: 'test City',

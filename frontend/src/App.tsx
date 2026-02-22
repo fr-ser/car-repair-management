@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Outlet } from 'react-router-dom';
 
-import MenuBar from './components/MenuBar.tsx';
+import { MenuBar } from './components/MenuBar.tsx';
 
 export function App() {
   return (

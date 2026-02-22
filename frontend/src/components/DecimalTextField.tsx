@@ -3,7 +3,7 @@ import { IMaskInput } from 'react-imask';
 
 import { DECIMAL_SEPARATOR, THOUSANDS_SEPARATOR } from '@/src/utils/numbers';
 
-import MaskedTextField from './MaskedTextField';
+import { MaskedTextField } from './MaskedTextField';
 
 interface CustomProps {
   onChange: (event: { target: { value: string } }) => void;
@@ -35,7 +35,7 @@ interface DecimalTextFieldProps {
   error?: string;
 }
 
-export default function DecimalTextField(props: DecimalTextFieldProps) {
+export function DecimalTextField(props: DecimalTextFieldProps) {
   const { value, onChange, id, label, error } = props;
 
   return (

@@ -9,6 +9,7 @@ A car repair shop management application — monorepo with a NestJS backend and 
 ## Commands
 
 ### Root (Makefile)
+
 ```bash
 make install              # Install all dependencies and set up dev database
 make up-be                # Start backend (dev mode)
@@ -21,6 +22,7 @@ make test-e2e-playwright  # Playwright e2e tests only
 ```
 
 ### Backend (`backend/`)
+
 ```bash
 make test                      # Lint + unit + e2e tests
 yarn run test:unit             # Unit tests only (vitest run src)
@@ -31,6 +33,7 @@ make run-prisma-studio         # Open Prisma Studio
 ```
 
 ### Frontend (`frontend/`)
+
 ```bash
 make test          # Lint + unit tests
 yarn run test      # Unit tests only (vitest run)
@@ -38,6 +41,7 @@ yarn run test:cov  # With coverage
 ```
 
 ### Running a single test file
+
 ```bash
 # Backend unit test
 cd backend && yarn vitest run src/path/to/file.spec.ts
@@ -55,6 +59,7 @@ yarn playwright test tests/e2e/clients.spec.ts
 ## Architecture
 
 ### Tech Stack
+
 - **Backend**: NestJS 11, TypeScript, Prisma ORM, SQLite
 - **Frontend**: React 18, React Router v7, TanStack Query v5, MUI v7, Vite
 - **Auth**: JWT in cookies (argon2 password hashing), global `JwtAuthGuard` on all routes
@@ -62,9 +67,11 @@ yarn playwright test tests/e2e/clients.spec.ts
 - **Package manager**: Yarn
 
 ### Backend structure (`backend/src/`)
+
 Domain modules: `auth/`, `cars/`, `clients/`, `articles/`. Each module follows NestJS convention (module, controller, service, DTOs).
 
 Key cross-cutting concerns in `common/`:
+
 - Global JWT auth guard applied to all endpoints
 - Global validation pipe with `transform: true`
 - Request logging via morgan middleware
@@ -72,6 +79,7 @@ Key cross-cutting concerns in `common/`:
 The backend also serves the compiled frontend as static files.
 
 ### Frontend structure (`frontend/src/`)
+
 - `pages/` — Route-level page components
 - `components/` — Reusable UI components (e.g. `DecimalTextField`, `MaskedTextField`, `MenuBar`)
 - `services/backend-service.ts` — Centralized HTTP client for all API calls
@@ -82,19 +90,28 @@ The backend also serves the compiled frontend as static files.
 State management uses TanStack Query for all server state. The app uses German locale (dayjs, date formats).
 
 ### Data model
+
 **Client** — has many **Cars** (optional FK). **Car** stores extensive vehicle details (registration, engine, service dates). **Article** is inventory. **User** stores hashed credentials only.
 
 Dates are stored as strings in SQLite (no native Date type).
 
 ### API conventions
+
 - Base path: `/api/`
 - List endpoints support `page`, `pageSize`, and `search` query params
 - Auth via JWT cookie; sign-in at `POST /api/auth/sign-in`
 
 ### Environment
+
 - Dev DB: `backend/dev.db`, Test DB: `backend/test.db`
 - Dev env file: `backend/.env.development`; test env: `backend/.env.test`
 - Default local credentials: `admin` / `local`
 
 ### Import ordering (Prettier)
+
 Enforced by `@trivago/prettier-plugin-sort-imports`: external packages → `@/` paths → relative imports. Single quotes throughout.
+
+### Exports (Frontend)
+
+Use named exports throughout (`export function Foo`, `export const bar`).
+Exception: when a file has a single export whose name matches the filename, use a default export (e.g. `export default function LoginPage` in `LoginPage.tsx`, `export default theme` in `theme.ts`).

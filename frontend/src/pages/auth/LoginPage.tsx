@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { signIn } from '@/src/services/backend-service';
 
-export default function LoginPage() {
+export function LoginPage() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

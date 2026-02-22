@@ -27,6 +27,11 @@ export class ClientsController {
     return await this.clientService.findAll(query);
   }
 
+  @Get(':id')
+  async getOne(@Param('id') id: number) {
+    return await this.clientService.findOne(id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id') id: number,

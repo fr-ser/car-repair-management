@@ -14,7 +14,7 @@ interface MaskedTextFieldProps {
   inputComponent: React.ComponentType<any>;
 }
 
-export default function MaskedTextField(props: MaskedTextFieldProps) {
+export function MaskedTextField(props: MaskedTextFieldProps) {
   const { value, onChange, id, label, error, inputComponent } = props;
 
   return (

@@ -19,6 +19,7 @@ export interface CreateCarRequest {
   timingBeltDate?: string;
   documentField2?: string;
   documentField3?: string;
+  clientId?: number | null;
 }
 
 export type UpdateCarRequest = Partial<CreateCarRequest>;
@@ -48,4 +49,5 @@ export interface CarForm {
   timingBeltDate: CarFormField<dayjs.Dayjs | null>;
   documentField2: CarFormField;
   documentField3: CarFormField;
+  clientId: CarFormField<number | null>;
 }

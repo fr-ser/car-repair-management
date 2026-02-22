@@ -42,7 +42,7 @@ function getFromFromClient(data?: BackendClient): ClientForm {
   };
 }
 
-export default (data?: BackendClient) => {
+export function useClientForm(data?: BackendClient) {
   const [formData, setFormData] = React.useState<ClientForm>(
     getFromFromClient(data),
   );
@@ -119,4 +119,4 @@ export default (data?: BackendClient) => {
     validate,
     getPayload,
   };
-};
+}

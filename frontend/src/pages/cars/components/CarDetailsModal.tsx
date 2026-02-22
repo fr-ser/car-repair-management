@@ -16,12 +16,13 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
-import DecimalInput from '@/src/components/DecimalTextField';
+import { DecimalTextField as DecimalInput } from '@/src/components/DecimalTextField';
 import { useNotification } from '@/src/hooks/notification/useNotification';
-import useCarForm from '@/src/pages/cars/useCarForm.hook';
+import { useCarForm } from '@/src/pages/cars/useCarForm.hook';
 import * as apiService from '@/src/services/backend-service';
 
-import TireTextField from './TireTextField';
+import { OwnerCard } from './OwnerCard';
+import { TireTextField } from './TireTextField';
 
 type CarDetailsPageProps = {
   selectedCarId?: number;
@@ -68,6 +69,11 @@ export function CarDetailsModal({
       onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       queryClient.invalidateQueries({ queryKey: ['car', selectedCarId] });
+      if (formData.clientId.value != null) {
+        queryClient.invalidateQueries({
+          queryKey: ['client', formData.clientId.value],
+        });
+      }
     },
     onError: (error: unknown) => {
       showNotification({
@@ -412,6 +418,10 @@ export function CarDetailsModal({
                 </CardContent>
               </Card>
             </Grid>
+            <OwnerCard
+              clientId={formData.clientId.value}
+              onFormInputChange={onFormInputChange}
+            />
           </Grid>
         )}
       </DialogContent>
