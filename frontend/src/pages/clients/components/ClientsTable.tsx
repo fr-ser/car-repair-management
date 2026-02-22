@@ -26,9 +26,9 @@ import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
-import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
-import { useNotification } from '@/src/hooks/notification/useNotification';
-import { useDebounce } from '@/src/hooks/useDebounce';
+import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
+import useNotification from '@/src/hooks/notification/useNotification';
+import useDebounce from '@/src/hooks/useDebounce';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
@@ -37,7 +37,7 @@ type ClientsTableProps = {
   handleCreateClient: () => void;
 };
 
-export function ClientsTable({
+export default function ClientsTable({
   handleCreateClient,
   handleEditClient,
 }: ClientsTableProps) {

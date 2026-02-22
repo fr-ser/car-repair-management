@@ -2,12 +2,12 @@ import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as React from 'react';
 
-import { CarDetailsModal } from './components/CarDetailsModal';
-import { CarsTable } from './components/CarsTable';
+import CarDetailsModal from './components/CarDetailsModal';
+import CarsTable from './components/CarsTable';
 
 const queryClient = new QueryClient();
 
-export function CarListPage() {
+export default function CarListPage() {
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<number | undefined>(undefined);
 

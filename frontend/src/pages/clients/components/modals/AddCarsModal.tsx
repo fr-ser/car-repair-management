@@ -11,8 +11,8 @@ import TextField from '@mui/material/TextField';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { useNotification } from '@/src/hooks/notification/useNotification';
-import { useDebounce } from '@/src/hooks/useDebounce';
+import useNotification from '@/src/hooks/notification/useNotification';
+import useDebounce from '@/src/hooks/useDebounce';
 import * as apiService from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
@@ -22,7 +22,11 @@ type AddCarsModalProps = {
   clientId: number;
 };
 
-export function AddCarsModal({ isOpen, onClose, clientId }: AddCarsModalProps) {
+export default function AddCarsModal({
+  isOpen,
+  onClose,
+  clientId,
+}: AddCarsModalProps) {
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');

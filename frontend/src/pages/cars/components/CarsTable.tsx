@@ -26,9 +26,9 @@ import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import * as React from 'react';
 
-import { useConfirmation } from '@/src/hooks/confirmation/useConfirmation';
-import { useNotification } from '@/src/hooks/notification/useNotification';
-import { useDebounce } from '@/src/hooks/useDebounce';
+import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
+import useNotification from '@/src/hooks/notification/useNotification';
+import useDebounce from '@/src/hooks/useDebounce';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
 
@@ -37,7 +37,10 @@ type CarsTableProps = {
   handleCreateCar: () => void;
 };
 
-export function CarsTable({ handleCreateCar, handleEditCar }: CarsTableProps) {
+export default function CarsTable({
+  handleCreateCar,
+  handleEditCar,
+}: CarsTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [cars, setCars] = React.useState<BackendCar[]>([]);

@@ -16,13 +16,13 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
-import { DecimalTextField as DecimalInput } from '@/src/components/DecimalTextField';
-import { useNotification } from '@/src/hooks/notification/useNotification';
+import DecimalInput from '@/src/components/DecimalTextField';
+import useNotification from '@/src/hooks/notification/useNotification';
 import { useCarForm } from '@/src/pages/cars/useCarForm.hook';
 import * as apiService from '@/src/services/backend-service';
 
-import { OwnerCard } from './OwnerCard';
-import { TireTextField } from './TireTextField';
+import OwnerCard from './OwnerCard';
+import TireTextField from './TireTextField';
 
 type CarDetailsPageProps = {
   selectedCarId?: number;
@@ -30,7 +30,7 @@ type CarDetailsPageProps = {
   onClose: () => void;
 };
 
-export function CarDetailsModal({
+export default function CarDetailsModal({
   selectedCarId,
   isOpen,
   onClose,

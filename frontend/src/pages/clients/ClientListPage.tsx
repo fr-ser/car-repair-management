@@ -4,12 +4,12 @@ import * as React from 'react';
 
 import { BackendClient } from '@/src/types/backend-contracts';
 
-import { ClientsTable } from './components/ClientsTable';
-import { ClientDetailsModal } from './components/modals/ClientDetailsModal';
+import ClientsTable from './components/ClientsTable';
+import ClientDetailsModal from './components/modals/ClientDetailsModal';
 
 const queryClient = new QueryClient();
 
-export function ClientListPage() {
+export default function ClientListPage() {
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<BackendClient | undefined>(
     undefined,
