@@ -23,12 +23,10 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useQuery } from '@tanstack/react-query';
-import * as React from 'react';
 
 import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
-import useDebounce from '@/src/hooks/useDebounce';
+import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendArticle } from '@/src/types/backend-contracts';
 import { formatNumber } from '@/src/utils/numbers';
@@ -38,50 +36,34 @@ type ArticlesTableProps = {
   handleCreateArticle: () => void;
 };
 
+const tableRowStyles = {
+  '& .deleteButton': {
+    visibility: 'hidden',
+  },
+  '&:hover .deleteButton': {
+    visibility: 'visible',
+  },
+};
+
 export default function ArticlesTable({
   handleCreateArticle,
   handleEditArticle,
 }: ArticlesTableProps) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [articles, setArticles] = React.useState<BackendArticle[]>([]);
-  const [totalItems, setTotalItems] = React.useState<number>(0);
-  const [searchTerm, setSearchTerm] = React.useState('');
-
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const {
+    items: articles,
+    totalItems,
+    isPending,
+    page,
+    rowsPerPage,
+    searchTerm,
+    refetch,
+    handlers,
+  } = useTableData<BackendArticle>('articles', (p, l, s) =>
+    apiClient.fetchArticles(p, l, s),
+  );
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
-
-  async function fetchData(
-    _page: number = 0,
-    _limit: number = 10,
-    _search: string = '',
-  ): Promise<BackendArticle[]> {
-    try {
-      const response = await apiClient.fetchArticles(_page, _limit, _search);
-      const data = response.data;
-      setArticles(data);
-      setTotalItems(response.meta.totalItems);
-      return data;
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        showNotification({ message: err.message, level: 'error' });
-      } else {
-        showNotification({
-          message: 'An unknown error occurred',
-          level: 'error',
-        });
-      }
-    }
-    return [];
-  }
-
-  const queryResult = useQuery({
-    queryKey: ['articles', page, rowsPerPage, debouncedSearchTerm],
-    queryFn: () => fetchData(page, rowsPerPage, debouncedSearchTerm),
-    placeholderData: [],
-  });
 
   async function handleDeleteArticle(article: BackendArticle) {
     const isConfirmed = await confirm({
@@ -94,43 +76,8 @@ export default function ArticlesTable({
 
     await apiClient.deleteArticle(article.id);
     showNotification({ message: `Artikel wurde gelöscht` });
-    await fetchData(page, rowsPerPage, debouncedSearchTerm);
+    await refetch();
   }
-
-  const handleChangePage = async (_: unknown, newPage: number) => {
-    setPage(newPage);
-    await fetchData(newPage, rowsPerPage, debouncedSearchTerm);
-  };
-
-  const handleChangeRowsPerPage = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-    await fetchData(0, +event.target.value, debouncedSearchTerm);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearchTerm = event.target.value;
-    setSearchTerm(newSearchTerm);
-  };
-
-  React.useEffect(() => {
-    if (debouncedSearchTerm !== searchTerm) {
-      setPage(0);
-    }
-  }, [debouncedSearchTerm, searchTerm]);
-
-  const styles = {
-    tableRowStyles: {
-      '& .deleteButton': {
-        visibility: 'hidden',
-      },
-      '&:hover .deleteButton': {
-        visibility: 'visible',
-      },
-    },
-  };
 
   return (
     <Grid sx={{ xs: 12, lg: 4 }}>
@@ -167,7 +114,7 @@ export default function ArticlesTable({
             fullWidth
             placeholder="Suche nach Artikel-Nr oder Bezeichnung"
             value={searchTerm}
-            onChange={handleSearchChange}
+            onChange={handlers.onSearchChange}
             slotProps={{
               input: {
                 startAdornment: (
@@ -180,7 +127,7 @@ export default function ArticlesTable({
             sx={{ mb: 2 }}
           />
 
-          {queryResult.isPending ? (
+          {isPending ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <CircularProgress />
             </div>
@@ -207,7 +154,7 @@ export default function ArticlesTable({
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleEditArticle(article)}
                         data-testid={`article-row-${article.id}`}
-                        sx={styles.tableRowStyles}
+                        sx={tableRowStyles}
                       >
                         <TableCell data-testid={`article-id-${article.id}`}>
                           {article.id}
@@ -253,8 +200,8 @@ export default function ArticlesTable({
                 count={totalItems}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                onPageChange={handlers.onPageChange}
+                onRowsPerPageChange={handlers.onRowsPerPageChange}
               />
             </Box>
           )}
