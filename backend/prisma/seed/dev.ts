@@ -13,6 +13,7 @@ const seed = async () => {
     },
   });
 
+  await prisma.order.deleteMany();
   await prisma.article.deleteMany();
   await prisma.article.createMany({
     data: [
@@ -131,6 +132,33 @@ const seed = async () => {
       },
     ],
   });
+  const devCar1 = await prisma.car.findFirst({ where: { carNumber: 'A1' } });
+  const devClient1 = await prisma.client.findFirst({
+    where: { clientNumber: 'K1' },
+  });
+  const devClient2 = await prisma.client.findFirst({
+    where: { clientNumber: 'K2' },
+  });
+
+  for (const [title, orderDate, status, clientId] of [
+    ['Ölwechsel + Inspektion', '2026-01-15', 'done', devClient1!.id],
+    ['Bremsenwechsel vorne', '2026-02-10', 'in_progress', devClient2!.id],
+    ['Reifenwechsel', '2026-02-20', 'cancelled', devClient1!.id],
+  ] as [string, string, string, number][]) {
+    const o = await prisma.order.create({
+      data: {
+        title,
+        orderDate,
+        status,
+        carId: devCar1!.id,
+        clientId,
+      },
+    });
+    await prisma.order.update({
+      where: { id: o.id },
+      data: { orderNumber: `A${o.id}` },
+    });
+  }
 };
 
 seed().catch(console.error);

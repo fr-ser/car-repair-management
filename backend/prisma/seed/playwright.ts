@@ -12,7 +12,9 @@ const seed = async () => {
       hash: await argon.hash(process.env.PASSWORD as string),
     },
   });
-  await prisma.client.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.article.deleteMany();
+  await prisma.car.deleteMany();
   await prisma.client.createMany({
     data: [
       // order matters because we want to see the results ordered by createdAt,
@@ -81,6 +83,53 @@ const seed = async () => {
         email: 'test.1@example.com',
       },
     ],
+  });
+  await prisma.article.create({
+    data: {
+      id: 'ART-PW1',
+      description: 'PW Test Artikel',
+      price: '19.95',
+      amount: '10',
+    },
+  });
+
+  const k1 = await prisma.client.findFirst({ where: { clientNumber: 'K1' } });
+  const car = await prisma.car.create({
+    data: {
+      carNumber: 'A1',
+      licensePlate: 'TEST-PW 1',
+      model: 'Testmodell',
+      manufacturer: 'Testhersteller',
+      clientId: k1?.id,
+    },
+  });
+
+  const order1 = await prisma.order.create({
+    data: {
+      title: 'Seed Auftrag 1',
+      orderDate: '2026-01-10',
+      status: 'done',
+      carId: car.id,
+      clientId: k1!.id,
+    },
+  });
+  await prisma.order.update({
+    where: { id: order1.id },
+    data: { orderNumber: `A${order1.id}` },
+  });
+
+  const order2 = await prisma.order.create({
+    data: {
+      title: 'Seed Auftrag 2',
+      orderDate: '2026-02-01',
+      status: 'in_progress',
+      carId: car.id,
+      clientId: k1!.id,
+    },
+  });
+  await prisma.order.update({
+    where: { id: order2.id },
+    data: { orderNumber: `A${order2.id}` },
   });
 };
 
