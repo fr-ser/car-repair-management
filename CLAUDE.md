@@ -2,16 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Keep this file updated when new patterns emerge.
+
 ## Project Overview
 
-A car repair shop management application — monorepo with a NestJS backend and React frontend. The backend serves frontend static assets in production. All endpoints are JWT-protected except login.
+A car repair shop management application — monorepo with a NestJS backend and React frontend.
+The backend serves frontend static assets in production.
+All endpoints are JWT-protected except login.
 
 ## Commands
 
 ### Root (Makefile)
 
 ```bash
-make install              # Install all dependencies and set up dev database
 make up-be                # Start backend (dev mode)
 make up-fe                # Start frontend (dev mode)
 make build                # Build both for production
@@ -23,21 +26,22 @@ make test-e2e-playwright  # Playwright e2e tests only
 
 ### Backend (`backend/`)
 
+Inside the backend directory:
+
 ```bash
 make test                      # Lint + unit + e2e tests
 yarn run test:unit             # Unit tests only (vitest run src)
 yarn run test:e2e              # Backend e2e tests (vitest run test --no-file-parallelism)
-make db-create-migration       # Create Prisma migration
 make setup-clean-test-database # Recreate clean test DB
-make run-prisma-studio         # Open Prisma Studio
 ```
 
 ### Frontend (`frontend/`)
 
+Inside the frontend directory:
+
 ```bash
 make test          # Lint + unit tests
 yarn run test      # Unit tests only (vitest run)
-yarn run test:cov  # With coverage
 ```
 
 ### Running a single test file
@@ -68,7 +72,7 @@ yarn playwright test tests/e2e/clients.spec.ts
 
 ### Backend structure (`backend/src/`)
 
-Domain modules: `auth/`, `cars/`, `clients/`, `articles/`. Each module follows NestJS convention (module, controller, service, DTOs).
+Domain modules: `auth/`, `cars/`, `clients/`, `articles/`, `orders/`. Each module follows NestJS convention (module, controller, service, DTOs).
 
 Key cross-cutting concerns in `common/`:
 
@@ -91,7 +95,11 @@ State management uses TanStack Query for all server state. The app uses German l
 
 ### Data model
 
-**Client** — has many **Cars** (optional FK). **Car** stores extensive vehicle details (registration, engine, service dates). **Article** is inventory. **User** stores hashed credentials only.
+**Client** — has many **Cars** (optional FK).
+**Car** stores extensive vehicle details (registration, engine, service dates).
+**Article** is inventory.
+**Order** (Auftrag) — belongs to one **Car** and one **Client**. Has many **OrderPositions** (headings or items). Items can reference an **Article** (adjusts article inventory on save/update/delete).
+**User** stores hashed credentials only.
 
 Dates are stored as strings in SQLite (no native Date type).
 
@@ -122,3 +130,7 @@ Prefer `@/src/...` absolute imports over relative ones. Allowed exceptions:
 
 Use named exports throughout (`export function Foo`, `export const bar`).
 Exception: when a file has a single export whose name matches the filename, use a default export (e.g. `export default function LoginPage` in `LoginPage.tsx`, `export default theme` in `theme.ts`).
+
+## AI Agent instructions
+
+Plans should not include manual testing steps. Verification sections should only reference automated tests (unit, e2e).

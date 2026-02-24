@@ -36,7 +36,7 @@ install: ## install all the dependencies
 db-create-migration: ## create prisma client and migrate DB
 	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
 
-db-init: ## initialise an empty database
+db-init: ## initialise a new dev database
 	rm -f ./dev.db
 	yarn run dotenv -e .env.development prisma migrate dev
 	yarn run dotenv -e .env.development ts-node prisma/seed/dev.ts

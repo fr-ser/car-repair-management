@@ -8,6 +8,8 @@ import type {
   Article,
   Car,
   Client,
+  Order,
+  OrderPosition,
 } from '@/../../backend/node_modules/@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -19,6 +21,20 @@ export interface BackendCar extends Car {}
 
 export interface BackendClientWithCars extends BackendClient {
   cars: BackendCar[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface BackendOrderPosition extends OrderPosition {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface BackendOrder extends Order {}
+export interface BackendOrderWithPositions extends BackendOrder {
+  positions: BackendOrderPosition[];
+  car: { carNumber: string | null; licensePlate: string };
+  client: {
+    clientNumber: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
 }
 
 export interface BackendPaginatedResponse<T> {

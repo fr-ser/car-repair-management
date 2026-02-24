@@ -1,7 +1,7 @@
 import {
   AddBox as AddBoxIcon,
-  Article as ArticleIcon,
   Delete as DeleteIcon,
+  Receipt as ReceiptIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -28,12 +29,18 @@ import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
 import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
-import { BackendArticle } from '@/src/types/backend-contracts';
-import { formatNumber } from '@/src/utils/numbers';
+import { BackendOrderWithPositions } from '@/src/types/backend-contracts';
+import { ORDER_STATUS, OrderStatus } from '@/src/types/orders';
 
-type ArticlesTableProps = {
-  handleEditArticle: (article: BackendArticle) => void;
-  handleCreateArticle: () => void;
+const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
+  [ORDER_STATUS.IN_PROGRESS]: 'In Arbeit',
+  [ORDER_STATUS.DONE]: 'Fertig',
+  [ORDER_STATUS.CANCELLED]: 'Abgebrochen',
+};
+
+type OrdersTableProps = {
+  handleEditOrder: (orderId: number) => void;
+  handleCreateOrder: () => void;
 };
 
 const tableRowStyles = {
@@ -45,12 +52,21 @@ const tableRowStyles = {
   },
 };
 
-export default function ArticlesTable({
-  handleCreateArticle,
-  handleEditArticle,
-}: ArticlesTableProps) {
+function statusColor(
+  status: string,
+): 'warning' | 'success' | 'error' | 'default' {
+  if (status === ORDER_STATUS.DONE) return 'success';
+  if (status === ORDER_STATUS.IN_PROGRESS) return 'warning';
+  if (status === ORDER_STATUS.CANCELLED) return 'error';
+  return 'default';
+}
+
+export default function OrdersTable({
+  handleCreateOrder,
+  handleEditOrder,
+}: OrdersTableProps) {
   const {
-    items: articles,
+    items: orders,
     totalItems,
     isPending,
     page,
@@ -58,40 +74,40 @@ export default function ArticlesTable({
     searchTerm,
     refetch,
     handlers,
-  } = useTableData<BackendArticle>('articles', (p, l, s) =>
-    apiClient.fetchArticles(p, l, s),
+  } = useTableData<BackendOrderWithPositions>('orders', (p, l, s) =>
+    apiClient.fetchOrders(p, l, s),
   );
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
 
-  async function handleDeleteArticle(article: BackendArticle) {
+  async function handleDeleteOrder(order: BackendOrderWithPositions) {
     const isConfirmed = await confirm({
-      title: `Bestätigung - Artikel löschen - ${article.description}`,
+      title: `Bestätigung - Auftrag löschen - ${order.title}`,
       message:
-        `Möchten Sie den Artikel "${article.description}" wirklich löschen? ` +
+        `Möchten Sie den Auftrag "${order.title}" wirklich löschen? ` +
         'Diese Aktion kann nicht rückgängig gemacht werden.',
     });
     if (!isConfirmed) return;
 
-    await apiClient.deleteArticle(article.id);
-    showNotification({ message: `Artikel wurde gelöscht` });
+    await apiClient.deleteOrder(order.id);
+    showNotification({ message: 'Auftrag wurde gelöscht' });
     await refetch();
   }
 
   return (
-    <Grid sx={{ xs: 12, lg: 4 }}>
+    <Grid sx={{ xs: 12 }}>
       <Card elevation={2}>
         <CardHeader
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <ArticleIcon />
+              <ReceiptIcon />
               <Typography
                 variant="h6"
                 component="h3"
                 sx={{ fontWeight: 500, pr: 14 }}
               >
-                Artikel
+                Aufträge
               </Typography>
             </Box>
           }
@@ -101,10 +117,10 @@ export default function ArticlesTable({
               color="secondary"
               startIcon={<AddBoxIcon />}
               size="small"
-              onClick={handleCreateArticle}
-              data-testid="button-article-create"
+              onClick={handleCreateOrder}
+              data-testid="button-order-create"
             >
-              Artikel erstellen
+              Auftrag erstellen
             </Button>
           }
           sx={{ pb: 1 }}
@@ -112,7 +128,7 @@ export default function ArticlesTable({
         <CardContent sx={{ pt: 0 }}>
           <TextField
             fullWidth
-            placeholder="Suche nach Artikel-Nr oder Bezeichnung"
+            placeholder="Suche nach Auftrags-Nr oder Titel"
             value={searchTerm}
             onChange={handlers.onSearchChange}
             slotProps={{
@@ -137,42 +153,43 @@ export default function ArticlesTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Artikel-Nr</TableCell>
-                      <TableCell>Bezeichnung</TableCell>
-                      <TableCell>Preis / Einheit</TableCell>
-                      <TableCell>Menge</TableCell>
-                      <TableCell>
-                        {/* placeholder for actions, e.g. delete */}
-                      </TableCell>
+                      <TableCell>Auftrags-Nr</TableCell>
+                      <TableCell>Titel</TableCell>
+                      <TableCell>Kennzeichen</TableCell>
+                      <TableCell>Kunde</TableCell>
+                      <TableCell>Datum</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>{/* actions */}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {articles.map((article) => (
+                    {orders.map((order) => (
                       <TableRow
-                        key={article.id}
+                        key={order.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditArticle(article)}
-                        data-testid={`article-row-${article.id}`}
+                        onClick={() => handleEditOrder(order.id)}
+                        data-testid={`order-row-${order.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell data-testid={`article-id-${article.id}`}>
-                          {article.id}
-                        </TableCell>
-                        <TableCell
-                          data-testid={`article-description-${article.id}`}
-                        >
-                          {article.description}
-                        </TableCell>
+                        <TableCell>{order.orderNumber}</TableCell>
+                        <TableCell>{order.title}</TableCell>
+                        <TableCell>{order.car.licensePlate}</TableCell>
                         <TableCell>
-                          {formatNumber(Number(article.price), {
-                            currency: true,
-                          })}
+                          {[order.client.firstName, order.client.lastName]
+                            .filter(Boolean)
+                            .join(' ') || order.client.clientNumber}
                         </TableCell>
-                        <TableCell data-testid={`article-amount-${article.id}`}>
-                          {article.amount != null
-                            ? formatNumber(Number(article.amount))
-                            : '–'}
+                        <TableCell>{order.orderDate}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={
+                              ORDER_STATUS_LABEL[order.status as OrderStatus] ??
+                              order.status
+                            }
+                            color={statusColor(order.status)}
+                            size="small"
+                          />
                         </TableCell>
                         <TableCell>
                           <IconButton
@@ -181,10 +198,10 @@ export default function ArticlesTable({
                             size="small"
                             onClick={(event) => {
                               event.stopPropagation();
-                              handleDeleteArticle(article);
+                              handleDeleteOrder(order);
                             }}
                             color="error"
-                            data-testid={`button-article-delete-${article.id}`}
+                            data-testid={`button-order-delete-${order.id}`}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>

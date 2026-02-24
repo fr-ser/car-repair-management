@@ -45,7 +45,8 @@ model Client {
   city        String?
   street      String?
 
-  cars Car[]
+  cars   Car[]
+  orders Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,6 +77,51 @@ model Car {
 
   clientId Int?
   client   Client? @relation(fields: [clientId], references: [id])
+
+  orders Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          Int     @id @default(autoincrement())
+  orderNumber String? @unique // this is a human-readable identifier for the order based on the ID
+
+  title          String
+  description    String?
+  orderDate      String // there is no "Date" type in SQLite
+  kmStand        Decimal?
+  status         String
+  paymentMethod  String?
+  paymentDueDate String? // there is no "Date" type in SQLite
+
+  carId    Int
+  car      Car    @relation(fields: [carId], references: [id])
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  positions OrderPosition[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderPosition {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  type         String // "heading" | "item"
+  sortOrder    Int
+  // heading fields
+  text         String?
+  // item fields
+  articleId    String?
+  description  String?
+  pricePerUnit Decimal?
+  amount       Decimal?
+  discount     Decimal?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

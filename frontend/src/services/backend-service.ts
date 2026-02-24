@@ -7,12 +7,14 @@ import {
   BackendCar,
   BackendClient,
   BackendClientWithCars,
+  BackendOrderWithPositions,
   BackendPaginatedResponse,
   ErrorResponse,
 } from '@/src/types/backend-contracts';
 import { CreateCarRequest, UpdateCarRequest } from '@/src/types/cars';
 import { CreateClientRequest } from '@/src/types/clients';
 import * as Errors from '@/src/types/errors';
+import { CreateOrderRequest, UpdateOrderRequest } from '@/src/types/orders';
 
 export async function signIn(userName: string, password: string) {
   const response = await fetch(`/api/auth/sign-in`, {
@@ -228,6 +230,82 @@ export async function updateArticle(
 
 export async function deleteArticle(articleId: string) {
   const response = await fetch(`/api/articles/${articleId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: object | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+}
+
+export async function fetchOrders(
+  page: number = 0,
+  limit: number = 10,
+  search: string = '',
+) {
+  const queryParameters = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) {
+    queryParameters.append('search', search);
+  }
+  const response = await fetch(`/api/orders?${queryParameters.toString()}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData:
+    | BackendPaginatedResponse<BackendOrderWithPositions>
+    | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendPaginatedResponse<BackendOrderWithPositions>;
+}
+
+export async function fetchOrder(orderId: number) {
+  const response = await fetch(`/api/orders/${orderId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const responseData: BackendOrderWithPositions | ErrorResponse =
+    await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendOrderWithPositions;
+}
+
+export async function createOrder(order: CreateOrderRequest) {
+  const response = await fetch(`/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+  });
+  const responseData: BackendOrderWithPositions | ErrorResponse =
+    await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendOrderWithPositions;
+}
+
+export async function updateOrder(orderId: number, order: UpdateOrderRequest) {
+  const response = await fetch(`/api/orders/${orderId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+  });
+  const responseData: BackendOrderWithPositions | ErrorResponse =
+    await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendOrderWithPositions;
+}
+
+export async function deleteOrder(orderId: number) {
+  const response = await fetch(`/api/orders/${orderId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });
