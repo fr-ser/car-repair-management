@@ -10,7 +10,7 @@ import type {
   Client,
   Order,
   OrderPosition,
-} from '@/../../backend/node_modules/@prisma/client';
+} from '@/../../backend/src/generated/prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BackendArticle extends Article {}

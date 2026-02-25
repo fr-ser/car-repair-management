@@ -17,18 +17,20 @@ setup-clean-test-database: ## (re)create a clean test database
 
 test: ## runs all tests
 	yarn run test:unit
+	yarn run dotenv -e .env.test prisma generate
 	yarn run lint
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e
 
 test-cov: ## runs all tests once with coverage report
 	yarn run test:unit
+	yarn run dotenv -e .env.test prisma generate
 	yarn run lint
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e:cov
 
 run-prisma-studio: ## start prisma studio
-	yarn prisma studio
+	yarn run dotenv -e .env.development prisma studio
 
 install: ## install all the dependencies
 	yarn install
@@ -39,4 +41,4 @@ db-create-migration: ## create prisma client and migrate DB
 db-init: ## initialise a new dev database
 	rm -f ./dev.db
 	yarn run dotenv -e .env.development prisma migrate dev
-	yarn run dotenv -e .env.development ts-node prisma/seed/dev.ts
+	yarn run dotenv -e .env.development tsx prisma/seed/dev.ts

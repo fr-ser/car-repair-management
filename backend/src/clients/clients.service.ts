@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Client } from '@prisma/client';
+
+import { Client } from '@/src/generated/prisma/client';
 
 import {
   PaginatedResponseDto,

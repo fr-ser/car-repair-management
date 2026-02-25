@@ -16,5 +16,7 @@ export default defineConfig({
     },
   },
   // the swc part is required for nest e2e tests
-  plugins: [swc.vite()],
+  // module type must be overridden: .swcrc sets commonjs for nest build,
+  // but vitest requires ESM
+  plugins: [swc.vite({ module: { type: 'es6' } })],
 });

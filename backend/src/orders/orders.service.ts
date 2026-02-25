@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
+
+import { Prisma } from '@/src/generated/prisma/client';
 
 import {
   PaginatedResponseDto,
@@ -144,26 +144,26 @@ export class OrdersService {
     oldPositions: Array<{
       type: string;
       articleId: string | null;
-      amount: Decimal | null;
+      amount: Prisma.Decimal | null;
     }>,
     newPositions: Array<{
       type: string;
       articleId: string | null;
-      amount: Decimal | null;
+      amount: Prisma.Decimal | null;
     }>,
   ) {
-    const delta = new Map<string, Decimal>();
+    const delta = new Map<string, Prisma.Decimal>();
 
     for (const pos of oldPositions) {
       if (pos.type === 'item' && pos.articleId && pos.amount != null) {
-        const prev = delta.get(pos.articleId) ?? new Decimal(0);
+        const prev = delta.get(pos.articleId) ?? new Prisma.Decimal(0);
         delta.set(pos.articleId, prev.plus(pos.amount));
       }
     }
 
     for (const pos of newPositions) {
       if (pos.type === 'item' && pos.articleId && pos.amount != null) {
-        const prev = delta.get(pos.articleId) ?? new Decimal(0);
+        const prev = delta.get(pos.articleId) ?? new Prisma.Decimal(0);
         delta.set(pos.articleId, prev.minus(pos.amount));
       }
     }
