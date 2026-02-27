@@ -31,10 +31,11 @@ up-fe: ## start FE locally
 # this command is used by playwright to start all services for testing
 start-playwright-services:
 	@$(MAKE) --directory backend setup-clean-test-database
-	cd backend && yarn run dotenv -e .env.test ts-node prisma/seed/playwright.ts
-	cd backend && DISABLE_REQUEST_LOGGING=false CONFIG_PATH=.env.test node dist/src/main
+	cd backend && yarn run dotenv -e .env.test tsx prisma/seed/playwright.ts
+	cd backend && DISABLE_REQUEST_LOGGING=false CONFIG_PATH=.env.test node dist/main
 
 test-e2e-playwright: ## run playwright e2e tests
+	cd backend && yarn run dotenv -e .env.test prisma generate
 	cd frontend && yarn run build --mode test
 	cd backend && yarn run build
 	yarn run playwright test

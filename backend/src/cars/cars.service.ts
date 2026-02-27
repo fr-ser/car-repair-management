@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Car } from '@prisma/client';
+
+import { Car } from '@/src/generated/prisma/client';
 
 import {
   PaginatedResponseDto,

@@ -1,8 +1,13 @@
 // This seed file is used for the local development database
-import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import * as argon from 'argon2';
 
-const prisma = new PrismaClient();
+import { PrismaClient } from '@/src/generated/prisma/client';
+
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL ?? 'file:./dev.db',
+});
+const prisma = new PrismaClient({ adapter });
 
 const seed = async () => {
   await prisma.user.deleteMany();
