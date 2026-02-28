@@ -37,6 +37,16 @@ export interface BackendOrderWithPositions extends BackendOrder {
   };
 }
 
+export interface BackendPendingOrder extends BackendOrder {
+  car: { carNumber: string | null; licensePlate: string };
+  client: {
+    clientNumber: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    company: string | null;
+  };
+}
+
 export interface BackendPaginatedResponse<T> {
   data: T[];
   meta: {

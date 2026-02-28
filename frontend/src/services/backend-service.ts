@@ -9,12 +9,36 @@ import {
   BackendClientWithCars,
   BackendOrderWithPositions,
   BackendPaginatedResponse,
-  ErrorResponse,
+  BackendPendingOrder,
 } from '@/src/types/backend-contracts';
 import { CreateCarRequest, UpdateCarRequest } from '@/src/types/cars';
 import { CreateClientRequest } from '@/src/types/clients';
 import * as Errors from '@/src/types/errors';
 import { CreateOrderRequest, UpdateOrderRequest } from '@/src/types/orders';
+
+async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...init,
+  });
+  const data = await response.json();
+  handleErrorResponse(response, data);
+  return data as T;
+}
+
+function paginatedUrl(
+  base: string,
+  page: number,
+  limit: number,
+  search: string,
+) {
+  const params = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) params.append('search', search);
+  return `${base}?${params}`;
+}
 
 export async function signIn(userName: string, password: string) {
   const response = await fetch(`/api/auth/sign-in`, {
@@ -27,291 +51,121 @@ export async function signIn(userName: string, password: string) {
   }
 }
 
-export async function createClient(client: CreateClientRequest) {
-  const response = await fetch(`/api/clients`, {
+export function createClient(client: CreateClientRequest) {
+  return apiFetch<BackendClient>('/api/clients', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client),
   });
-  const responseData: BackendClient | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendClient;
 }
 
-export async function updateClient(
-  clientId: number,
-  client: CreateClientRequest,
-) {
-  const response = await fetch(`/api/clients/${clientId}`, {
+export function updateClient(clientId: number, client: CreateClientRequest) {
+  return apiFetch<BackendClient>(`/api/clients/${clientId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client),
   });
-  const responseData: BackendClient | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendClient;
 }
 
-export async function deleteClient(clientId: number) {
-  const response = await fetch(`/api/clients/${clientId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: object | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
+export function deleteClient(clientId: number) {
+  return apiFetch<object>(`/api/clients/${clientId}`, { method: 'DELETE' });
 }
 
-export async function fetchClient(clientId: number) {
-  const response = await fetch(`/api/clients/${clientId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendClientWithCars | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendClientWithCars;
+export function fetchClient(clientId: number) {
+  return apiFetch<BackendClientWithCars>(`/api/clients/${clientId}`);
 }
 
-export async function fetchClients(
-  page: number = 0,
-  limit: number = 10,
-  search: string = '',
-) {
-  const queryParameters = new URLSearchParams({
-    page: (page + 1).toString(),
-    limit: limit.toString(),
-  });
-  if (search) {
-    queryParameters.append('search', search);
-  }
-  const response = await fetch(`/api/clients?${queryParameters.toString()}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendPaginatedResponse<BackendClient> | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendPaginatedResponse<BackendClient>;
+export function fetchClients(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendClient>>(
+    paginatedUrl('/api/clients', page, limit, search),
+  );
 }
 
-export async function createCar(car: CreateCarRequest) {
-  const response = await fetch(`/api/cars`, {
+export function createCar(car: CreateCarRequest) {
+  return apiFetch<BackendCar>('/api/cars', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(car),
   });
-  const responseData: BackendCar | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendCar;
 }
 
-export async function updateCar(carId: number, car: UpdateCarRequest) {
-  const response = await fetch(`/api/cars/${carId}`, {
+export function updateCar(carId: number, car: UpdateCarRequest) {
+  return apiFetch<BackendCar>(`/api/cars/${carId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(car),
   });
-  const responseData: BackendCar | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendCar;
 }
 
-export async function fetchCars(
-  page: number = 0,
-  limit: number = 10,
-  search: string = '',
-) {
-  const queryParameters = new URLSearchParams({
-    page: (page + 1).toString(),
-    limit: limit.toString(),
-  });
-  if (search) {
-    queryParameters.append('search', search);
-  }
-  const response = await fetch(`/api/cars?${queryParameters.toString()}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendPaginatedResponse<BackendCar> | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendPaginatedResponse<BackendCar>;
+export function fetchCars(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendCar>>(
+    paginatedUrl('/api/cars', page, limit, search),
+  );
 }
 
-export async function fetchCar(carId: number) {
-  const response = await fetch(`/api/cars/${carId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendCar | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendCar;
+export function fetchCar(carId: number) {
+  return apiFetch<BackendCar>(`/api/cars/${carId}`);
 }
 
-export async function deleteCar(carId: number) {
-  const response = await fetch(`/api/cars/${carId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: object | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
+export function deleteCar(carId: number) {
+  return apiFetch<object>(`/api/cars/${carId}`, { method: 'DELETE' });
 }
 
-export async function fetchArticles(
-  page: number = 0,
-  limit: number = 10,
-  search: string = '',
-) {
-  const queryParameters = new URLSearchParams({
-    page: (page + 1).toString(),
-    limit: limit.toString(),
-  });
-  if (search) {
-    queryParameters.append('search', search);
-  }
-  const response = await fetch(`/api/articles?${queryParameters.toString()}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendPaginatedResponse<BackendArticle> | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendPaginatedResponse<BackendArticle>;
+export function fetchArticles(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendArticle>>(
+    paginatedUrl('/api/articles', page, limit, search),
+  );
 }
 
-export async function createArticle(article: CreateArticleRequest) {
-  const response = await fetch(`/api/articles`, {
+export function createArticle(article: CreateArticleRequest) {
+  return apiFetch<BackendArticle>('/api/articles', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(article),
   });
-  const responseData: BackendArticle | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendArticle;
 }
 
-export async function updateArticle(
+export function updateArticle(
   articleId: string,
   article: UpdateArticleRequest,
 ) {
-  const response = await fetch(`/api/articles/${articleId}`, {
+  return apiFetch<BackendArticle>(`/api/articles/${articleId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(article),
   });
-  const responseData: BackendArticle | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendArticle;
 }
 
-export async function deleteArticle(articleId: string) {
-  const response = await fetch(`/api/articles/${articleId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: object | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
+export function deleteArticle(articleId: string) {
+  return apiFetch<object>(`/api/articles/${articleId}`, { method: 'DELETE' });
 }
 
-export async function fetchOrders(
-  page: number = 0,
-  limit: number = 10,
-  search: string = '',
-) {
-  const queryParameters = new URLSearchParams({
-    page: (page + 1).toString(),
-    limit: limit.toString(),
-  });
-  if (search) {
-    queryParameters.append('search', search);
-  }
-  const response = await fetch(`/api/orders?${queryParameters.toString()}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData:
-    | BackendPaginatedResponse<BackendOrderWithPositions>
-    | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendPaginatedResponse<BackendOrderWithPositions>;
+export function fetchOrders(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendOrderWithPositions>>(
+    paginatedUrl('/api/orders', page, limit, search),
+  );
 }
 
-export async function fetchOrder(orderId: number) {
-  const response = await fetch(`/api/orders/${orderId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: BackendOrderWithPositions | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendOrderWithPositions;
+export function fetchPendingOrders(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendPendingOrder>>(
+    paginatedUrl('/api/orders/overview/pending', page, limit, search),
+  );
 }
 
-export async function createOrder(order: CreateOrderRequest) {
-  const response = await fetch(`/api/orders`, {
+export function fetchOrder(orderId: number) {
+  return apiFetch<BackendOrderWithPositions>(`/api/orders/${orderId}`);
+}
+
+export function createOrder(order: CreateOrderRequest) {
+  return apiFetch<BackendOrderWithPositions>('/api/orders', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
   });
-  const responseData: BackendOrderWithPositions | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendOrderWithPositions;
 }
 
-export async function updateOrder(orderId: number, order: UpdateOrderRequest) {
-  const response = await fetch(`/api/orders/${orderId}`, {
+export function updateOrder(orderId: number, order: UpdateOrderRequest) {
+  return apiFetch<BackendOrderWithPositions>(`/api/orders/${orderId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
   });
-  const responseData: BackendOrderWithPositions | ErrorResponse =
-    await response.json();
-
-  handleErrorResponse(response, responseData);
-
-  return responseData as BackendOrderWithPositions;
 }
 
-export async function deleteOrder(orderId: number) {
-  const response = await fetch(`/api/orders/${orderId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const responseData: object | ErrorResponse = await response.json();
-
-  handleErrorResponse(response, responseData);
+export function deleteOrder(orderId: number) {
+  return apiFetch<object>(`/api/orders/${orderId}`, { method: 'DELETE' });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,6 +1,7 @@
 import {
   AddBox as AddBoxIcon,
   Delete as DeleteIcon,
+  OpenInNew as OpenInNewIcon,
   Receipt as ReceiptIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
@@ -23,6 +24,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
@@ -31,6 +33,7 @@ import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendOrderWithPositions } from '@/src/types/backend-contracts';
 import { ORDER_STATUS, OrderStatus } from '@/src/types/orders';
+import { clientOptionLabel } from '@/src/utils/clients';
 
 const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   [ORDER_STATUS.IN_PROGRESS]: 'In Arbeit',
@@ -174,11 +177,63 @@ export default function OrdersTable({
                       >
                         <TableCell>{order.orderNumber}</TableCell>
                         <TableCell>{order.title}</TableCell>
-                        <TableCell>{order.car.licensePlate}</TableCell>
                         <TableCell>
-                          {[order.client.firstName, order.client.lastName]
-                            .filter(Boolean)
-                            .join(' ') || order.client.clientNumber}
+                          <Box
+                            component="span"
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {[order.car.carNumber, order.car.licensePlate]
+                              .filter(Boolean)
+                              .join(' – ')}
+                            <Tooltip title="In neuem Tab öffnen">
+                              <IconButton
+                                component="a"
+                                href={`/cars/${order.carId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                size="small"
+                                sx={{
+                                  p: 0.25,
+                                  ml: 0.5,
+                                  color: 'action.active',
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <OpenInNewIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box
+                            component="span"
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {clientOptionLabel(order.client)}
+                            <Tooltip title="In neuem Tab öffnen">
+                              <IconButton
+                                component="a"
+                                href={`/clients/${order.clientId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                size="small"
+                                sx={{
+                                  p: 0.25,
+                                  ml: 0.5,
+                                  color: 'action.active',
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <OpenInNewIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
                         </TableCell>
                         <TableCell>{order.orderDate}</TableCell>
                         <TableCell>

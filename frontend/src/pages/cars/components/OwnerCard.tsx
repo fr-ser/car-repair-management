@@ -1,4 +1,8 @@
-import { Close as CloseIcon, Person as PersonIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  OpenInNew as OpenInNewIcon,
+  Person as PersonIcon,
+} from '@mui/icons-material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,6 +17,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
@@ -20,6 +25,7 @@ import React from 'react';
 import useDebounce from '@/src/hooks/useDebounce';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
+import { clientDisplayName, clientOptionLabel } from '@/src/utils/clients';
 
 type OwnerCardProps = {
   clientId: number | null;
@@ -108,11 +114,30 @@ export default function OwnerCard({
               }}
             >
               <Box>
-                <Typography variant="body1" fontWeight={500}>
-                  {[ownerData.firstName, ownerData.lastName]
-                    .filter(Boolean)
-                    .join(' ') || ownerData.company}
-                </Typography>
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}
+                >
+                  <Typography variant="body1" fontWeight={500}>
+                    {clientDisplayName(ownerData)}
+                  </Typography>
+                  <Tooltip title="In neuem Tab öffnen">
+                    <IconButton
+                      component="a"
+                      href={`/clients/${ownerData.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
+                      sx={{ p: 0.25, color: 'action.active' }}
+                    >
+                      <OpenInNewIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
                 <Typography
                   variant="caption"
                   display="block"
@@ -158,12 +183,7 @@ export default function OwnerCard({
           <Autocomplete
             sx={{ mt: 2 }}
             options={clientOptions}
-            getOptionLabel={(option) => {
-              const name = [option.firstName, option.lastName]
-                .filter(Boolean)
-                .join(' ');
-              return `${option.clientNumber} – ${name || option.company || ''}`;
-            }}
+            getOptionLabel={(option) => clientOptionLabel(option)}
             loading={isSearching}
             value={selectedOption}
             onChange={(_, value) => setSelectedOption(value)}

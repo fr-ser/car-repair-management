@@ -22,6 +22,7 @@ import LoginPage from './pages/auth/LoginPage.tsx';
 import CarListPage from './pages/cars/CarListPage.tsx';
 import ClientListPage from './pages/clients/ClientListPage.tsx';
 import OrderListPage from './pages/orders/OrderListPage.tsx';
+import OverviewPage from './pages/overview/OverviewPage.tsx';
 import theme from './theme.ts';
 
 const router = createBrowserRouter([
@@ -31,9 +32,12 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/documents" replace /> },
       { path: '/clients', element: <ClientListPage /> },
+      { path: '/clients/:id', element: <ClientListPage /> },
       { path: '/cars', element: <CarListPage /> },
+      { path: '/cars/:id', element: <CarListPage /> },
       { path: '/orders', element: <OrderListPage /> },
-      { path: '/overview', element: <div>/overview</div> },
+      { path: '/orders/:id', element: <OrderListPage /> },
+      { path: '/overview', element: <OverviewPage /> },
       { path: '/documents', element: <div>/documents</div> },
       { path: '/articles', element: <ArticleListPage /> },
       { path: '/login', element: <LoginPage /> },

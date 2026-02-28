@@ -31,7 +31,7 @@ import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
 
 type ClientsTableProps = {
-  handleEditClient: (client: BackendClient) => void;
+  handleEditClient: (clientId: number) => void;
   handleCreateClient: () => void;
 };
 
@@ -151,7 +151,7 @@ export default function ClientsTable({
                         key={client.id}
                         hover
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleEditClient(client)}
+                        onClick={() => handleEditClient(client.id)}
                         data-testid={`client-row-${client.id}`}
                         sx={tableRowStyles}
                       >
