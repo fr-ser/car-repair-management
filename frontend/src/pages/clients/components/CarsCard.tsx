@@ -2,6 +2,7 @@ import {
   Add as AddIcon,
   DirectionsCar as CarIcon,
   Delete as DeleteIcon,
+  OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -14,6 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -113,7 +115,26 @@ export default function CarsCard({
                   }
                 >
                   <ListItemText
-                    primary={`${car.manufacturer} ${car.model}`}
+                    primary={
+                      <Box
+                        component="span"
+                        sx={{ display: 'inline-flex', alignItems: 'center' }}
+                      >
+                        {car.manufacturer} {car.model}
+                        <Tooltip title="In neuem Tab öffnen">
+                          <IconButton
+                            component="a"
+                            href={`/cars/${car.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            size="small"
+                            sx={{ p: 0.25, ml: 0.5, color: 'action.active' }}
+                          >
+                            <OpenInNewIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    }
                     secondary={
                       <Box>
                         <Typography variant="caption" display="block">

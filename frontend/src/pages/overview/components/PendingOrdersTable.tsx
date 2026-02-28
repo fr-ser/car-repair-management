@@ -1,10 +1,13 @@
-import { Search as SearchIcon } from '@mui/icons-material';
+import {
+  OpenInNew as OpenInNewIcon,
+  Search as SearchIcon,
+} from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -15,12 +18,12 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
 import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendPendingOrder } from '@/src/types/backend-contracts';
-import { clientDisplayName } from '@/src/utils/clients';
+import { clientOptionLabel } from '@/src/utils/clients';
 
 export function PendingOrdersTable() {
   const {
@@ -38,15 +41,7 @@ export function PendingOrdersTable() {
   return (
     <Grid sx={{ xs: 12 }}>
       <Card elevation={2}>
-        <CardHeader
-          title={
-            <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
-              Offene Aufträge
-            </Typography>
-          }
-          sx={{ pb: 1 }}
-        />
-        <CardContent sx={{ pt: 0 }}>
+        <CardContent>
           <TextField
             fullWidth
             placeholder="Suche nach Kunde, Unternehmen, ID, Auftrag oder Kennzeichen"
@@ -76,8 +71,7 @@ export function PendingOrdersTable() {
                     <TableRow>
                       <TableCell>Auftrags-Nr</TableCell>
                       <TableCell>Titel</TableCell>
-                      <TableCell>Kennzeichen</TableCell>
-                      <TableCell>Fahrzeugnummer</TableCell>
+                      <TableCell>Fahrzeug</TableCell>
                       <TableCell>Kunde/Unternehmen</TableCell>
                       <TableCell>Datum</TableCell>
                     </TableRow>
@@ -85,11 +79,24 @@ export function PendingOrdersTable() {
                   <TableBody>
                     {orders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell>{order.orderNumber}</TableCell>
+                        <TableCell>
+                          <EntityLink href={`/orders/${order.id}`}>
+                            {order.orderNumber}
+                          </EntityLink>
+                        </TableCell>
                         <TableCell>{order.title}</TableCell>
-                        <TableCell>{order.car.licensePlate}</TableCell>
-                        <TableCell>{order.car.carNumber}</TableCell>
-                        <TableCell>{clientDisplayName(order.client)}</TableCell>
+                        <TableCell>
+                          <EntityLink href={`/cars/${order.carId}`}>
+                            {[order.car.carNumber, order.car.licensePlate]
+                              .filter(Boolean)
+                              .join(' – ')}
+                          </EntityLink>
+                        </TableCell>
+                        <TableCell>
+                          <EntityLink href={`/clients/${order.clientId}`}>
+                            {clientOptionLabel(order.client)}
+                          </EntityLink>
+                        </TableCell>
                         <TableCell>{order.orderDate}</TableCell>
                       </TableRow>
                     ))}
@@ -110,5 +117,31 @@ export function PendingOrdersTable() {
         </CardContent>
       </Card>
     </Grid>
+  );
+}
+
+function EntityLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+      {children}
+      <Tooltip title="In neuem Tab öffnen">
+        <IconButton
+          component="a"
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          size="small"
+          sx={{ p: 0.25, ml: 0.5, color: 'action.active' }}
+        >
+          <OpenInNewIcon sx={{ fontSize: 14 }} />
+        </IconButton>
+      </Tooltip>
+    </Box>
   );
 }

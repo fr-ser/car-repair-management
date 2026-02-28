@@ -32,8 +32,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/documents" replace /> },
       { path: '/clients', element: <ClientListPage /> },
+      { path: '/clients/:id', element: <ClientListPage /> },
       { path: '/cars', element: <CarListPage /> },
+      { path: '/cars/:id', element: <CarListPage /> },
       { path: '/orders', element: <OrderListPage /> },
+      { path: '/orders/:id', element: <OrderListPage /> },
       { path: '/overview', element: <OverviewPage /> },
       { path: '/documents', element: <div>/documents</div> },
       { path: '/articles', element: <ArticleListPage /> },

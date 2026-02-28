@@ -1,4 +1,8 @@
-import { Close as CloseIcon, Person as PersonIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  OpenInNew as OpenInNewIcon,
+  Person as PersonIcon,
+} from '@mui/icons-material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,6 +17,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
@@ -109,9 +114,30 @@ export default function OwnerCard({
               }}
             >
               <Box>
-                <Typography variant="body1" fontWeight={500}>
-                  {clientDisplayName(ownerData)}
-                </Typography>
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}
+                >
+                  <Typography variant="body1" fontWeight={500}>
+                    {clientDisplayName(ownerData)}
+                  </Typography>
+                  <Tooltip title="In neuem Tab öffnen">
+                    <IconButton
+                      component="a"
+                      href={`/clients/${ownerData.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
+                      sx={{ p: 0.25, color: 'action.active' }}
+                    >
+                      <OpenInNewIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
                 <Typography
                   variant="caption"
                   display="block"

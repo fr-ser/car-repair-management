@@ -21,20 +21,25 @@ import CarsCard from '@/src/pages/clients/components/CarsCard';
 import AddCarsModal from '@/src/pages/clients/components/modals/AddCarsModal';
 import { useClientForm } from '@/src/pages/clients/useClientForm.hook';
 import * as apiService from '@/src/services/backend-service';
-import { BackendClient } from '@/src/types/backend-contracts';
 
 type ClientDetailsPageProps = {
-  selectedClient?: BackendClient;
+  selectedClientId?: number;
   isOpen: boolean;
   onClose: () => void;
 };
 
 export default function ClientDetailsModal({
-  selectedClient,
+  selectedClientId,
   isOpen,
   onClose,
 }: ClientDetailsPageProps) {
   const { showNotification } = useNotification();
+
+  const { data: selectedClient, isLoading: isClientLoading } = useQuery({
+    queryKey: ['client', selectedClientId],
+    queryFn: () => apiService.fetchClient(selectedClientId!),
+    enabled: !!selectedClientId && isOpen,
+  });
 
   const { formData, reloadForm, onFormInputChange, getPayload } =
     useClientForm(selectedClient);
@@ -43,15 +48,9 @@ export default function ClientDetailsModal({
 
   const queryClient = useQueryClient();
 
-  const { data: clientWithCars } = useQuery({
-    queryKey: ['client', selectedClient?.id],
-    queryFn: () => apiService.fetchClient(selectedClient!.id),
-    enabled: !!selectedClient && isOpen,
-  });
-
   async function handleSubmit() {
-    if (selectedClient !== undefined) {
-      await apiService.updateClient(selectedClient.id, getPayload());
+    if (selectedClientId != undefined) {
+      await apiService.updateClient(selectedClientId, getPayload());
     } else {
       await apiService.createClient(getPayload());
     }
@@ -97,234 +96,242 @@ export default function ClientDetailsModal({
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={4} pt={1}>
-          {/* Customer Information Card */}
-          <Grid size={{ xs: 12, lg: 8 }}>
-            <Card elevation={2}>
-              <CardContent sx={{ pt: 0 }}>
-                {/* Personal Information Section */}
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
-                    }}
-                  >
-                    Persönliche Daten
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Vorname"
-                        value={formData.firstName.value}
-                        onChange={(e) =>
-                          onFormInputChange('firstName', e.target.value)
-                        }
-                        error={!!formData.firstName.errorMessage}
-                        helperText={formData.firstName.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Nachname"
-                        value={formData.lastName.value}
-                        onChange={(e) =>
-                          onFormInputChange('lastName', e.target.value)
-                        }
-                        error={!!formData.lastName.errorMessage}
-                        helperText={formData.lastName.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Firma"
-                        value={formData.company.value}
-                        onChange={(e) =>
-                          onFormInputChange('company', e.target.value)
-                        }
-                        error={!!formData.company.errorMessage}
-                        helperText={formData.company.errorMessage}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
+        {isClientLoading && selectedClientId ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <Grid container spacing={4} pt={1}>
+              {/* Customer Information Card */}
+              <Grid size={{ xs: 12, lg: 8 }}>
+                <Card elevation={2}>
+                  <CardContent sx={{ pt: 0 }}>
+                    {/* Personal Information Section */}
+                    <Box>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          display: 'block',
+                        }}
+                      >
+                        Persönliche Daten
+                      </Typography>
+                      <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Vorname"
+                            value={formData.firstName.value}
+                            onChange={(e) =>
+                              onFormInputChange('firstName', e.target.value)
+                            }
+                            error={!!formData.firstName.errorMessage}
+                            helperText={formData.firstName.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Nachname"
+                            value={formData.lastName.value}
+                            onChange={(e) =>
+                              onFormInputChange('lastName', e.target.value)
+                            }
+                            error={!!formData.lastName.errorMessage}
+                            helperText={formData.lastName.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Firma"
+                            value={formData.company.value}
+                            onChange={(e) =>
+                              onFormInputChange('company', e.target.value)
+                            }
+                            error={!!formData.company.errorMessage}
+                            helperText={formData.company.errorMessage}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
 
-                <Divider sx={{ mt: 2, mb: 1 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
-                {/* Address Section */}
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
-                    }}
-                  >
-                    Adresse
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Straße und Nr."
-                        value={formData.street.value}
-                        onChange={(e) =>
-                          onFormInputChange('street', e.target.value)
-                        }
-                        error={!!formData.street.errorMessage}
-                        helperText={formData.street.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="PLZ"
-                        value={formData.postalCode.value}
-                        onChange={(e) =>
-                          onFormInputChange('postalCode', e.target.value)
-                        }
-                        error={!!formData.postalCode.errorMessage}
-                        helperText={formData.postalCode.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Stadt"
-                        value={formData.city.value}
-                        onChange={(e) =>
-                          onFormInputChange('city', e.target.value)
-                        }
-                        error={!!formData.city.errorMessage}
-                        helperText={formData.city.errorMessage}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
+                    {/* Address Section */}
+                    <Box>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          display: 'block',
+                        }}
+                      >
+                        Adresse
+                      </Typography>
+                      <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Straße und Nr."
+                            value={formData.street.value}
+                            onChange={(e) =>
+                              onFormInputChange('street', e.target.value)
+                            }
+                            error={!!formData.street.errorMessage}
+                            helperText={formData.street.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="PLZ"
+                            value={formData.postalCode.value}
+                            onChange={(e) =>
+                              onFormInputChange('postalCode', e.target.value)
+                            }
+                            error={!!formData.postalCode.errorMessage}
+                            helperText={formData.postalCode.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Stadt"
+                            value={formData.city.value}
+                            onChange={(e) =>
+                              onFormInputChange('city', e.target.value)
+                            }
+                            error={!!formData.city.errorMessage}
+                            helperText={formData.city.errorMessage}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
 
-                <Divider sx={{ mt: 2, mb: 1 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
-                {/* Contact Information Section */}
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
-                    }}
-                  >
-                    Kontaktdaten
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Festnetz"
-                        value={formData.landline.value}
-                        onChange={(e) =>
-                          onFormInputChange('landline', e.target.value)
-                        }
-                        error={!!formData.landline.errorMessage}
-                        helperText={formData.landline.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="Mobil"
-                        value={formData.phoneNumber.value}
-                        onChange={(e) =>
-                          onFormInputChange('phoneNumber', e.target.value)
-                        }
-                        error={!!formData.phoneNumber.errorMessage}
-                        helperText={formData.phoneNumber.errorMessage}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <TextField
-                        fullWidth
-                        label="E-Mail"
-                        type="email"
-                        value={formData.email.value}
-                        onChange={(e) =>
-                          onFormInputChange('email', e.target.value)
-                        }
-                        error={!!formData.email.errorMessage}
-                        helperText={formData.email.errorMessage}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
+                    {/* Contact Information Section */}
+                    <Box>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          display: 'block',
+                        }}
+                      >
+                        Kontaktdaten
+                      </Typography>
+                      <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Festnetz"
+                            value={formData.landline.value}
+                            onChange={(e) =>
+                              onFormInputChange('landline', e.target.value)
+                            }
+                            error={!!formData.landline.errorMessage}
+                            helperText={formData.landline.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="Mobil"
+                            value={formData.phoneNumber.value}
+                            onChange={(e) =>
+                              onFormInputChange('phoneNumber', e.target.value)
+                            }
+                            error={!!formData.phoneNumber.errorMessage}
+                            helperText={formData.phoneNumber.errorMessage}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 4 }}>
+                          <TextField
+                            fullWidth
+                            label="E-Mail"
+                            type="email"
+                            value={formData.email.value}
+                            onChange={(e) =>
+                              onFormInputChange('email', e.target.value)
+                            }
+                            error={!!formData.email.errorMessage}
+                            helperText={formData.email.errorMessage}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
 
-                <Divider sx={{ mt: 2, mb: 1 }} />
+                    <Divider sx={{ mt: 2, mb: 1 }} />
 
-                {/* Additional Information Section */}
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
-                    }}
-                  >
-                    Zusätzliche Informationen
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <DatePicker
-                        label="Geburtstag"
-                        value={formData.birthday.value}
-                        onChange={(newValue) =>
-                          onFormInputChange(
-                            'birthday',
-                            newValue?.toDate() || null,
-                          )
-                        }
-                        slotProps={{ textField: { fullWidth: true } }}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth={true}
-                        label="Kommentar"
-                        multiline
-                        rows={3}
-                        value={formData.comment.value}
-                        onChange={(e) =>
-                          onFormInputChange('comment', e.target.value)
-                        }
-                        error={!!formData.comment.errorMessage}
-                        helperText={formData.comment.errorMessage}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                    {/* Additional Information Section */}
+                    <Box>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          display: 'block',
+                        }}
+                      >
+                        Zusätzliche Informationen
+                      </Typography>
+                      <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <DatePicker
+                            label="Geburtstag"
+                            value={formData.birthday.value}
+                            onChange={(newValue) =>
+                              onFormInputChange(
+                                'birthday',
+                                newValue?.toDate() || null,
+                              )
+                            }
+                            slotProps={{ textField: { fullWidth: true } }}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <TextField
+                            fullWidth={true}
+                            label="Kommentar"
+                            multiline
+                            rows={3}
+                            value={formData.comment.value}
+                            onChange={(e) =>
+                              onFormInputChange('comment', e.target.value)
+                            }
+                            error={!!formData.comment.errorMessage}
+                            helperText={formData.comment.errorMessage}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-          {selectedClient && (
-            <CarsCard
-              cars={clientWithCars?.cars ?? []}
-              clientId={selectedClient.id}
-              setCarModalOpen={setCarDialogOpen}
-            />
-          )}
-        </Grid>
-        {selectedClient && (
-          <AddCarsModal
-            isOpen={carDialogOpen}
-            onClose={() => setCarDialogOpen(false)}
-            clientId={selectedClient.id}
-          />
+              {selectedClientId && (
+                <CarsCard
+                  cars={selectedClient?.cars ?? []}
+                  clientId={selectedClientId}
+                  setCarModalOpen={setCarDialogOpen}
+                />
+              )}
+            </Grid>
+            {selectedClientId && (
+              <AddCarsModal
+                isOpen={carDialogOpen}
+                onClose={() => setCarDialogOpen(false)}
+                clientId={selectedClientId}
+              />
+            )}
+          </>
         )}
       </DialogContent>
       <DialogActions>
