@@ -18,6 +18,18 @@ const orderInclude = {
   },
 };
 
+const pendingOverviewInclude = {
+  car: { select: { carNumber: true, licensePlate: true } },
+  client: {
+    select: {
+      clientNumber: true,
+      firstName: true,
+      lastName: true,
+      company: true,
+    },
+  },
+};
+
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
@@ -53,6 +65,39 @@ export class OrdersService {
 
       return updated;
     });
+  }
+
+  async findPendingOverview(query: SearchPaginationQueryDto) {
+    const { page, limit, search } = query;
+
+    const where: Prisma.OrderWhereInput = {
+      status: OrderStatus.IN_PROGRESS,
+    };
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search } },
+        { title: { contains: search } },
+        { car: { licensePlate: { contains: search } } },
+        { car: { carNumber: { contains: search } } },
+        { client: { firstName: { contains: search } } },
+        { client: { lastName: { contains: search } } },
+        { client: { company: { contains: search } } },
+        { client: { clientNumber: { contains: search } } },
+      ];
+    }
+
+    const [total, data] = await Promise.all([
+      this.prisma.order.count({ where }),
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: query.skip,
+        take: limit,
+        include: pendingOverviewInclude,
+      }),
+    ]);
+
+    return new PaginatedResponseDto(data, total, { page, limit });
   }
 
   async findAll(query: SearchPaginationQueryDto) {

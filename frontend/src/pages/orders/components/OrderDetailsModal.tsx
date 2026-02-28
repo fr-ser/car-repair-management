@@ -25,6 +25,7 @@ import { useOrderForm } from '@/src/pages/orders/useOrderForm.hook';
 import * as apiService from '@/src/services/backend-service';
 import { BackendCar, BackendClient } from '@/src/types/backend-contracts';
 import { ORDER_STATUS, PAYMENT_METHOD } from '@/src/types/orders';
+import { clientOptionLabel } from '@/src/utils/clients';
 import { getVatRate } from '@/src/utils/helpers';
 import { formatNumber } from '@/src/utils/numbers';
 
@@ -150,12 +151,7 @@ function ClientAutocomplete({
 
   React.useEffect(() => {
     if (selectedClient) {
-      const name = [selectedClient.firstName, selectedClient.lastName]
-        .filter(Boolean)
-        .join(' ');
-      setInputValue(
-        `${selectedClient.clientNumber ?? ''} – ${name || selectedClient.company || ''}`,
-      );
+      setInputValue(clientOptionLabel(selectedClient));
     }
   }, [selectedClient]);
 
@@ -165,22 +161,14 @@ function ClientAutocomplete({
   ) => {
     onChange(value?.id ?? null);
     if (value) {
-      const name = [value.firstName, value.lastName].filter(Boolean).join(' ');
-      setInputValue(
-        `${value.clientNumber ?? ''} – ${name || value.company || ''}`,
-      );
+      setInputValue(clientOptionLabel(value));
     }
   };
 
   return (
     <Autocomplete
       options={clientOptions}
-      getOptionLabel={(option) => {
-        const name = [option.firstName, option.lastName]
-          .filter(Boolean)
-          .join(' ');
-        return `${option.clientNumber ?? ''} – ${name || option.company || ''}`;
-      }}
+      getOptionLabel={(option) => clientOptionLabel(option)}
       value={selectedClient}
       onChange={handleChange}
       inputValue={inputValue}

@@ -20,6 +20,7 @@ import React from 'react';
 import useDebounce from '@/src/hooks/useDebounce';
 import * as apiService from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
+import { clientDisplayName, clientOptionLabel } from '@/src/utils/clients';
 
 type OwnerCardProps = {
   clientId: number | null;
@@ -109,9 +110,7 @@ export default function OwnerCard({
             >
               <Box>
                 <Typography variant="body1" fontWeight={500}>
-                  {[ownerData.firstName, ownerData.lastName]
-                    .filter(Boolean)
-                    .join(' ') || ownerData.company}
+                  {clientDisplayName(ownerData)}
                 </Typography>
                 <Typography
                   variant="caption"
@@ -158,12 +157,7 @@ export default function OwnerCard({
           <Autocomplete
             sx={{ mt: 2 }}
             options={clientOptions}
-            getOptionLabel={(option) => {
-              const name = [option.firstName, option.lastName]
-                .filter(Boolean)
-                .join(' ');
-              return `${option.clientNumber} – ${name || option.company || ''}`;
-            }}
+            getOptionLabel={(option) => clientOptionLabel(option)}
             loading={isSearching}
             value={selectedOption}
             onChange={(_, value) => setSelectedOption(value)}

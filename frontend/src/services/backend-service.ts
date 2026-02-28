@@ -9,6 +9,7 @@ import {
   BackendClientWithCars,
   BackendOrderWithPositions,
   BackendPaginatedResponse,
+  BackendPendingOrder,
   ErrorResponse,
 } from '@/src/types/backend-contracts';
 import { CreateCarRequest, UpdateCarRequest } from '@/src/types/cars';
@@ -261,6 +262,34 @@ export async function fetchOrders(
   handleErrorResponse(response, responseData);
 
   return responseData as BackendPaginatedResponse<BackendOrderWithPositions>;
+}
+
+export async function fetchPendingOrders(
+  page: number = 0,
+  limit: number = 10,
+  search: string = '',
+) {
+  const queryParameters = new URLSearchParams({
+    page: (page + 1).toString(),
+    limit: limit.toString(),
+  });
+  if (search) {
+    queryParameters.append('search', search);
+  }
+  const response = await fetch(
+    `/api/orders/overview/pending?${queryParameters.toString()}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    },
+  );
+  const responseData:
+    | BackendPaginatedResponse<BackendPendingOrder>
+    | ErrorResponse = await response.json();
+
+  handleErrorResponse(response, responseData);
+
+  return responseData as BackendPaginatedResponse<BackendPendingOrder>;
 }
 
 export async function fetchOrder(orderId: number) {

@@ -31,6 +31,7 @@ import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendOrderWithPositions } from '@/src/types/backend-contracts';
 import { ORDER_STATUS, OrderStatus } from '@/src/types/orders';
+import { clientDisplayName } from '@/src/utils/clients';
 
 const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   [ORDER_STATUS.IN_PROGRESS]: 'In Arbeit',
@@ -175,11 +176,7 @@ export default function OrdersTable({
                         <TableCell>{order.orderNumber}</TableCell>
                         <TableCell>{order.title}</TableCell>
                         <TableCell>{order.car.licensePlate}</TableCell>
-                        <TableCell>
-                          {[order.client.firstName, order.client.lastName]
-                            .filter(Boolean)
-                            .join(' ') || order.client.clientNumber}
-                        </TableCell>
+                        <TableCell>{clientDisplayName(order.client)}</TableCell>
                         <TableCell>{order.orderDate}</TableCell>
                         <TableCell>
                           <Chip
