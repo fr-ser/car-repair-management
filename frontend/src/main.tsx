@@ -21,6 +21,8 @@ import ArticleListPage from './pages/articles/ArticleListPage.tsx';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import CarListPage from './pages/cars/CarListPage.tsx';
 import ClientListPage from './pages/clients/ClientListPage.tsx';
+import DocumentDetailPage from './pages/documents/DocumentDetailPage.tsx';
+import DocumentListPage from './pages/documents/DocumentListPage.tsx';
 import OrderListPage from './pages/orders/OrderListPage.tsx';
 import OverviewPage from './pages/overview/OverviewPage.tsx';
 import theme from './theme.ts';
@@ -38,7 +40,8 @@ const router = createBrowserRouter([
       { path: '/orders', element: <OrderListPage /> },
       { path: '/orders/:id', element: <OrderListPage /> },
       { path: '/overview', element: <OverviewPage /> },
-      { path: '/documents', element: <div>/documents</div> },
+      { path: '/documents', element: <DocumentListPage /> },
+      { path: '/documents/:id', element: <DocumentDetailPage /> },
       { path: '/articles', element: <ArticleListPage /> },
       { path: '/login', element: <LoginPage /> },
     ],

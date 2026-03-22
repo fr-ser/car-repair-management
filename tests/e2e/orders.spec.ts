@@ -15,10 +15,6 @@ test('create-edit-delete-order', async ({ page }) => {
 
   await page.goto('orders');
 
-  // Wait for orders to be loaded
-  await page.waitForTimeout(500);
-  const initialCount = await page.getByTestId(/order-row-.*/).count();
-
   // CREATE
   const uniqueTitle = `Auftrag ${Date.now()}`;
   await page.getByTestId('button-order-create').click();
@@ -41,15 +37,17 @@ test('create-edit-delete-order', async ({ page }) => {
     .click();
 
   // select client via autocomplete
-  await page.getByTestId('order-autocomplete-client').fill('FTest 1');
+  await page.getByTestId('order-autocomplete-client').fill('Test First 1');
   await page.waitForSelector('[role="listbox"]');
   await page
-    .getByRole('option', { name: /FTest 1/ })
+    .getByRole('option', { name: /Test First 1/ })
     .first()
     .click();
 
   await page.getByTestId('button-order-save').click();
-  await expect(page.getByTestId(/order-row-.*/)).toHaveCount(initialCount + 1);
+  await expect(
+    page.getByTestId(/order-row-.*/).filter({ hasText: uniqueTitle }),
+  ).toHaveCount(1);
 
   // EDIT — open the newly created order (first in list)
   const newRow = page.getByTestId(/order-row-.*/).first();
@@ -94,5 +92,7 @@ test('create-edit-delete-order', async ({ page }) => {
   await newRow.hover();
   await newRow.getByTestId(/button-order-delete-.*/).click();
   await page.getByTestId('confirm-dialog-button-confirm').click();
-  await expect(page.getByTestId(/order-row-.*/)).toHaveCount(initialCount);
+  await expect(
+    page.getByTestId(/order-row-.*/).filter({ hasText: updatedTitle }),
+  ).toHaveCount(0);
 });

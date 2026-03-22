@@ -126,3 +126,56 @@ model OrderPosition {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Document {
+  id             Int     @id @default(autoincrement())
+  documentNumber String? @unique // "YY-MM-###" (or "YY-MM-###-K" for offer)
+
+  type         String // "invoice" | "offer"
+  documentDate String // snapshot date (string, no SQLite Date type)
+
+  orderId Int // reference only — no FK relation (order can be deleted)
+
+  // snapshot from order
+  paymentMethod  String?
+  paymentDueDate String?
+
+  // snapshot from client
+  clientNumber     String?
+  clientCompany    String?
+  clientFirstName  String?
+  clientLastName   String?
+  clientStreet     String?
+  clientPostalCode String?
+  clientCity       String?
+
+  // snapshot from car
+  carLicensePlate String
+  carManufacturer String
+  carModel        String
+  carVin          String?
+  carMileage      Decimal?
+
+  positions DocumentPosition[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DocumentPosition {
+  id         Int      @id @default(autoincrement())
+  documentId Int
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  type         String // "heading" | "item"
+  sortOrder    Int
+  text         String?
+  articleId    String?
+  description  String?
+  pricePerUnit Decimal?
+  amount       Decimal?
+  discount     Decimal?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

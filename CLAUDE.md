@@ -26,38 +26,15 @@ make test-e2e-playwright  # Playwright e2e tests only
 
 ### Backend (`backend/`)
 
-Inside the backend directory:
-
 ```bash
 make test                      # Lint + unit + e2e tests
-yarn run test:unit             # Unit tests only (vitest run src)
-yarn run test:e2e              # Backend e2e tests (vitest run test --no-file-parallelism)
 make setup-clean-test-database # Recreate clean test DB
 ```
 
 ### Frontend (`frontend/`)
 
-Inside the frontend directory:
-
 ```bash
-make test          # Lint + unit tests
-yarn run test      # Unit tests only (vitest run)
-```
-
-### Running a single test file
-
-```bash
-# Backend unit test
-cd backend && yarn vitest run src/path/to/file.spec.ts
-
-# Backend e2e test
-cd backend && yarn vitest run test/auth.e2e-spec.ts --no-file-parallelism
-
-# Frontend unit test
-cd frontend && yarn vitest run src/path/to/file.test.tsx
-
-# Playwright single spec
-yarn playwright test tests/e2e/clients.spec.ts
+make test  # Lint + unit tests
 ```
 
 ## Architecture
@@ -130,6 +107,10 @@ Prefer `@/src/...` absolute imports over relative ones. Allowed exceptions:
 
 Use named exports throughout (`export function Foo`, `export const bar`).
 Exception: when a file has a single export whose name matches the filename, use a default export (e.g. `export default function LoginPage` in `LoginPage.tsx`, `export default theme` in `theme.ts`).
+
+### Language
+
+All non-user-facing values must be in English: variable names, constants, enum values, database field values, seed data content, comments, commit messages, test descriptions, and any other code-level strings. German is only used where it is directly displayed to the end user in the UI (e.g. button labels, column headers, form labels, error messages shown on screen).
 
 ## AI Agent instructions
 

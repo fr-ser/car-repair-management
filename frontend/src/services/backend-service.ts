@@ -7,12 +7,15 @@ import {
   BackendCar,
   BackendClient,
   BackendClientWithCars,
+  BackendDocument,
+  BackendDocumentWithPositions,
   BackendOrderWithPositions,
   BackendPaginatedResponse,
   BackendPendingOrder,
 } from '@/src/types/backend-contracts';
 import { CreateCarRequest, UpdateCarRequest } from '@/src/types/cars';
 import { CreateClientRequest } from '@/src/types/clients';
+import { CreateDocumentRequest } from '@/src/types/documents';
 import * as Errors from '@/src/types/errors';
 import { CreateOrderRequest, UpdateOrderRequest } from '@/src/types/orders';
 
@@ -166,6 +169,31 @@ export function updateOrder(orderId: number, order: UpdateOrderRequest) {
 
 export function deleteOrder(orderId: number) {
   return apiFetch<object>(`/api/orders/${orderId}`, { method: 'DELETE' });
+}
+
+export function fetchDocumentsByOrder(orderId: number) {
+  return apiFetch<BackendDocument[]>(`/api/documents/by-order/${orderId}`);
+}
+
+export function fetchDocuments(page = 0, limit = 10, search = '') {
+  return apiFetch<BackendPaginatedResponse<BackendDocument>>(
+    paginatedUrl('/api/documents', page, limit, search),
+  );
+}
+
+export function fetchDocument(documentId: number) {
+  return apiFetch<BackendDocumentWithPositions>(`/api/documents/${documentId}`);
+}
+
+export function createDocument(data: CreateDocumentRequest) {
+  return apiFetch<BackendDocument>('/api/documents', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteDocument(documentId: number) {
+  return apiFetch<object>(`/api/documents/${documentId}`, { method: 'DELETE' });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

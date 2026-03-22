@@ -19,7 +19,8 @@ deployment/production
 
 # local development artifacts
 .envrc
-.claude
+.claude/*
+!.claude/skills/
 
 # app artifacts
 *.pdf
