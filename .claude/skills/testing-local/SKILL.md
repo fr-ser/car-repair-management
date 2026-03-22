@@ -79,6 +79,12 @@ make test-all
 
 ---
 
+## Snapshot tests
+
+**Never regenerate snapshots without explicit user confirmation.** If snapshots are failing and regeneration seems like the fix, stop and ask first. Snapshots represent intentional baselines — silently overwriting them defeats their purpose.
+
+---
+
 ## Patterns to follow
 
 - Look at an existing test file in the same layer (unit/e2e/playwright) before writing a new one — match its import style, structure, and mock setup.

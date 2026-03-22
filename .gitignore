@@ -24,6 +24,7 @@ deployment/production
 
 # app artifacts
 *.pdf
+!backend/src/documents/snapshots/*.pdf
 
 # database
 *.db

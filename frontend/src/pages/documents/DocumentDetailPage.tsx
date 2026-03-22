@@ -1,6 +1,7 @@
 import {
   ArrowBack as ArrowBackIcon,
   Assignment as AssignmentIcon,
+  PictureAsPdf as PictureAsPdfIcon,
   Receipt as ReceiptIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
@@ -54,6 +55,23 @@ function DocumentDetailContent() {
           }
           action={
             <Box sx={{ display: 'flex', gap: 1 }}>
+              {document && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PictureAsPdfIcon />}
+                  size="small"
+                  onClick={() =>
+                    apiService.downloadDocumentPdf(
+                      document.id,
+                      `${document.documentNumber ?? document.id}.pdf`,
+                    )
+                  }
+                  data-testid="button-document-download-pdf"
+                >
+                  PDF herunterladen
+                </Button>
+              )}
               {document && (
                 <Button
                   variant="contained"

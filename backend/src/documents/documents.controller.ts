@@ -7,7 +7,9 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 
 import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
 
@@ -31,6 +33,17 @@ export class DocumentsController {
   @Get('by-order/:orderId')
   findByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
     return this.documentsService.findByOrderId(orderId);
+  }
+
+  @Get(':id/pdf')
+  async getPdf(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+    const buffer = await this.documentsService.getPdf(id);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${id}.pdf"`,
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
   }
 
   @Get(':id')

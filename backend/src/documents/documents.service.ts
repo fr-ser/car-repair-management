@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateDocumentDto, DOCUMENT_TYPE } from './document.dto';
+import { renderPDF } from './renderPDF';
 
 const documentInclude = {
   positions: { orderBy: { sortOrder: 'asc' as const } },
@@ -128,5 +129,14 @@ export class DocumentsService {
 
   async remove(id: number) {
     return this.prisma.document.delete({ where: { id } });
+  }
+
+  async getPdf(id: number): Promise<Buffer> {
+    const document = await this.prisma.document.findUniqueOrThrow({
+      where: { id },
+      include: documentInclude,
+    });
+
+    return renderPDF(document);
   }
 }
