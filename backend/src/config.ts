@@ -25,6 +25,20 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   JWT_SECRET: string;
+
+  // Document company info
+  @IsNotEmpty() @IsString() DOC_COMPANY_TITLE: string;
+  @IsNotEmpty() @IsString() DOC_COMPANY_SUB_TITLE: string;
+  @IsNotEmpty() @IsString() DOC_STREET_AND_NUMBER: string;
+  @IsNotEmpty() @IsString() DOC_ZIP_AND_CITY: string;
+  @IsNotEmpty() @IsString() DOC_PHONE_NUMBER: string;
+  @IsNotEmpty() @IsString() DOC_EMAIL: string;
+  @IsNotEmpty() @IsString() DOC_OWNER: string;
+  @IsNotEmpty() @IsString() DOC_BANK: string;
+  @IsNotEmpty() @IsString() DOC_BIC: string;
+  @IsNotEmpty() @IsString() DOC_IBAN: string;
+  @IsNotEmpty() @IsString() DOC_VAT_ID: string;
+  @IsNotEmpty() @IsString() DOC_TAX_ID: string;
 }
 
 export function validate(config: Record<string, unknown>) {

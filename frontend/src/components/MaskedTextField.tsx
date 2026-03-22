@@ -18,18 +18,10 @@ export default function MaskedTextField(props: MaskedTextFieldProps) {
   const { value, onChange, id, label, error, inputComponent } = props;
 
   return (
-    <FormControl fullWidth error={!!error}>
-      <InputLabel
-        sx={{
-          '&:not(.MuiInputLabel-shrink)': {
-            top: '-6px',
-          },
-        }}
-        htmlFor={id}
-      >
-        {label}
-      </InputLabel>
+    <FormControl fullWidth size="small" error={!!error}>
+      <InputLabel htmlFor={id}>{label}</InputLabel>
       <OutlinedInput
+        size="small"
         value={value}
         label={label}
         onChange={(e) => onChange(e.target.value)}

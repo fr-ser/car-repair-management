@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     include: ['**/*.{spec,e2e-spec}.[jt]s'],
     environment: 'node',
+    clearMocks: true,
     env: {
       CONFIG_PATH: '.env.test',
     },

@@ -8,6 +8,8 @@ import type {
   Article,
   Car,
   Client,
+  Document,
+  DocumentPosition,
   Order,
   OrderPosition,
 } from '@/../../backend/src/generated/prisma/client';
@@ -56,6 +58,14 @@ export interface BackendPaginatedResponse<T> {
     totalPages: number;
     hasNextPage: boolean;
   };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface BackendDocumentPosition extends DocumentPosition {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface BackendDocument extends Document {}
+export interface BackendDocumentWithPositions extends BackendDocument {
+  positions: BackendDocumentPosition[];
 }
 
 export interface ErrorResponse {

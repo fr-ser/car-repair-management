@@ -47,6 +47,7 @@ test('get-create-edit-delete-article', async ({ page }) => {
   await newRow.click();
 
   const updatedDescription = `Updated Artikel ${Date.now()}`;
+  await page.getByLabel('Bezeichnung').click({ clickCount: 3 });
   await page.getByLabel('Bezeichnung').fill(updatedDescription);
   await page.getByTestId('button-article-save').click();
 

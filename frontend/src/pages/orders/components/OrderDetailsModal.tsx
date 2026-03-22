@@ -1,4 +1,9 @@
-import { Receipt as ReceiptIcon, Save as SaveIcon } from '@mui/icons-material';
+import {
+  Assignment as AssignmentIcon,
+  OpenInNew as OpenInNewIcon,
+  Receipt as ReceiptIcon,
+  Save as SaveIcon,
+} from '@mui/icons-material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -17,13 +22,19 @@ import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import DecimalTextField from '@/src/components/DecimalTextField';
 import useNotification from '@/src/hooks/notification/useNotification';
 import useDebounce from '@/src/hooks/useDebounce';
 import { useOrderForm } from '@/src/pages/orders/useOrderForm.hook';
 import * as apiService from '@/src/services/backend-service';
-import { BackendCar, BackendClient } from '@/src/types/backend-contracts';
+import {
+  BackendCar,
+  BackendClient,
+  BackendDocument,
+} from '@/src/types/backend-contracts';
+import { DOCUMENT_TYPE } from '@/src/types/documents';
 import { ORDER_STATUS, PAYMENT_METHOD } from '@/src/types/orders';
 import { clientOptionLabel } from '@/src/utils/clients';
 import { getVatRate } from '@/src/utils/helpers';
@@ -196,12 +207,86 @@ function ClientAutocomplete({
   );
 }
 
+function documentTypeLabel(type: string) {
+  if (type === DOCUMENT_TYPE.INVOICE) return 'Rechnung';
+  if (type === DOCUMENT_TYPE.OFFER) return 'Kostenvoranschlag';
+  return type;
+}
+
+function OrderDocumentsCard({ orderId }: { orderId: number }) {
+  const navigate = useNavigate();
+
+  const { data: documents, isPending } = useQuery({
+    queryKey: ['documents', 'by-order', orderId],
+    queryFn: () => apiService.fetchDocumentsByOrder(orderId),
+  });
+
+  return (
+    <Card elevation={2}>
+      <CardContent>
+        <Typography
+          variant="overline"
+          sx={{ color: 'text.secondary', fontWeight: 600, display: 'block' }}
+        >
+          Dokumente
+        </Typography>
+        {isPending && <CircularProgress size={20} />}
+        {!isPending && (!documents || documents.length === 0) && (
+          <Typography variant="body2" color="text.secondary">
+            Noch keine Dokumente
+          </Typography>
+        )}
+        {documents && documents.length > 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            {documents.map((doc: BackendDocument) => (
+              <Box
+                key={doc.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 1,
+                  py: 0.5,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  '&:last-child': { borderBottom: 'none' },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <AssignmentIcon
+                    fontSize="small"
+                    sx={{ color: 'text.secondary' }}
+                  />
+                  <Typography variant="body2">
+                    {documentTypeLabel(doc.type)} {doc.documentNumber}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {doc.documentDate}
+                  </Typography>
+                </Box>
+                <Button
+                  size="small"
+                  endIcon={<OpenInNewIcon fontSize="small" />}
+                  onClick={() => navigate(`/documents/${doc.id}`)}
+                >
+                  Öffnen
+                </Button>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function OrderDetailsModal({
   selectedOrderId,
   isOpen,
   onClose,
 }: OrderDetailsModalProps) {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const { data: selectedOrder, isLoading: isOrderLoading } = useQuery({
     queryKey: ['order', selectedOrderId],
@@ -243,6 +328,27 @@ export default function OrderDetailsModal({
       });
       onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error: unknown) => {
+      showNotification({
+        level: 'error',
+        message:
+          error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten',
+      });
+    },
+  });
+
+  const saveAsDocumentMutation = useMutation({
+    mutationFn: (type: (typeof DOCUMENT_TYPE)[keyof typeof DOCUMENT_TYPE]) =>
+      apiService.createDocument({
+        orderId: selectedOrderId!,
+        type,
+        documentDate: new Date().toISOString().slice(0, 10),
+      }),
+    onSuccess: (doc) => {
+      showNotification({ level: 'success', message: 'Dokument erstellt' });
+      onClose();
+      navigate(`/documents/${doc.id}`);
     },
     onError: (error: unknown) => {
       showNotification({
@@ -514,7 +620,7 @@ export default function OrderDetailsModal({
               </Card>
 
               {/* Kunde card */}
-              <Card elevation={2}>
+              <Card elevation={2} sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography
                     variant="overline"
@@ -533,18 +639,46 @@ export default function OrderDetailsModal({
                   />
                 </CardContent>
               </Card>
+
+              {/* Dokumente card — only when editing an existing order */}
+              {selectedOrderId != undefined && (
+                <OrderDocumentsCard orderId={selectedOrderId} />
+              )}
             </Grid>
           </Grid>
         )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onCleanAndClose}>Abbrechen</Button>
+        {selectedOrderId != undefined && (
+          <>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => saveAsDocumentMutation.mutate(DOCUMENT_TYPE.OFFER)}
+              disabled={saveAsDocumentMutation.isPending}
+              data-testid="button-order-save-as-offer"
+            >
+              Als Kostenvoranschlag speichern
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() =>
+                saveAsDocumentMutation.mutate(DOCUMENT_TYPE.INVOICE)
+              }
+              disabled={saveAsDocumentMutation.isPending}
+              data-testid="button-order-save-as-invoice"
+            >
+              Als Rechnung speichern
+            </Button>
+          </>
+        )}
         <Button
           variant="contained"
           startIcon={
-            mutation.isPending ? <CircularProgress size={24} /> : <SaveIcon />
+            mutation.isPending ? <CircularProgress size={20} /> : <SaveIcon />
           }
-          size="large"
           onClick={() => mutation.mutate()}
           sx={{ flex: { xs: 1, sm: 'none' } }}
           data-testid="button-order-save"
