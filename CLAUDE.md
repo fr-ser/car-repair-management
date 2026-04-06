@@ -10,6 +10,10 @@ A car repair shop management application — monorepo with a NestJS backend and 
 The backend serves frontend static assets in production.
 All endpoints are JWT-protected except login.
 
+This project is the successor of a legacy application (`werkstattapp-legacy`, also in the VS Code workspace).
+The legacy app defines all business logic and domain rules — refer to it when in doubt about what the application should do.
+Do not follow its technical patterns; use the conventions established in this repository instead.
+
 ## Commands
 
 ### Root (Makefile)

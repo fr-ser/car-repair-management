@@ -19,6 +19,7 @@ deployment/production
 
 # local development artifacts
 .envrc
+.serena
 .claude/*
 !.claude/skills/
 
