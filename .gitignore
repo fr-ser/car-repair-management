@@ -19,11 +19,13 @@ deployment/production
 
 # local development artifacts
 .envrc
+.serena
 .claude/*
 !.claude/skills/
 
 # app artifacts
 *.pdf
+!backend/src/documents/test-snapshots/*.pdf
 
 # database
 *.db

@@ -17,15 +17,17 @@ setup-clean-test-database: ## (re)create a clean test database
 
 test: ## runs all tests
 	yarn run dotenv -e .env.test prisma generate
-	yarn run test:unit
+	yarn run dotenv -e .env.test yarn run test:unit
 	yarn run lint
+	yarn tsc --noEmit
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e
 
 test-cov: ## runs all tests once with coverage report
 	yarn run dotenv -e .env.test prisma generate
-	yarn run test:unit
+	yarn run dotenv -e .env.test yarn run test:unit
 	yarn run lint
+	yarn tsc --noEmit
 	@$(MAKE) setup-clean-test-database
 	yarn run test:e2e:cov
 

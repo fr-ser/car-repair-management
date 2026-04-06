@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Prisma } from '@/src/generated/prisma/client';
 
@@ -173,10 +173,12 @@ export class OrdersService {
 
   async remove(id: number) {
     return this.prisma.$transaction(async (tx) => {
-      const order = await tx.order.findUniqueOrThrow({
+      const order = await tx.order.findUnique({
         where: { id },
         include: { positions: true },
       });
+
+      if (!order) throw new NotFoundException(`Order ${id} not found`);
 
       await this._adjustInventory(tx, order.positions, []);
 

@@ -196,6 +196,21 @@ export function deleteDocument(documentId: number) {
   return apiFetch<object>(`/api/documents/${documentId}`, { method: 'DELETE' });
 }
 
+export async function downloadDocumentPdf(
+  documentId: number,
+  filename: string,
+) {
+  const response = await fetch(`/api/documents/${documentId}/pdf`);
+  if (!response.ok) throw new Error('PDF download failed');
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleErrorResponse(response: Response, responseData: any) {
   if (response.ok) return;

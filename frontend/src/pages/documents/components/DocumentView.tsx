@@ -243,21 +243,24 @@ export function DocumentView({ document }: Props) {
         <TableBody>
           {document.positions.map((pos) => {
             if (pos.type === 'heading') {
+              const headingCellSx = {
+                border: '1px solid #bdbdbd',
+                fontFamily: 'serif',
+                fontSize: '14px',
+                padding: '2px 4px',
+                textAlign: 'center' as const,
+              };
               return (
                 <TableRow key={pos.id}>
-                  <TableCell
-                    colSpan={7}
-                    sx={{
-                      fontWeight: 'bold',
-                      border: '1px solid #bdbdbd',
-                      textAlign: 'left',
-                      fontFamily: 'serif',
-                      fontSize: '14px',
-                      padding: '2px 4px',
-                    }}
-                  >
+                  <TableCell sx={headingCellSx} />
+                  <TableCell sx={headingCellSx} />
+                  <TableCell sx={{ ...headingCellSx, fontWeight: 'bold' }}>
                     {pos.text}
                   </TableCell>
+                  <TableCell sx={headingCellSx} />
+                  <TableCell sx={headingCellSx} />
+                  <TableCell sx={headingCellSx} />
+                  <TableCell sx={headingCellSx} />
                 </TableRow>
               );
             }
@@ -280,18 +283,18 @@ export function DocumentView({ document }: Props) {
               <TableRow key={pos.id}>
                 <TableCell sx={cellSx}>{itemIndex}</TableCell>
                 <TableCell sx={cellSx}>{pos.articleId ?? ''}</TableCell>
-                <TableCell sx={{ ...cellSx, textAlign: 'left' }}>
-                  {pos.description ?? ''}
+                <TableCell sx={cellSx}>{pos.description ?? ''}</TableCell>
+                <TableCell sx={cellSx}>
+                  {formatNumber(price, { minDecimals: 2, maxDecimals: 2 })}
+                </TableCell>
+                <TableCell
+                  sx={cellSx}
+                >{`${formatNumber(discount, { minDecimals: 2, maxDecimals: 2 })} %`}</TableCell>
+                <TableCell sx={cellSx}>
+                  {formatNumber(amount, { minDecimals: 2, maxDecimals: 2 })}
                 </TableCell>
                 <TableCell sx={cellSx}>
-                  {formatNumber(price, { currency: true })}
-                </TableCell>
-                <TableCell sx={cellSx}>
-                  {discount > 0 ? `${discount} %` : ''}
-                </TableCell>
-                <TableCell sx={cellSx}>{amount}</TableCell>
-                <TableCell sx={cellSx}>
-                  {formatNumber(net, { currency: true })}
+                  {formatNumber(net, { minDecimals: 2, maxDecimals: 2 })}
                 </TableCell>
               </TableRow>
             );
@@ -343,7 +346,6 @@ export function DocumentView({ document }: Props) {
                 key={i}
                 style={{
                   width: '33%',
-                  fontWeight: 'bold',
                   border: '1px solid #000',
                   textAlign: 'center',
                   padding: '2px 4px',
