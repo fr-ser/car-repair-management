@@ -7,7 +7,7 @@ import {
 import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateDocumentDto, DOCUMENT_TYPE } from './document.dto';
-import { renderPDF } from './renderPDF';
+import { renderMultiplePDF, renderPDF } from './renderPDF';
 
 const documentInclude = {
   positions: { orderBy: { sortOrder: 'asc' as const } },
@@ -138,5 +138,15 @@ export class DocumentsService {
     });
 
     return renderPDF(document);
+  }
+
+  async getBulkPdf(ids: number[]): Promise<Buffer> {
+    const documents = await this.prisma.document.findMany({
+      where: { id: { in: ids } },
+      include: documentInclude,
+      orderBy: { documentNumber: 'asc' },
+    });
+
+    return renderMultiplePDF(documents);
   }
 }

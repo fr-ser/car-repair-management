@@ -1,12 +1,15 @@
 import {
   Delete as DeleteIcon,
   Description as DescriptionIcon,
+  Download as DownloadIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Checkbox from '@mui/material/Checkbox';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -21,6 +24,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
 
 import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
@@ -64,6 +68,38 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page, searchTerm]);
+
+  const allOnPageSelected =
+    documents.length > 0 && documents.every((doc) => selectedIds.has(doc.id));
+  const someOnPageSelected =
+    documents.some((doc) => selectedIds.has(doc.id)) && !allOnPageSelected;
+
+  function handleSelectAll() {
+    if (allOnPageSelected) {
+      const updated = new Set(selectedIds);
+      documents.forEach((doc) => updated.delete(doc.id));
+      setSelectedIds(updated);
+    } else {
+      const updated = new Set(selectedIds);
+      documents.forEach((doc) => updated.add(doc.id));
+      setSelectedIds(updated);
+    }
+  }
+
+  function handleToggleSelect(id: number) {
+    const updated = new Set(selectedIds);
+    if (updated.has(id)) {
+      updated.delete(id);
+    } else {
+      updated.add(id);
+    }
+    setSelectedIds(updated);
+  }
 
   async function handleDeleteDocument(doc: BackendDocument) {
     const isConfirmed = await confirm({
@@ -75,6 +111,17 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
     await apiClient.deleteDocument(doc.id);
     showNotification({ message: 'Dokument wurde gelöscht' });
     await refetch();
+  }
+
+  async function handleDownloadSelected() {
+    try {
+      await apiClient.downloadDocumentsPdf([...selectedIds]);
+    } catch {
+      showNotification({
+        message: 'PDF-Download fehlgeschlagen',
+        level: 'error',
+      });
+    }
   }
 
   return (
@@ -92,22 +139,33 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
           sx={{ pb: 1 }}
         />
         <CardContent sx={{ pt: 0 }}>
-          <TextField
-            fullWidth
-            placeholder="Suche nach Dokumentennummer oder Kunde"
-            value={searchTerm}
-            onChange={handlers.onSearchChange}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ mb: 2 }}
-          />
+          <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+            <TextField
+              fullWidth
+              placeholder="Suche nach Dokumentennummer oder Kunde"
+              value={searchTerm}
+              onChange={handlers.onSearchChange}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            {selectedIds.size > 0 && (
+              <Button
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadSelected}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                PDF ({selectedIds.size})
+              </Button>
+            )}
+          </Box>
 
           {isPending ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>
@@ -119,6 +177,13 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          indeterminate={someOnPageSelected}
+                          checked={allOnPageSelected}
+                          onChange={handleSelectAll}
+                        />
+                      </TableCell>
                       <TableCell>Nummer</TableCell>
                       <TableCell>Typ</TableCell>
                       <TableCell>Datum</TableCell>
@@ -137,6 +202,13 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                         data-testid={`document-row-${doc.id}`}
                         sx={tableRowStyles}
                       >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds.has(doc.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            onChange={() => handleToggleSelect(doc.id)}
+                          />
+                        </TableCell>
                         <TableCell>{doc.documentNumber}</TableCell>
                         <TableCell>{documentTypeLabel(doc.type)}</TableCell>
                         <TableCell>{doc.documentDate}</TableCell>

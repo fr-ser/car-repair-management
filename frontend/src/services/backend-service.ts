@@ -211,6 +211,22 @@ export async function downloadDocumentPdf(
   URL.revokeObjectURL(url);
 }
 
+export async function downloadDocumentsPdf(ids: number[]) {
+  const response = await fetch('/api/documents/bulk-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new Error('PDF download failed');
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'documents.pdf';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleErrorResponse(response: Response, responseData: any) {
   if (response.ok) return;
