@@ -54,7 +54,9 @@ test('create-view-delete-document', async ({ page }) => {
   await expect(page).toHaveURL(/\/documents\/\d+/);
 
   // Document view should show car license plate
-  await expect(page.getByText('TEST-PW', { exact: false })).toBeVisible();
+  await expect(
+    page.getByText('TEST-PW', { exact: false }).first(),
+  ).toBeVisible();
 
   // Navigate to documents list
   await page.goto('documents');
@@ -79,7 +81,9 @@ test('create-view-delete-document', async ({ page }) => {
   // Cleanup: delete the test order
   await page.goto('orders');
   await page.waitForTimeout(500);
-  const orderRow = page.getByTestId(/order-row-.*/).first();
+  const orderRow = page
+    .getByTestId(/order-row-.*/)
+    .filter({ hasText: uniqueTitle });
   await orderRow.hover();
   await orderRow.getByTestId(/button-order-delete-.*/).click();
   await page.getByTestId('confirm-dialog-button-confirm').click();

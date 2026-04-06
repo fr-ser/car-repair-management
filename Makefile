@@ -43,8 +43,13 @@ test-e2e-playwright: ## run playwright e2e tests
 test-e2e-playwright-dev: ## run playwright UI tests against the running development instance
 	CONFIG_PATH=./backend/.env.development PLAYWRIGHT_PORT=5173 yarn run playwright test --ui
 
-format: ## Format files
+format: ## Format files (root only)
 	yarn run eslint --fix
+
+format-all: ## Format files in root, backend, and frontend
+	yarn run eslint --fix
+	cd backend && yarn run eslint --fix
+	cd frontend && yarn run eslint --fix
 
 test: ## run all tests
 	yarn run eslint

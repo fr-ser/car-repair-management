@@ -89,8 +89,11 @@ test('create-edit-delete-order', async ({ page }) => {
   await page.waitForTimeout(500);
 
   // DELETE
-  await newRow.hover();
-  await newRow.getByTestId(/button-order-delete-.*/).click();
+  const rowToDelete = page
+    .getByTestId(/order-row-.*/)
+    .filter({ hasText: updatedTitle });
+  await rowToDelete.hover();
+  await rowToDelete.getByTestId(/button-order-delete-.*/).click();
   await page.getByTestId('confirm-dialog-button-confirm').click();
   await expect(
     page.getByTestId(/order-row-.*/).filter({ hasText: updatedTitle }),

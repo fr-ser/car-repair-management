@@ -287,7 +287,9 @@ export function DocumentView({ document }: Props) {
                 <TableCell sx={cellSx}>
                   {formatNumber(price, { minDecimals: 2, maxDecimals: 2 })}
                 </TableCell>
-                <TableCell sx={cellSx}>{`${formatNumber(discount, { minDecimals: 2, maxDecimals: 2 })} %`}</TableCell>
+                <TableCell
+                  sx={cellSx}
+                >{`${formatNumber(discount, { minDecimals: 2, maxDecimals: 2 })} %`}</TableCell>
                 <TableCell sx={cellSx}>
                   {formatNumber(amount, { minDecimals: 2, maxDecimals: 2 })}
                 </TableCell>

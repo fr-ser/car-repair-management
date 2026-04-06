@@ -4,8 +4,9 @@ import PDFDocument from 'pdfkit';
 import { Prisma } from '@/src/generated/prisma/client';
 
 import { formatIsoDateString, getVatRate } from '@/src/common/helpers';
+import { AppConfig, getConfig } from '@/src/config';
 
-// ── Public input type ─────────────────────────────────────────────────────────
+// ── Public input types ────────────────────────────────────────────────────────
 
 export interface DocumentPositionForRender {
   type: string; // 'heading' | 'item'
@@ -38,7 +39,7 @@ export interface DocumentForRender {
   positions: DocumentPositionForRender[];
 }
 
-// ── Internal types (pdfkit rendering) ────────────────────────────────────────
+// ── Internal types ────────────────────────────────────────────────────────────
 
 interface InvoicePosition {
   heading?: string;
@@ -74,6 +75,12 @@ interface InvoiceData {
     city?: string;
     clientNumber?: string;
   };
+}
+
+interface PageState {
+  totalPages: number;
+  prevY: number;
+  currY: number;
 }
 
 // ── Mapping: public model → internal render format ────────────────────────────
@@ -136,8 +143,28 @@ const numberFormatter = new Intl.NumberFormat('de-DE', {
   maximumFractionDigits: 2,
 });
 
-function mmToPx(num: number) {
+// Passed as the y argument to pdfkit text() calls that should continue from doc.y
+const CONTINUE_Y = null as unknown as number;
+
+function mmToPx(num: number): number {
   return (72 / 25.4) * num;
+}
+
+function newPageCheck(
+  doc: PDFKit.PDFDocument,
+  pageState: PageState,
+  addition: number,
+): boolean {
+  if (
+    pageOptions.size[1] - pageOptions.margins.bottom <
+    pageState.currY + addition
+  ) {
+    doc.addPage(pageOptions);
+    pageState.totalPages++;
+    pageState.currY = pageOptions.margins.top;
+    return true;
+  }
+  return false;
 }
 
 // ── pdfkit page setup ─────────────────────────────────────────────────────────
@@ -159,624 +186,495 @@ const pageOptions: NumPDFDocOptions = {
   bufferPages: true,
 };
 
-// ── PDF rendering ─────────────────────────────────────────────────────────────
+// X-positions for the 7 columns of the positions table (plus end boundary)
+const COL_X = [
+  pageOptions.margins.left, // Pos.
+  mmToPx(25), // Art.-Nr.
+  mmToPx(53), // Bezeichnung
+  mmToPx(117), // Preis / Einheit
+  mmToPx(140), // Rabatt
+  mmToPx(155), // Menge
+  mmToPx(170), // Preis (Netto)
+  pageOptions.size[0] - pageOptions.margins.right, // end boundary
+];
 
-function createInvoice(doc: PDFKit.PDFDocument, data: InvoiceData) {
-  const DOC_COMPANY_TITLE = process.env.DOC_COMPANY_TITLE!;
-  const DOC_COMPANY_SUB_TITLE = process.env.DOC_COMPANY_SUB_TITLE!;
-  const DOC_STREET_AND_NUMBER = process.env.DOC_STREET_AND_NUMBER!;
-  const DOC_ZIP_AND_CITY = process.env.DOC_ZIP_AND_CITY!;
-  const DOC_EMAIL = process.env.DOC_EMAIL!;
-  const DOC_PHONE_NUMBER = process.env.DOC_PHONE_NUMBER!;
-  const DOC_BANK = process.env.DOC_BANK!;
-  const DOC_BIC = process.env.DOC_BIC!;
-  const DOC_IBAN = process.env.DOC_IBAN!;
-  const DOC_OWNER = process.env.DOC_OWNER!;
-  const DOC_VAT_ID = process.env.DOC_VAT_ID!;
-  const DOC_TAX_ID = process.env.DOC_TAX_ID!;
+// ── PDF section renderers ─────────────────────────────────────────────────────
 
-  const pageState = { totalPages: 1, prevY: 0, currY: 0 };
+function renderSubHeader(
+  doc: PDFKit.PDFDocument,
+  data: InvoiceData,
+  cfg: AppConfig,
+): void {
+  const contentWidth =
+    pageOptions.size[0] - pageOptions.margins.left - pageOptions.margins.right;
 
-  const newPageCheck = function (
-    doc: PDFKit.PDFDocument,
-    start: number,
-    addition: number,
-  ) {
-    if (pageOptions.size[1] - pageOptions.margins.bottom < start + addition) {
-      doc.addPage(pageOptions);
-      pageState.totalPages++;
-      pageState.currY = pageOptions.margins.top;
-      return true;
-    } else return false;
-  };
-
-  const createSubHeader = function (
-    doc: PDFKit.PDFDocument,
-    data: InvoiceData,
-  ) {
-    doc
-      .font('Times-Roman')
-      .fontSize(25)
-      .text(
-        DOC_COMPANY_TITLE,
-        pageOptions.margins.left,
-        pageOptions.margins.top,
-        {
-          width:
-            pageOptions.size[0] -
-            pageOptions.margins.left -
-            pageOptions.margins.right,
-          align: 'center',
-        },
-      )
-      .font('Times-Roman')
-      .fontSize(14)
-      .text(DOC_COMPANY_SUB_TITLE, pageOptions.margins.left, doc.y - 5, {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
+  doc
+    .font('Times-Roman')
+    .fontSize(25)
+    .text(
+      cfg.DOC_COMPANY_TITLE,
+      pageOptions.margins.left,
+      pageOptions.margins.top,
+      {
+        width: contentWidth,
         align: 'center',
+      },
+    )
+    .font('Times-Roman')
+    .fontSize(14)
+    .text(cfg.DOC_COMPANY_SUB_TITLE, pageOptions.margins.left, doc.y - 5, {
+      width: contentWidth,
+      align: 'center',
+    });
+
+  doc
+    .lineWidth(1)
+    .moveTo(pageOptions.margins.left, mmToPx(27))
+    .lineTo(pageOptions.size[0] - pageOptions.margins.right, mmToPx(27))
+    .stroke();
+
+  doc
+    .fontSize(8)
+    .text(
+      `${cfg.DOC_STREET_AND_NUMBER} / ${cfg.DOC_ZIP_AND_CITY} / E-Mail: ${cfg.DOC_EMAIL}`,
+      pageOptions.margins.left,
+      mmToPx(28),
+    )
+    .text(formatIsoDateString(data.order.date), mmToPx(110), mmToPx(28), {
+      width: pageOptions.size[0] - pageOptions.margins.right - mmToPx(110),
+      align: 'right',
+    });
+
+  doc
+    .font('Times-Bold')
+    .fontSize(18)
+    .text(data.documentType, pageOptions.margins.left, mmToPx(40), {
+      width: contentWidth,
+      align: 'center',
+    });
+}
+
+function renderInfoTable(doc: PDFKit.PDFDocument, data: InvoiceData): void {
+  doc.fontSize(10);
+
+  const leftTableText: [string, string][] = [
+    ['Firma', data.client.company || ' '],
+    ['Nachname', data.client.lastName || ' '],
+    ['Vorname', data.client.firstName || ' '],
+    ['Straße', data.client.street || ' '],
+    ['PLZ', data.client.postalCode || ' '],
+    ['Stadt', data.client.city || ' '],
+    ['Dokumenten-Nr', data.documentNumber],
+  ];
+
+  doc.y = mmToPx(55);
+  for (const [key, value] of leftTableText) {
+    const yPosition = doc.y;
+    doc
+      .font('Times-Bold')
+      .text(`${key}: `, mmToPx(22), yPosition)
+      .font('Times-Roman')
+      .text(value, mmToPx(50), yPosition, { lineGap: 3.7, width: mmToPx(55) });
+
+    doc
+      .lineWidth(1)
+      .moveTo(mmToPx(50), doc.y - 3)
+      .lineTo(mmToPx(105), doc.y - 3)
+      .strokeColor('black')
+      .strokeOpacity(1)
+      .stroke();
+  }
+
+  const rightTableText: [string, string][] = [
+    ['Zahlungsart', data.order.paymentMethod],
+    ['Kundennummer', data.client.clientNumber || ' '],
+    ['Kennzeichen', data.vehicle.licensePlate],
+    ['Hersteller', data.vehicle.manufacturer || ' '],
+    ['Modell', data.vehicle.model || ' '],
+    ['Fahrzeug-Ident-Nr', data.vehicle.vin || ' '],
+    ['KM-Stand', data.order.mileage || ' '],
+  ];
+
+  doc.y = mmToPx(55);
+  for (const [key, value] of rightTableText) {
+    const yPosition = doc.y;
+    doc
+      .font('Times-Bold')
+      .text(`${key}: `, mmToPx(110), yPosition)
+      .font('Times-Roman')
+      .text(value, mmToPx(150), yPosition, {
+        lineGap: 3.7,
+        width: pageOptions.size[0] - pageOptions.margins.right - mmToPx(150),
       });
 
     doc
       .lineWidth(1)
-      .moveTo(pageOptions.margins.left, mmToPx(27))
-      .lineTo(pageOptions.size[0] - pageOptions.margins.right, mmToPx(27))
+      .moveTo(mmToPx(150), doc.y - 3)
+      .lineTo(pageOptions.size[0] - pageOptions.margins.right, doc.y - 3)
+      .strokeColor('black')
+      .strokeOpacity(1)
       .stroke();
+  }
 
-    doc
-      .fontSize(8)
-      .text(
-        `${DOC_STREET_AND_NUMBER} / ${DOC_ZIP_AND_CITY} / E-Mail: ${DOC_EMAIL}`,
-        pageOptions.margins.left,
-        mmToPx(28),
-      )
-      .text(formatIsoDateString(data.order.date), mmToPx(110), mmToPx(28), {
-        width: pageOptions.size[0] - pageOptions.margins.right - mmToPx(110),
-        align: 'right',
-      });
+  // fold mark
+  doc
+    .lineWidth(2)
+    .moveTo(mmToPx(5), mmToPx(105))
+    .lineTo(mmToPx(10), mmToPx(105));
+}
 
-    doc
-      .font('Times-Bold')
-      .fontSize(18)
-      .text(data.documentType, pageOptions.margins.left, mmToPx(40), {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
+function renderPositionsTable(
+  doc: PDFKit.PDFDocument,
+  data: InvoiceData,
+  pageState: PageState,
+): void {
+  const renderTableHeader = () => {
+    const headers = [
+      'Pos.',
+      'Art.-Nr.',
+      'Bezeichnung',
+      'Preis / Einheit',
+      'Rabatt',
+      'Menge',
+      'Preis (Netto)',
+    ];
+
+    doc.font('Times-Roman').fontSize(10);
+    for (let i = 0; i < headers.length; i++) {
+      doc.text(headers[i], COL_X[i], pageState.currY, {
+        width: COL_X[i + 1] - COL_X[i],
         align: 'center',
       });
+    }
+
+    doc
+      .lineWidth(1)
+      .moveTo(COL_X[0], pageState.currY + mmToPx(4))
+      .lineTo(COL_X[7], pageState.currY + mmToPx(4))
+      .stroke();
+    pageState.currY = pageState.currY + mmToPx(4) + 5;
   };
 
-  const createTableTopTable = function (
-    doc: PDFKit.PDFDocument,
-    data: InvoiceData,
-  ) {
+  pageState.currY = mmToPx(107);
+  renderTableHeader();
+
+  let posCounter = 0;
+
+  for (const position of data.order.positions) {
     doc.fontSize(10);
 
-    const leftTableText: [string, string][] = [
-      ['Firma', data.client.company || ' '],
-      ['Nachname', data.client.lastName || ' '],
-      ['Vorname', data.client.firstName || ' '],
-      ['Straße', data.client.street || ' '],
-      ['PLZ', data.client.postalCode || ' '],
-      ['Stadt', data.client.city || ' '],
-      ['Dokumenten-Nr', data.documentNumber],
-    ];
+    const heightDescription = doc.heightOfString(
+      'heading' in position
+        ? (position.heading as string)
+        : (position.description as string),
+      { width: COL_X[3] - COL_X[2] },
+    );
+    const heightArticleNumber = doc.heightOfString(
+      'articleId' in position ? (position.articleId as string) : '',
+      { width: COL_X[2] - COL_X[1] },
+    );
+    const rowHeight = Math.max(heightArticleNumber, heightDescription);
 
-    doc.y = mmToPx(55);
-    for (const [key, value] of leftTableText) {
-      let yPosition = doc.y;
-      doc
-        .font('Times-Bold')
-        .text(`${key}: `, mmToPx(22), yPosition)
-        .font('Times-Roman')
-        .text(value, mmToPx(50), yPosition, {
-          lineGap: 3.7,
-          width: mmToPx(55),
-        });
-
-      yPosition = doc.y;
-      doc
-        .lineWidth(1)
-        .moveTo(mmToPx(50), doc.y - 3)
-        .lineTo(mmToPx(105), doc.y - 3)
-        .strokeColor('black')
-        .strokeOpacity(1)
-        .stroke();
+    if (newPageCheck(doc, pageState, rowHeight)) {
+      renderTableHeader();
     }
 
-    const rightTableText: [string, string][] = [
-      ['Zahlungsart', data.order.paymentMethod],
-      ['Kundennummer', data.client.clientNumber || ' '],
-      ['Kennzeichen', data.vehicle.licensePlate],
-      ['Hersteller', data.vehicle.manufacturer || ' '],
-      ['Modell', data.vehicle.model || ' '],
-      ['Fahrzeug-Ident-Nr', data.vehicle.vin || ' '],
-      ['KM-Stand', data.order.mileage || ' '],
-    ];
-
-    doc.y = mmToPx(55);
-    for (const [key, value] of rightTableText) {
-      let yPosition = doc.y;
+    if ('heading' in position) {
       doc
         .font('Times-Bold')
-        .text(`${key}: `, mmToPx(110), yPosition)
-        .font('Times-Roman')
-        .text(value, mmToPx(150), yPosition, {
-          lineGap: 3.7,
-          width: pageOptions.size[0] - pageOptions.margins.right - mmToPx(150),
+        .fontSize(10)
+        .text((position.heading as string).trim(), COL_X[2], pageState.currY, {
+          width: COL_X[3] - COL_X[2],
+          align: 'center',
         });
+    } else {
+      posCounter++;
 
-      yPosition = doc.y;
-      doc
-        .lineWidth(1)
-        .moveTo(mmToPx(150), doc.y - 3)
-        .lineTo(pageOptions.size[0] - pageOptions.margins.right, doc.y - 3)
-        .strokeColor('black')
-        .strokeOpacity(1)
-        .stroke();
-    }
-
-    // fold mark
-    doc
-      .lineWidth(2)
-      .moveTo(mmToPx(5), mmToPx(105))
-      .lineTo(mmToPx(10), mmToPx(105));
-  };
-
-  const tParams: { [index: string]: number } = {
-    c1x: pageOptions.margins.left,
-    c2x: mmToPx(25),
-    c3x: mmToPx(53),
-    c4x: mmToPx(117),
-    c5x: mmToPx(140),
-    c6x: mmToPx(155),
-    c7x: mmToPx(170),
-    c8x: pageOptions.size[0] - pageOptions.margins.right,
-  };
-
-  const createTable = function (doc: PDFKit.PDFDocument, data: InvoiceData) {
-    const createTableHeader = function () {
       doc
         .font('Times-Roman')
         .fontSize(10)
-        .text('Pos.', tParams.c1x, pageState.currY, {
-          width: tParams.c2x - tParams.c1x,
+        .text(posCounter.toString(), COL_X[0], pageState.currY, {
+          width: COL_X[1] - COL_X[0],
           align: 'center',
         })
-        .text('Art.-Nr.', tParams.c2x, pageState.currY, {
-          width: tParams.c3x - tParams.c2x,
+        .text(position.articleId as string, COL_X[1], pageState.currY, {
+          width: COL_X[2] - COL_X[1],
           align: 'center',
         })
-        .text('Bezeichnung', tParams.c3x, pageState.currY, {
-          width: tParams.c4x - tParams.c3x,
-          align: 'center',
-        })
-        .text('Preis / Einheit', tParams.c4x, pageState.currY, {
-          width: tParams.c5x - tParams.c4x,
-          align: 'center',
-        })
-        .text('Rabatt', tParams.c5x, pageState.currY, {
-          width: tParams.c6x - tParams.c5x,
-          align: 'center',
-        })
-        .text('Menge', tParams.c6x, pageState.currY, {
-          width: tParams.c7x - tParams.c6x,
-          align: 'center',
-        })
-        .text('Preis (Netto)', tParams.c7x, pageState.currY, {
-          width: tParams.c8x - tParams.c7x,
-          align: 'center',
-        });
-
-      doc
-        .lineWidth(1)
-        .moveTo(tParams.c1x, pageState.currY + mmToPx(4))
-        .lineTo(
-          pageOptions.size[0] - pageOptions.margins.right,
-          pageState.currY + mmToPx(4),
+        .text(
+          (position.description as string).trim(),
+          COL_X[2],
+          pageState.currY,
+          { width: COL_X[3] - COL_X[2], align: 'center' },
         )
-        .stroke();
-      pageState.currY = pageState.currY + mmToPx(4) + 5;
-    };
+        .fontSize(9)
+        .text(
+          numberFormatter.format(position.pricePerUnit as number),
+          COL_X[3],
+          pageState.currY,
+          { width: COL_X[4] - COL_X[3], align: 'center' },
+        )
+        .text(
+          numberFormatter.format(position.discount as number) + ' %',
+          COL_X[4],
+          pageState.currY,
+          { width: COL_X[5] - COL_X[4], align: 'center' },
+        )
+        .text(
+          numberFormatter.format(position.amount as number),
+          COL_X[5],
+          pageState.currY,
+          { width: COL_X[6] - COL_X[5], align: 'center' },
+        )
+        .text(
+          numberFormatter.format(
+            (position.pricePerUnit as number) *
+              (position.amount as number) *
+              (1 - (position.discount as number) / 100),
+          ),
+          COL_X[6],
+          pageState.currY,
+          { width: COL_X[7] - COL_X[6], align: 'center' },
+        );
+    }
 
-    pageState.currY = mmToPx(107);
-    createTableHeader();
+    doc
+      .lineWidth(1)
+      .strokeOpacity(0.5)
+      .strokeColor([96, 125, 139])
+      .moveTo(COL_X[0], pageState.currY + rowHeight + 1)
+      .lineTo(COL_X[7], pageState.currY + rowHeight + 1)
+      .stroke();
 
-    let posCounter = 0;
+    pageState.prevY = pageState.currY;
+    pageState.currY = pageState.currY + rowHeight + 5;
 
-    data.order.positions.forEach(function (position) {
-      doc.fontSize(10);
-
-      const heightDescription = doc.heightOfString(
-        'heading' in position
-          ? (position.heading as string)
-          : (position.description as string),
-        { width: tParams.c4x - tParams.c3x },
-      );
-
-      const heightArticleNumber = doc.heightOfString(
-        'articleId' in position ? (position.articleId as string) : '',
-        { width: tParams.c3x - tParams.c2x },
-      );
-
-      const biggestLineHeight = Math.max(
-        heightArticleNumber,
-        heightDescription,
-      );
-
-      if (newPageCheck(doc, pageState.currY, biggestLineHeight)) {
-        createTableHeader();
-      }
-
-      if ('heading' in position) {
-        doc
-          .font('Times-Bold')
-          .fontSize(10)
-          .text(
-            (position.heading as string).trim(),
-            tParams.c3x,
-            pageState.currY,
-            {
-              width: tParams.c4x - tParams.c3x,
-              align: 'center',
-            },
-          );
-      } else {
-        posCounter++;
-
-        doc
-          .font('Times-Roman')
-          .fontSize(10)
-          .text(posCounter.toString(), tParams.c1x, pageState.currY, {
-            width: tParams.c2x - tParams.c1x,
-            align: 'center',
-          })
-          .text(position.articleId as string, tParams.c2x, pageState.currY, {
-            width: tParams.c3x - tParams.c2x,
-            align: 'center',
-          })
-          .text(
-            (position.description as string).trim(),
-            tParams.c3x,
-            pageState.currY,
-            {
-              width: tParams.c4x - tParams.c3x,
-              align: 'center',
-            },
-          )
-          .fontSize(9)
-          .text(
-            numberFormatter.format(position.pricePerUnit as number),
-            tParams.c4x,
-            pageState.currY,
-            {
-              width: tParams.c5x - tParams.c4x,
-              align: 'center',
-            },
-          )
-          .text(
-            numberFormatter.format(position.discount as number) + ' %',
-            tParams.c5x,
-            pageState.currY,
-            {
-              width: tParams.c6x - tParams.c5x,
-              align: 'center',
-            },
-          )
-          .text(
-            numberFormatter.format(position.amount as number),
-            tParams.c6x,
-            pageState.currY,
-            {
-              width: tParams.c7x - tParams.c6x,
-              align: 'center',
-            },
-          )
-          .text(
-            numberFormatter.format(
-              (position.pricePerUnit as number) *
-                (position.amount as number) *
-                (1 - (position.discount as number) / 100),
-            ),
-            tParams.c7x,
-            pageState.currY,
-            { width: tParams.c8x - tParams.c7x, align: 'center' },
-          );
-      }
-
+    for (const x of COL_X) {
       doc
         .lineWidth(1)
         .strokeOpacity(0.5)
         .strokeColor([96, 125, 139])
-        .moveTo(tParams.c1x, pageState.currY + biggestLineHeight + 1)
-        .lineTo(
-          pageOptions.size[0] - pageOptions.margins.right,
-          pageState.currY + biggestLineHeight + 1,
-        )
+        .moveTo(x, pageState.prevY - 5)
+        .lineTo(x, pageState.currY - 5)
         .stroke();
-
-      pageState.prevY = pageState.currY;
-      pageState.currY = pageState.currY + biggestLineHeight + 5;
-
-      for (let ii = 1; ii < 9; ii++) {
-        const tempX = tParams['c' + ii + 'x'];
-
-        doc
-          .lineWidth(1)
-          .strokeOpacity(0.5)
-          .strokeColor([96, 125, 139])
-          .moveTo(tempX, pageState.prevY - 5)
-          .lineTo(tempX, pageState.currY - 5)
-          .stroke();
-      }
-    });
-    pageState.currY += 10;
-  };
-
-  const createSumTable = function (doc: PDFKit.PDFDocument, data: InvoiceData) {
-    const vatRate = getVatRate(data.order.date);
-    if (pageState.totalPages === 1 && pageState.currY < mmToPx(215))
-      pageState.currY = mmToPx(215);
-
-    doc.fontSize(12).font('Times-Bold');
-    newPageCheck(doc, pageState.currY, doc.currentLineHeight() * 4);
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left, pageState.currY - 3)
-      .lineTo(
-        pageOptions.size[0] - pageOptions.margins.right,
-        pageState.currY - 3,
-      )
-      .strokeColor('black')
-      .strokeOpacity(1)
-      .stroke();
-
-    doc
-      .text('Netto', pageOptions.margins.left, pageState.currY + 3, {
-        width: mmToPx(60),
-        align: 'center',
-      })
-      .text(
-        `${vatRate * 100}% MwSt`,
-        pageOptions.margins.left + mmToPx(60),
-        pageState.currY + 3,
-        { width: mmToPx(60), align: 'center' },
-      )
-      .text(
-        'Brutto',
-        pageOptions.margins.left + mmToPx(120),
-        pageState.currY + 3,
-        { width: mmToPx(60), align: 'center' },
-      )
-      .moveDown(0.7);
-    pageState.prevY = pageState.currY;
-    pageState.currY = doc.y;
-
-    const netSum = data.order.positions.reduce(function (
-      curr: number,
-      item: InvoicePosition,
-    ) {
-      if ('heading' in item) return curr;
-      else
-        return (curr += parseFloat(
-          (
-            (item.pricePerUnit as number) *
-            (item.amount as number) *
-            (1 - (item.discount as number) / 100)
-          ).toFixed(2),
-        ));
-    }, 0);
-
-    doc
-      .font('Times-Roman')
-      .text(
-        numberFormatter.format(netSum) + ' €',
-        pageOptions.margins.left,
-        pageState.currY,
-        { width: mmToPx(60), align: 'center' },
-      )
-      .text(
-        numberFormatter.format(netSum * vatRate) + ' €',
-        pageOptions.margins.left + mmToPx(60),
-        pageState.currY,
-        { width: mmToPx(60), align: 'center' },
-      )
-      .text(
-        numberFormatter.format(netSum * (1 + vatRate)) + ' €',
-        pageOptions.margins.left + mmToPx(120),
-        pageState.currY,
-        { width: mmToPx(60), align: 'center' },
-      );
-
-    pageState.currY = doc.y;
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left, pageState.currY + 3)
-      .lineTo(
-        pageOptions.size[0] - pageOptions.margins.left,
-        pageState.currY + 3,
-      )
-      .strokeColor('black')
-      .strokeOpacity(1)
-      .stroke();
-
-    doc
-      .lineWidth(1)
-      .moveTo(
-        pageOptions.margins.left,
-        pageState.prevY + (doc.y - pageState.prevY) / 2,
-      )
-      .lineTo(
-        pageOptions.size[0] - pageOptions.margins.left,
-        pageState.prevY + (doc.y - pageState.prevY) / 2,
-      )
-      .stroke();
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left, pageState.prevY - 3)
-      .lineTo(pageOptions.margins.left, pageState.currY + 3)
-      .stroke();
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left + mmToPx(60), pageState.prevY - 3)
-      .lineTo(pageOptions.margins.left + mmToPx(60), pageState.currY + 3)
-      .stroke();
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left + mmToPx(120), pageState.prevY - 3)
-      .lineTo(pageOptions.margins.left + mmToPx(120), pageState.currY + 3)
-      .stroke();
-
-    doc
-      .lineWidth(1)
-      .moveTo(pageOptions.margins.left + mmToPx(180), pageState.prevY - 3)
-      .lineTo(pageOptions.margins.left + mmToPx(180), pageState.currY + 3)
-      .stroke();
-  };
-
-  const createTableBottomText = function (
-    doc: PDFKit.PDFDocument,
-    data: InvoiceData,
-  ) {
-    doc.font('Times-Roman').fontSize(11);
-    doc.moveDown(2);
-    pageState.currY = doc.y;
-    newPageCheck(doc, pageState.currY, doc.currentLineHeight() * 7);
-    doc.text(
-      `Unsere Servicenummer ist ${DOC_PHONE_NUMBER}`,
-      pageOptions.margins.left,
-      null as unknown as number,
-      {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
-        align: 'center',
-      },
-    );
-    doc.text(
-      'Sie erreichen uns täglich von 8:00 bis 20:00',
-      pageOptions.margins.left,
-      null as unknown as number,
-      {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
-        align: 'center',
-      },
-    );
-    doc.moveDown(1);
-    if (data.order.paymentDueDate) {
-      doc.text(
-        `Bitte zahlen Sie die Rechnung fristgerecht bis zum ${formatIsoDateString(
-          data.order.paymentDueDate,
-        )}.`,
-        pageOptions.margins.left,
-        null as unknown as number,
-        {
-          width:
-            pageOptions.size[0] -
-            pageOptions.margins.left -
-            pageOptions.margins.right,
-          align: 'center',
-        },
-      );
     }
-    doc.text(
-      'Rechnungsdatum entspricht Leistungs- bzw. Ausführungsdatum.',
-      pageOptions.margins.left,
-      null as unknown as number,
-      {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
-        align: 'center',
-      },
-    );
-    doc.text(
-      'Dieser Beleg wurde maschinell erstellt und ist auch ohne Unterschrift gültig.',
-      pageOptions.margins.left,
-      null as unknown as number,
-      {
-        width:
-          pageOptions.size[0] -
-          pageOptions.margins.left -
-          pageOptions.margins.right,
-        align: 'center',
-      },
-    );
-    pageState.currY = doc.y;
+  }
 
-    newPageCheck(doc, pageState.currY, doc.currentLineHeight() * 6);
+  pageState.currY += 10;
+}
+
+function renderSumTable(
+  doc: PDFKit.PDFDocument,
+  data: InvoiceData,
+  pageState: PageState,
+): void {
+  const vatRate = getVatRate(data.order.date);
+  if (pageState.totalPages === 1 && pageState.currY < mmToPx(215)) {
+    pageState.currY = mmToPx(215);
+  }
+
+  doc.fontSize(12).font('Times-Bold');
+  newPageCheck(doc, pageState, doc.currentLineHeight() * 4);
+
+  const left = pageOptions.margins.left;
+  const colWidth = mmToPx(60);
+
+  doc
+    .lineWidth(1)
+    .moveTo(left, pageState.currY - 3)
+    .lineTo(
+      pageOptions.size[0] - pageOptions.margins.right,
+      pageState.currY - 3,
+    )
+    .strokeColor('black')
+    .strokeOpacity(1)
+    .stroke();
+
+  doc
+    .text('Netto', left, pageState.currY + 3, {
+      width: colWidth,
+      align: 'center',
+    })
+    .text(`${vatRate * 100}% MwSt`, left + colWidth, pageState.currY + 3, {
+      width: colWidth,
+      align: 'center',
+    })
+    .text('Brutto', left + colWidth * 2, pageState.currY + 3, {
+      width: colWidth,
+      align: 'center',
+    })
+    .moveDown(0.7);
+
+  pageState.prevY = pageState.currY;
+  pageState.currY = doc.y;
+
+  const netSum = data.order.positions.reduce(
+    (acc: number, item: InvoicePosition) => {
+      if ('heading' in item) return acc;
+      return (acc += parseFloat(
+        (
+          (item.pricePerUnit as number) *
+          (item.amount as number) *
+          (1 - (item.discount as number) / 100)
+        ).toFixed(2),
+      ));
+    },
+    0,
+  );
+
+  doc
+    .font('Times-Roman')
+    .text(numberFormatter.format(netSum) + ' €', left, pageState.currY, {
+      width: colWidth,
+      align: 'center',
+    })
+    .text(
+      numberFormatter.format(netSum * vatRate) + ' €',
+      left + colWidth,
+      pageState.currY,
+      { width: colWidth, align: 'center' },
+    )
+    .text(
+      numberFormatter.format(netSum * (1 + vatRate)) + ' €',
+      left + colWidth * 2,
+      pageState.currY,
+      { width: colWidth, align: 'center' },
+    );
+
+  pageState.currY = doc.y;
+
+  doc
+    .lineWidth(1)
+    .moveTo(left, pageState.currY + 3)
+    .lineTo(pageOptions.size[0] - pageOptions.margins.left, pageState.currY + 3)
+    .strokeColor('black')
+    .strokeOpacity(1)
+    .stroke();
+
+  doc
+    .lineWidth(1)
+    .moveTo(left, pageState.prevY + (pageState.currY - pageState.prevY) / 2)
+    .lineTo(
+      pageOptions.size[0] - pageOptions.margins.left,
+      pageState.prevY + (pageState.currY - pageState.prevY) / 2,
+    )
+    .stroke();
+
+  for (const x of [
+    left,
+    left + colWidth,
+    left + colWidth * 2,
+    left + colWidth * 3,
+  ]) {
     doc
-      .moveDown()
-      .text(`Bank: ${DOC_BANK} (`, mmToPx(30), null as unknown as number, {
-        underline: true,
-        continued: true,
-      })
-      .font('Times-Bold')
-      .text('BIC', { underline: true, continued: true })
-      .font('Times-Roman')
-      .text(`: ${DOC_BIC}) `, { underline: true, continued: true })
-      .font('Times-Bold')
-      .text('IBAN', { underline: true, continued: true })
-      .font('Times-Roman')
-      .text(`: ${DOC_IBAN}`, { underline: true })
-      .text(
-        `${DOC_COMPANY_TITLE} - Inh. ${DOC_OWNER} - ` +
-          `${DOC_STREET_AND_NUMBER} - ${DOC_ZIP_AND_CITY}`,
-        pageOptions.margins.left,
-        null as unknown as number,
-        {
-          width:
-            pageOptions.size[0] -
-            pageOptions.margins.left -
-            pageOptions.margins.right,
-          align: 'center',
-        },
-      )
-      .text(
-        `Mobil: ${DOC_PHONE_NUMBER} - E-Mail: ${DOC_EMAIL}`,
-        pageOptions.margins.left,
-        null as unknown as number,
-        {
-          width:
-            pageOptions.size[0] -
-            pageOptions.margins.left -
-            pageOptions.margins.right,
-          align: 'center',
-        },
-      )
-      .text(
-        `Ust.-IdNr.: ${DOC_VAT_ID} - St.Nr.: ${DOC_TAX_ID}`,
-        pageOptions.margins.left,
-        null as unknown as number,
-        {
-          width:
-            pageOptions.size[0] -
-            pageOptions.margins.left -
-            pageOptions.margins.right,
-          align: 'center',
-        },
-      );
-    pageState.currY = doc.y;
-  };
+      .lineWidth(1)
+      .moveTo(x, pageState.prevY - 3)
+      .lineTo(x, pageState.currY + 3)
+      .stroke();
+  }
+}
 
-  createSubHeader(doc, data);
-  createTableTopTable(doc, data);
-  createTable(doc, data);
-  createSumTable(doc, data);
-  createTableBottomText(doc, data);
+function renderFooter(
+  doc: PDFKit.PDFDocument,
+  data: InvoiceData,
+  pageState: PageState,
+  cfg: AppConfig,
+): void {
+  const contentWidth =
+    pageOptions.size[0] - pageOptions.margins.left - pageOptions.margins.right;
+  const centeredOpts = { width: contentWidth, align: 'center' as const };
+
+  doc.font('Times-Roman').fontSize(11);
+  doc.moveDown(2);
+  pageState.currY = doc.y;
+  newPageCheck(doc, pageState, doc.currentLineHeight() * 7);
+
+  doc.text(
+    `Unsere Servicenummer ist ${cfg.DOC_PHONE_NUMBER}`,
+    pageOptions.margins.left,
+    CONTINUE_Y,
+    centeredOpts,
+  );
+  doc.text(
+    'Sie erreichen uns täglich von 8:00 bis 20:00',
+    pageOptions.margins.left,
+    CONTINUE_Y,
+    centeredOpts,
+  );
+  doc.moveDown(1);
+
+  if (data.order.paymentDueDate) {
+    doc.text(
+      `Bitte zahlen Sie die Rechnung fristgerecht bis zum ${formatIsoDateString(data.order.paymentDueDate)}.`,
+      pageOptions.margins.left,
+      CONTINUE_Y,
+      centeredOpts,
+    );
+  }
+
+  doc.text(
+    'Rechnungsdatum entspricht Leistungs- bzw. Ausführungsdatum.',
+    pageOptions.margins.left,
+    CONTINUE_Y,
+    centeredOpts,
+  );
+  doc.text(
+    'Dieser Beleg wurde maschinell erstellt und ist auch ohne Unterschrift gültig.',
+    pageOptions.margins.left,
+    CONTINUE_Y,
+    centeredOpts,
+  );
+
+  pageState.currY = doc.y;
+  newPageCheck(doc, pageState, doc.currentLineHeight() * 6);
+
+  doc
+    .moveDown()
+    .text(`Bank: ${cfg.DOC_BANK} (`, mmToPx(30), CONTINUE_Y, {
+      underline: true,
+      continued: true,
+    })
+    .font('Times-Bold')
+    .text('BIC', { underline: true, continued: true })
+    .font('Times-Roman')
+    .text(`: ${cfg.DOC_BIC}) `, { underline: true, continued: true })
+    .font('Times-Bold')
+    .text('IBAN', { underline: true, continued: true })
+    .font('Times-Roman')
+    .text(`: ${cfg.DOC_IBAN}`, { underline: true })
+    .text(
+      `${cfg.DOC_COMPANY_TITLE} - Inh. ${cfg.DOC_OWNER} - ${cfg.DOC_STREET_AND_NUMBER} - ${cfg.DOC_ZIP_AND_CITY}`,
+      pageOptions.margins.left,
+      CONTINUE_Y,
+      centeredOpts,
+    )
+    .text(
+      `Mobil: ${cfg.DOC_PHONE_NUMBER} - E-Mail: ${cfg.DOC_EMAIL}`,
+      pageOptions.margins.left,
+      CONTINUE_Y,
+      centeredOpts,
+    )
+    .text(
+      `Ust.-IdNr.: ${cfg.DOC_VAT_ID} - St.Nr.: ${cfg.DOC_TAX_ID}`,
+      pageOptions.margins.left,
+      CONTINUE_Y,
+      centeredOpts,
+    );
+
+  pageState.currY = doc.y;
+}
+
+// ── PDF rendering ─────────────────────────────────────────────────────────────
+
+function createInvoice(doc: PDFKit.PDFDocument, data: InvoiceData): void {
+  const cfg = getConfig();
+  const pageState: PageState = { totalPages: 1, prevY: 0, currY: 0 };
+
+  renderSubHeader(doc, data, cfg);
+  renderInfoTable(doc, data);
+  renderPositionsTable(doc, data, pageState);
+  renderSumTable(doc, data, pageState);
+  renderFooter(doc, data, pageState, cfg);
   doc.flushPages();
 }
 
@@ -786,51 +684,54 @@ interface RenderOptions {
   savePath?: string;
 }
 
+function initPdfStream(options: RenderOptions): {
+  pdfDoc: PDFKit.PDFDocument;
+  result: Promise<Buffer>;
+} {
+  const pdfDoc = new PDFDocument(pageOptions);
+  if (options.savePath) pdfDoc.pipe(fs.createWriteStream(options.savePath));
+
+  const chunks: Buffer[] = [];
+  const result = new Promise<Buffer>((resolve, reject) => {
+    pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));
+    pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
+    pdfDoc.on('error', reject);
+  });
+
+  return { pdfDoc, result };
+}
+
 export function renderPDF(
   document: DocumentForRender,
   options: RenderOptions = {},
 ): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    try {
-      const pdfDoc = new PDFDocument(pageOptions);
-      if (options.savePath) pdfDoc.pipe(fs.createWriteStream(options.savePath));
-
-      const chunks: Buffer[] = [];
-      pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));
-      pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
-
-      const data = toInvoiceData(document);
-      createInvoice(pdfDoc, data);
-      pdfDoc.info.Title =
-        'Rechnung_' +
-        (document.documentNumber ?? String(document.documentNumber));
-      pdfDoc.end();
-    } catch (err) {
-      reject(err instanceof Error ? err : new Error(String(err)));
-    }
-  });
+  try {
+    const { pdfDoc, result } = initPdfStream(options);
+    const data = toInvoiceData(document);
+    createInvoice(pdfDoc, data);
+    pdfDoc.info.Title =
+      'Rechnung_' +
+      (document.documentNumber ?? String(document.documentNumber));
+    pdfDoc.end();
+    return result;
+  } catch (err) {
+    return Promise.reject(err instanceof Error ? err : new Error(String(err)));
+  }
 }
 
 export function renderMultiplePDF(
   documents: DocumentForRender[],
   options: RenderOptions = {},
 ): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    try {
-      const pdfDoc = new PDFDocument(pageOptions);
-      if (options.savePath) pdfDoc.pipe(fs.createWriteStream(options.savePath));
-
-      const chunks: Buffer[] = [];
-      pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));
-      pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
-
-      documents.forEach((document, index) => {
-        if (index > 0) pdfDoc.addPage(pageOptions);
-        createInvoice(pdfDoc, toInvoiceData(document));
-        if (index === documents.length - 1) pdfDoc.end();
-      });
-    } catch (err) {
-      reject(err instanceof Error ? err : new Error(String(err)));
-    }
-  });
+  try {
+    const { pdfDoc, result } = initPdfStream(options);
+    documents.forEach((document, index) => {
+      if (index > 0) pdfDoc.addPage(pageOptions);
+      createInvoice(pdfDoc, toInvoiceData(document));
+      if (index === documents.length - 1) pdfDoc.end();
+    });
+    return result;
+  } catch (err) {
+    return Promise.reject(err instanceof Error ? err : new Error(String(err)));
+  }
 }

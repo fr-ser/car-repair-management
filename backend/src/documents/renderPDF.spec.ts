@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { renderMultiplePDF, renderPDF } from './renderPDF';
 
-const SNAPSHOT_DIR = path.join(__dirname, 'snapshots');
+const SNAPSHOT_DIR = path.join(__dirname, 'test-snapshots');
 
 function compareToSnapshot(buffer: Buffer, snapshotFile: string) {
   const snapshotPath = path.join(SNAPSHOT_DIR, snapshotFile);
