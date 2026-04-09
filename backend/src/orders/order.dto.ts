@@ -14,6 +14,20 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
+
+export class OrdersListQueryDto extends SearchPaginationQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  clientId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  carId?: number;
+}
+
 export enum OrderStatus {
   IN_PROGRESS = 'in_progress',
   DONE = 'done',

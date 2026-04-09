@@ -14,7 +14,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -70,7 +69,7 @@ export default function OwnerCard({
   const clientOptions = clientsData?.data ?? [];
 
   return (
-    <Grid size={{ xs: 12, lg: 4 }}>
+    <>
       <Card elevation={2} data-testid="owner-card">
         <CardHeader
           title={
@@ -216,6 +215,6 @@ export default function OwnerCard({
           </Button>
         </DialogActions>
       </Dialog>
-    </Grid>
+    </>
   );
 }

@@ -137,10 +137,17 @@ export function deleteArticle(articleId: string) {
   return apiFetch<object>(`/api/articles/${articleId}`, { method: 'DELETE' });
 }
 
-export function fetchOrders(page = 0, limit = 10, search = '') {
-  return apiFetch<BackendPaginatedResponse<BackendOrderWithPositions>>(
-    paginatedUrl('/api/orders', page, limit, search),
-  );
+export function fetchOrders(
+  page = 0,
+  limit = 10,
+  search = '',
+  clientId?: number,
+  carId?: number,
+) {
+  let url = paginatedUrl('/api/orders', page, limit, search);
+  if (clientId) url += `&clientId=${clientId}`;
+  if (carId) url += `&carId=${carId}`;
+  return apiFetch<BackendPaginatedResponse<BackendOrderWithPositions>>(url);
 }
 
 export function fetchPendingOrders(page = 0, limit = 10, search = '') {

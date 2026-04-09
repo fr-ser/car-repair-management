@@ -10,7 +10,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -53,107 +52,105 @@ export default function CarsCard({
   });
 
   return (
-    <Grid sx={{ xs: 12, lg: 4 }}>
-      <Card elevation={2}>
-        <CardHeader
-          title={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CarIcon />
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ fontWeight: 500, pr: 14 }}
-              >
-                Fahrzeuge
-              </Typography>
-            </Box>
-          }
-          action={
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<AddIcon />}
-              size="small"
-              onClick={() => setCarModalOpen(true)}
+    <Card elevation={2}>
+      <CardHeader
+        title={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CarIcon />
+            <Typography
+              variant="h6"
+              component="h3"
+              sx={{ fontWeight: 500, pr: 14 }}
             >
-              Auto Zuordnen
-            </Button>
-          }
-          sx={{ pb: 1 }}
-        />
-        <CardContent sx={{ pt: 0 }}>
-          {cars.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <CarIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-              <Typography variant="body2" color="text.secondary">
-                Noch keine Fahrzeuge zugeordnet
-              </Typography>
-              <Typography variant="caption" color="text.disabled">
-                Klicken Sie auf "Auto Zuordnen" um ein Fahrzeug hinzuzufügen
-              </Typography>
-            </Box>
-          ) : (
-            <List dense>
-              {cars.map((car) => (
-                <ListItem
-                  key={car.id}
-                  divider
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      onClick={() => removeMutation.mutate(car.id)}
-                      color="error"
-                      disabled={removeMutation.isPending}
+              Fahrzeuge
+            </Typography>
+          </Box>
+        }
+        action={
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<AddIcon />}
+            size="small"
+            onClick={() => setCarModalOpen(true)}
+          >
+            Auto Zuordnen
+          </Button>
+        }
+        sx={{ pb: 1 }}
+      />
+      <CardContent sx={{ pt: 0 }}>
+        {cars.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <CarIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+            <Typography variant="body2" color="text.secondary">
+              Noch keine Fahrzeuge zugeordnet
+            </Typography>
+            <Typography variant="caption" color="text.disabled">
+              Klicken Sie auf "Auto Zuordnen" um ein Fahrzeug hinzuzufügen
+            </Typography>
+          </Box>
+        ) : (
+          <List dense>
+            {cars.map((car) => (
+              <ListItem
+                key={car.id}
+                divider
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    onClick={() => removeMutation.mutate(car.id)}
+                    color="error"
+                    disabled={removeMutation.isPending}
+                  >
+                    {removeMutation.isPending ? (
+                      <CircularProgress size={16} />
+                    ) : (
+                      <DeleteIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                }
+              >
+                <ListItemText
+                  primary={
+                    <Box
+                      component="span"
+                      sx={{ display: 'inline-flex', alignItems: 'center' }}
                     >
-                      {removeMutation.isPending ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <DeleteIcon fontSize="small" />
-                      )}
-                    </IconButton>
+                      {car.manufacturer} {car.model}
+                      <Tooltip title="In neuem Tab öffnen">
+                        <IconButton
+                          component="a"
+                          href={`/cars/${car.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          size="small"
+                          sx={{ p: 0.25, ml: 0.5, color: 'action.active' }}
+                        >
+                          <OpenInNewIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   }
-                >
-                  <ListItemText
-                    primary={
-                      <Box
-                        component="span"
-                        sx={{ display: 'inline-flex', alignItems: 'center' }}
-                      >
-                        {car.manufacturer} {car.model}
-                        <Tooltip title="In neuem Tab öffnen">
-                          <IconButton
-                            component="a"
-                            href={`/cars/${car.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            size="small"
-                            sx={{ p: 0.25, ml: 0.5, color: 'action.active' }}
-                          >
-                            <OpenInNewIcon sx={{ fontSize: 14 }} />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    }
-                    secondary={
-                      <Box>
+                  secondary={
+                    <Box>
+                      <Typography variant="caption" display="block">
+                        Kennzeichen: {car.licensePlate}
+                      </Typography>
+                      {car.firstRegistration && (
                         <Typography variant="caption" display="block">
-                          Kennzeichen: {car.licensePlate}
+                          Erstzulassung: {car.firstRegistration}
                         </Typography>
-                        {car.firstRegistration && (
-                          <Typography variant="caption" display="block">
-                            Erstzulassung: {car.firstRegistration}
-                          </Typography>
-                        )}
-                      </Box>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
-    </Grid>
+                      )}
+                    </Box>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </CardContent>
+    </Card>
   );
 }

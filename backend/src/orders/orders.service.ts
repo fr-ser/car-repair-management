@@ -8,7 +8,12 @@ import {
 } from '@/src/common/dto/pagination.dto';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
-import { CreateOrderDto, OrderStatus, UpdateOrderDto } from './order.dto';
+import {
+  CreateOrderDto,
+  OrderStatus,
+  OrdersListQueryDto,
+  UpdateOrderDto,
+} from './order.dto';
 
 const orderInclude = {
   positions: { orderBy: { sortOrder: 'asc' as const } },
@@ -100,17 +105,18 @@ export class OrdersService {
     return new PaginatedResponseDto(data, total, { page, limit });
   }
 
-  async findAll(query: SearchPaginationQueryDto) {
-    const { page, limit, search } = query;
+  async findAll(query: OrdersListQueryDto) {
+    const { page, limit, search, clientId, carId } = query;
 
-    const where = search
-      ? {
-          OR: [
-            { orderNumber: { contains: search } },
-            { title: { contains: search } },
-          ],
-        }
-      : {};
+    const where: Prisma.OrderWhereInput = {};
+    if (clientId) where.clientId = clientId;
+    if (carId) where.carId = carId;
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search } },
+        { title: { contains: search } },
+      ];
+    }
 
     const [total, data] = await Promise.all([
       this.prisma.order.count({ where }),

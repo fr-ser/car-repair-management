@@ -10,12 +10,16 @@ type FetchFn<T> = (
   search: string,
 ) => Promise<{ data: T[]; meta: { totalItems: number } }>;
 
-export default function useTableData<T>(queryKey: string, fetchFn: FetchFn<T>) {
+export default function useTableData<T>(
+  queryKey: string,
+  fetchFn: FetchFn<T>,
+  initialSearch = '',
+) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [items, setItems] = React.useState<T[]>([]);
   const [totalItems, setTotalItems] = React.useState(0);
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState(initialSearch);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const { showNotification } = useNotification();
