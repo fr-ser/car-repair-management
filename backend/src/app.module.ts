@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { CarsModule } from './cars/cars.module';
 import { ClientsModule } from './clients/clients.module';
 import { ENV_FILE_PATH, validate } from './config';
+import { DailyTasksModule } from './daily-tasks/daily-tasks.module';
 import { DocumentsModule } from './documents/documents.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -40,6 +41,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CarsModule,
     OrdersModule,
     DocumentsModule,
+    DailyTasksModule,
   ],
   providers: [
     {
