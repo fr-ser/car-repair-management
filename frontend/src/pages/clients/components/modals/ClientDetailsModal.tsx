@@ -10,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -18,6 +19,7 @@ import React, { useState } from 'react';
 
 import useNotification from '@/src/hooks/notification/useNotification';
 import CarsCard from '@/src/pages/clients/components/CarsCard';
+import OrdersCard from '@/src/pages/clients/components/OrdersCard';
 import AddCarsModal from '@/src/pages/clients/components/modals/AddCarsModal';
 import { useClientForm } from '@/src/pages/clients/useClientForm.hook';
 import * as apiService from '@/src/services/backend-service';
@@ -317,11 +319,16 @@ export default function ClientDetailsModal({
               </Grid>
 
               {selectedClientId && (
-                <CarsCard
-                  cars={selectedClient?.cars ?? []}
-                  clientId={selectedClientId}
-                  setCarModalOpen={setCarDialogOpen}
-                />
+                <Grid size={{ xs: 12, lg: 4 }}>
+                  <Stack spacing={2}>
+                    <CarsCard
+                      cars={selectedClient?.cars ?? []}
+                      clientId={selectedClientId}
+                      setCarModalOpen={setCarDialogOpen}
+                    />
+                    <OrdersCard clientId={selectedClientId} />
+                  </Stack>
+                </Grid>
               )}
             </Grid>
             {selectedClientId && (

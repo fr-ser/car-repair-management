@@ -10,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -19,6 +20,7 @@ import React from 'react';
 import DecimalInput from '@/src/components/DecimalTextField';
 import useNotification from '@/src/hooks/notification/useNotification';
 import { useCarForm } from '@/src/pages/cars/useCarForm.hook';
+import OrdersCard from '@/src/pages/clients/components/OrdersCard';
 import * as apiService from '@/src/services/backend-service';
 
 import OwnerCard from './OwnerCard';
@@ -214,6 +216,19 @@ export default function CarDetailsModal({
                           }
                           error={!!formData.enginePower.errorMessage}
                           helperText={formData.enginePower.errorMessage}
+                        />
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <TextField
+                          fullWidth
+                          label="Kraftstoffart"
+                          required={!!formData.fuelType.required}
+                          value={formData.fuelType.value}
+                          onChange={(e) =>
+                            onFormInputChange('fuelType', e.target.value)
+                          }
+                          error={!!formData.fuelType.errorMessage}
+                          helperText={formData.fuelType.errorMessage}
                         />
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>
@@ -418,10 +433,15 @@ export default function CarDetailsModal({
                 </CardContent>
               </Card>
             </Grid>
-            <OwnerCard
-              clientId={formData.clientId.value}
-              onFormInputChange={onFormInputChange}
-            />
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <Stack spacing={2}>
+                <OwnerCard
+                  clientId={formData.clientId.value}
+                  onFormInputChange={onFormInputChange}
+                />
+                {selectedCarId && <OrdersCard carId={selectedCarId} />}
+              </Stack>
+            </Grid>
           </Grid>
         )}
       </DialogContent>

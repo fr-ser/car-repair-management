@@ -16,8 +16,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -601,16 +603,34 @@ export default function OrderDetailsModal({
               {/* Fahrzeug card */}
               <Card elevation={2} sx={{ mb: 3 }}>
                 <CardContent>
-                  <Typography
-                    variant="overline"
+                  <Box
                     sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    Fahrzeug
-                  </Typography>
+                    <Typography
+                      variant="overline"
+                      sx={{ color: 'text.secondary', fontWeight: 600 }}
+                    >
+                      Fahrzeug
+                    </Typography>
+                    {formData.carId.value != null && (
+                      <Tooltip title="In neuem Tab öffnen">
+                        <IconButton
+                          component="a"
+                          href={`/cars/${formData.carId.value}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          size="small"
+                          sx={{ color: 'action.active' }}
+                        >
+                          <OpenInNewIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
                   <CarAutocomplete
                     carId={formData.carId.value}
                     errorMessage={formData.carId.errorMessage}
@@ -622,16 +642,34 @@ export default function OrderDetailsModal({
               {/* Kunde card */}
               <Card elevation={2} sx={{ mb: 3 }}>
                 <CardContent>
-                  <Typography
-                    variant="overline"
+                  <Box
                     sx={{
-                      color: 'text.secondary',
-                      fontWeight: 600,
-                      display: 'block',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    Kunde
-                  </Typography>
+                    <Typography
+                      variant="overline"
+                      sx={{ color: 'text.secondary', fontWeight: 600 }}
+                    >
+                      Kunde
+                    </Typography>
+                    {formData.clientId.value != null && (
+                      <Tooltip title="In neuem Tab öffnen">
+                        <IconButton
+                          component="a"
+                          href={`/clients/${formData.clientId.value}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          size="small"
+                          sx={{ color: 'action.active' }}
+                        >
+                          <OpenInNewIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
                   <ClientAutocomplete
                     clientId={formData.clientId.value}
                     errorMessage={formData.clientId.errorMessage}

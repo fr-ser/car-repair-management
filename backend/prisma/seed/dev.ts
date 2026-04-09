@@ -393,6 +393,57 @@ const seed = async () => {
       },
     ],
   });
+
+  // Orders 4–8: additional orders for K1 (John Doe) to test the preview card
+  const extraOrders: {
+    title: string;
+    date: string;
+    status: string;
+    km: string;
+  }[] = [
+    {
+      title: 'Timing Belt Replacement',
+      date: '2025-09-05',
+      status: 'done',
+      km: '78200',
+    },
+    { title: 'AC Service', date: '2025-06-12', status: 'done', km: '71000' },
+    {
+      title: 'Windshield Replacement',
+      date: '2025-03-18',
+      status: 'done',
+      km: '64500',
+    },
+    {
+      title: 'Battery Replacement',
+      date: '2024-11-22',
+      status: 'done',
+      km: '58000',
+    },
+    {
+      title: 'Suspension Check',
+      date: '2024-07-30',
+      status: 'done',
+      km: '51300',
+    },
+  ];
+
+  for (const entry of extraOrders) {
+    const o = await prisma.order.create({
+      data: {
+        title: entry.title,
+        orderDate: entry.date,
+        status: entry.status,
+        kmStand: entry.km,
+        carId: devCar1.id,
+        clientId: devClient1.id,
+      },
+    });
+    await prisma.order.update({
+      where: { id: o.id },
+      data: { orderNumber: `A${o.id}` },
+    });
+  }
 };
 
 seed().catch(console.error);

@@ -10,9 +10,11 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
-
-import { CreateOrderDto, UpdateOrderDto } from './order.dto';
+import {
+  CreateOrderDto,
+  OrdersListQueryDto,
+  UpdateOrderDto,
+} from './order.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('orders')
@@ -25,12 +27,12 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@Query() query: SearchPaginationQueryDto) {
+  findAll(@Query() query: OrdersListQueryDto) {
     return this.ordersService.findAll(query);
   }
 
   @Get('overview/pending')
-  findPendingOverview(@Query() query: SearchPaginationQueryDto) {
+  findPendingOverview(@Query() query: OrdersListQueryDto) {
     return this.ordersService.findPendingOverview(query);
   }
 

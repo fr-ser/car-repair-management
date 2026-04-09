@@ -26,6 +26,7 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { useQuery } from '@tanstack/react-query';
 
 import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
@@ -33,7 +34,7 @@ import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendOrderWithPositions } from '@/src/types/backend-contracts';
 import { ORDER_STATUS, OrderStatus } from '@/src/types/orders';
-import { clientOptionLabel } from '@/src/utils/clients';
+import { clientDisplayName, clientOptionLabel } from '@/src/utils/clients';
 
 const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   [ORDER_STATUS.IN_PROGRESS]: 'In Arbeit',
@@ -44,6 +45,11 @@ const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
 type OrdersTableProps = {
   handleEditOrder: (orderId: number) => void;
   handleCreateOrder: () => void;
+  initialSearch?: string;
+  clientId?: number;
+  onClearClientFilter?: () => void;
+  carId?: number;
+  onClearCarFilter?: () => void;
 };
 
 const tableRowStyles = {
@@ -67,6 +73,11 @@ function statusColor(
 export default function OrdersTable({
   handleCreateOrder,
   handleEditOrder,
+  initialSearch,
+  clientId,
+  onClearClientFilter,
+  carId,
+  onClearCarFilter,
 }: OrdersTableProps) {
   const {
     items: orders,
@@ -77,9 +88,23 @@ export default function OrdersTable({
     searchTerm,
     refetch,
     handlers,
-  } = useTableData<BackendOrderWithPositions>('orders', (p, l, s) =>
-    apiClient.fetchOrders(p, l, s),
+  } = useTableData<BackendOrderWithPositions>(
+    'orders',
+    (p, l, s) => apiClient.fetchOrders(p, l, s, clientId, carId),
+    initialSearch,
   );
+
+  const { data: clientData } = useQuery({
+    queryKey: ['client', clientId],
+    queryFn: () => apiClient.fetchClient(clientId!),
+    enabled: clientId != null,
+  });
+
+  const { data: carData } = useQuery({
+    queryKey: ['car', carId],
+    queryFn: () => apiClient.fetchCar(carId!),
+    enabled: carId != null,
+  });
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
@@ -129,6 +154,36 @@ export default function OrdersTable({
           sx={{ pb: 1 }}
         />
         <CardContent sx={{ pt: 0 }}>
+          {(clientId || carId) && (
+            <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {clientId && (
+                <Chip
+                  label={
+                    clientData
+                      ? `Kunde: ${clientDisplayName(clientData)}`
+                      : 'Gefiltert nach Kunde'
+                  }
+                  onDelete={onClearClientFilter}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
+              )}
+              {carId && (
+                <Chip
+                  label={
+                    carData
+                      ? `Fahrzeug: ${[carData.carNumber, carData.licensePlate].filter(Boolean).join(' – ')}`
+                      : 'Gefiltert nach Fahrzeug'
+                  }
+                  onDelete={onClearCarFilter}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
+              )}
+            </Box>
+          )}
           <TextField
             fullWidth
             placeholder="Suche nach Auftrags-Nr oder Titel"

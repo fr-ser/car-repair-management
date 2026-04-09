@@ -13,7 +13,7 @@ import type { Response } from 'express';
 
 import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
 
-import { CreateDocumentDto } from './document.dto';
+import { BulkPdfDto, CreateDocumentDto } from './document.dto';
 import { DocumentsService } from './documents.service';
 
 @Controller('documents')
@@ -23,6 +23,17 @@ export class DocumentsController {
   @Post()
   create(@Body() createDocumentDto: CreateDocumentDto) {
     return this.documentsService.create(createDocumentDto);
+  }
+
+  @Post('bulk-pdf')
+  async getBulkPdf(@Body() dto: BulkPdfDto, @Res() res: Response) {
+    const buffer = await this.documentsService.getBulkPdf(dto.ids);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="Dokumente.pdf"',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
   }
 
   @Get()

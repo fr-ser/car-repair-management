@@ -1,4 +1,11 @@
-import { IsIn, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export const DOCUMENT_TYPE = {
   INVOICE: 'invoice',
@@ -7,12 +14,18 @@ export const DOCUMENT_TYPE = {
 
 export type DocumentType = (typeof DOCUMENT_TYPE)[keyof typeof DOCUMENT_TYPE];
 
+export class BulkPdfDto {
+  @IsArray()
+  @IsInt({ each: true })
+  declare ids: number[];
+}
+
 export class CreateDocumentDto {
   @IsInt()
-  orderId: number;
+  declare orderId: number;
 
   @IsIn([...Object.values(DOCUMENT_TYPE)])
-  type: DocumentType;
+  declare type: DocumentType;
 
   @IsOptional()
   @IsString()

@@ -137,10 +137,17 @@ export function deleteArticle(articleId: string) {
   return apiFetch<object>(`/api/articles/${articleId}`, { method: 'DELETE' });
 }
 
-export function fetchOrders(page = 0, limit = 10, search = '') {
-  return apiFetch<BackendPaginatedResponse<BackendOrderWithPositions>>(
-    paginatedUrl('/api/orders', page, limit, search),
-  );
+export function fetchOrders(
+  page = 0,
+  limit = 10,
+  search = '',
+  clientId?: number,
+  carId?: number,
+) {
+  let url = paginatedUrl('/api/orders', page, limit, search);
+  if (clientId) url += `&clientId=${clientId}`;
+  if (carId) url += `&carId=${carId}`;
+  return apiFetch<BackendPaginatedResponse<BackendOrderWithPositions>>(url);
 }
 
 export function fetchPendingOrders(page = 0, limit = 10, search = '') {
@@ -207,6 +214,22 @@ export async function downloadDocumentPdf(
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function downloadDocumentsPdf(ids: number[]) {
+  const response = await fetch('/api/documents/bulk-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new Error('PDF download failed');
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'documents.pdf';
   a.click();
   URL.revokeObjectURL(url);
 }
