@@ -20,7 +20,7 @@ export class NotificationsService {
     await this.sendBirthdayReminder(today);
   }
 
-  async sendBirthdayReminder(today: dayjs.Dayjs): Promise<void> {
+  async sendBirthdayReminder(today: dayjs.Dayjs = dayjs()): Promise<void> {
     const clients = await this.prisma.client.findMany({
       where: { birthday: { not: null } },
     });
