@@ -9,6 +9,9 @@ export default defineConfig({
     clearMocks: true,
     env: {
       CONFIG_PATH: '.env.test',
+      // Override one key per service so real .envrc credentials cannot be used in tests
+      APP_MAIL_HOST: 'test-placeholder',
+      DROPBOX_CLIENT_ID: 'test-placeholder',
     },
   },
   resolve: {

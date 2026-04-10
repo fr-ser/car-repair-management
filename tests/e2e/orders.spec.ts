@@ -13,6 +13,11 @@ test('create-edit-delete-order', async ({ page }) => {
   // not visible because of a redirect
   await expect(page.getByTestId('login-button')).not.toBeVisible();
 
+  await page.goto('articles');
+  const initialArticleAmount = Number(
+    await page.getByTestId('article-amount-ART-PW1').textContent(),
+  );
+
   await page.goto('orders');
 
   // CREATE
@@ -83,7 +88,9 @@ test('create-edit-delete-order', async ({ page }) => {
   // check that the article inventory was reduced by the ordered amount
   await page.goto('articles');
   await page.waitForTimeout(500);
-  await expect(page.getByTestId('article-amount-ART-PW1')).toHaveText('8');
+  await expect(page.getByTestId('article-amount-ART-PW1')).toHaveText(
+    String(initialArticleAmount - 2),
+  );
 
   await page.goto('orders');
   await page.waitForTimeout(500);
