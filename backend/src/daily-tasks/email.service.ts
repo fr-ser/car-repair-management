@@ -1,12 +1,12 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
-  private readonly logger = new Logger(EmailService.name);
-  private transporter: nodemailer.Transporter | null = null;
+  private transporter!: nodemailer.Transporter;
+  private from!: string;
 
   constructor(private configService: ConfigService) {}
 
@@ -15,12 +15,15 @@ export class EmailService implements OnModuleInit {
     const port = this.configService.get<number>('APP_MAIL_PORT');
     const user = this.configService.get<string>('APP_MAIL_USER');
     const pass = this.configService.get<string>('APP_MAIL_PASSWORD');
+    const from = this.configService.get<string>('APP_MAIL_FROM');
 
-    if (!host || !port || !user || !pass) {
-      this.logger.warn('Mail not configured — email sending disabled');
-      return;
+    if (!host || !port || !user || !pass || !from) {
+      throw new Error(
+        'Mail is not configured — set APP_MAIL_HOST, APP_MAIL_PORT, APP_MAIL_USER, APP_MAIL_PASSWORD, APP_MAIL_FROM',
+      );
     }
 
+    this.from = from;
     this.transporter = nodemailer.createTransport({
       host,
       port,
@@ -29,12 +32,6 @@ export class EmailService implements OnModuleInit {
   }
 
   async send(options: Mail.Options): Promise<void> {
-    if (!this.transporter) {
-      this.logger.warn('Email not sent — transporter not configured');
-      return;
-    }
-
-    const from = this.configService.get<string>('APP_MAIL_FROM');
-    await this.transporter.sendMail({ from, ...options });
+    await this.transporter.sendMail({ from: this.from, ...options });
   }
 }

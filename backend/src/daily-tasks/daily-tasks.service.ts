@@ -17,8 +17,26 @@ export class DailyTasksService {
   async runDailyTasks(): Promise<void> {
     this.logger.log('Daily tasks starting');
 
-    await Promise.allSettled([this.notifications.run(), this.backup.run()]);
+    const results = await Promise.allSettled([
+      this.notifications.run(),
+      this.backup.run(),
+    ]);
+
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        this.logger.error('Daily task failed', result.reason);
+      }
+    }
 
     this.logger.log('Daily tasks complete');
+  }
+
+  @Cron('0 4 1 * *')
+  async runMonthlyTasks(): Promise<void> {
+    this.logger.log('Monthly tasks starting');
+
+    await this.notifications.sendTuevReminder();
+
+    this.logger.log('Monthly tasks complete');
   }
 }

@@ -88,15 +88,8 @@ describe('NotificationsService.sendBirthdayReminder', () => {
 describe('NotificationsService.sendTuevReminder', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('skips when today is not the 1st of the month', async () => {
-    const today = dayjs('2024-03-10');
-    await makeService().sendTuevReminder(today);
-    expect(mockPrisma.car.findMany).not.toHaveBeenCalled();
-    expect(mockEmailService.send).not.toHaveBeenCalled();
-  });
-
   it('sends email when cars have inspection due this month', async () => {
-    const today = dayjs('2024-03-01');
+    const today = dayjs('2024-03-10');
     mockPrisma.car.findMany.mockResolvedValue([
       {
         id: 1,
@@ -118,7 +111,7 @@ describe('NotificationsService.sendTuevReminder', () => {
   });
 
   it('does not send email when no cars have inspection due this month', async () => {
-    const today = dayjs('2024-03-01');
+    const today = dayjs('2024-03-10');
     mockPrisma.car.findMany.mockResolvedValue([
       {
         id: 1,
@@ -136,7 +129,7 @@ describe('NotificationsService.sendTuevReminder', () => {
   });
 
   it('only matches cars in the exact year and month', async () => {
-    const today = dayjs('2024-03-01');
+    const today = dayjs('2024-03-10');
     mockPrisma.car.findMany.mockResolvedValue([
       // same month but different year — should not match
       {

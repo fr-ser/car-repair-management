@@ -40,6 +40,27 @@ install: ## install all the dependencies
 db-create-migration: ## create prisma client and migrate DB
 	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
 
+_login: ## (internal) authenticate and store session cookie
+	@/usr/bin/curl -s -c /tmp/.car-repair-session \
+		-X POST http://localhost:8080/api/auth/sign-in \
+		-H "Content-Type: application/json" \
+		-d '{"userName":"admin","password":"local"}' > /dev/null
+
+_trigger: ## (internal) POST to a trigger endpoint; usage: make _trigger PATH=backup
+	@/usr/bin/curl -s -o /dev/null -w "%{http_code}" \
+		-b /tmp/.car-repair-session \
+		-X POST http://localhost:8080/api/daily-tasks/trigger/$(PATH)
+	@echo ""
+
+trigger-backup: _login ## manually trigger backup (requires running dev server)
+	@$(MAKE) _trigger PATH=backup
+
+trigger-birthday: _login ## manually trigger birthday reminders (requires running dev server)
+	@$(MAKE) _trigger PATH=birthday
+
+trigger-tuev: _login ## manually trigger TÜV reminders (requires running dev server)
+	@$(MAKE) _trigger PATH=tuev
+
 db-init: ## initialise a new dev database
 	rm -f ./dev.db
 	yarn run dotenv -e .env.development prisma migrate dev

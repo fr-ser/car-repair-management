@@ -30,11 +30,6 @@ export class BackupService {
   // ── DB backup ─────────────────────────────────────────────────────────────
 
   async backupDatabase(today: dayjs.Dayjs = dayjs()): Promise<void> {
-    if (!this.dropbox.isConfigured()) {
-      this.logger.warn('DB backup skipped — Dropbox not configured');
-      return;
-    }
-
     const dbUrl = this.configService.get<string>('DATABASE_URL') ?? '';
     const dbPath = dbUrl.replace(/^file:/, '');
     const absolutePath = path.resolve(process.cwd(), dbPath);
@@ -101,11 +96,6 @@ export class BackupService {
   // ── Document backup ───────────────────────────────────────────────────────
 
   async backupDocuments(): Promise<void> {
-    if (!this.dropbox.isConfigured()) {
-      this.logger.warn('Document backup skipped — Dropbox not configured');
-      return;
-    }
-
     const lastRunAt = await this.readLastRunTimestamp();
 
     const documents = await this.prisma.document.findMany({

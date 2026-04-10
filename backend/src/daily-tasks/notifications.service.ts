@@ -17,10 +17,7 @@ export class NotificationsService {
   ) {}
 
   async run(today: dayjs.Dayjs = dayjs()): Promise<void> {
-    await Promise.all([
-      this.sendBirthdayReminder(today),
-      this.sendTuevReminder(today),
-    ]);
+    await this.sendBirthdayReminder(today);
   }
 
   async sendBirthdayReminder(today: dayjs.Dayjs): Promise<void> {
@@ -58,9 +55,7 @@ export class NotificationsService {
     this.logger.log(`Birthday reminder sent for ${matches.length} client(s)`);
   }
 
-  async sendTuevReminder(today: dayjs.Dayjs): Promise<void> {
-    if (today.date() !== 1) return;
-
+  async sendTuevReminder(today: dayjs.Dayjs = dayjs()): Promise<void> {
     const cars = await this.prisma.car.findMany({
       where: { inspectionDate: { not: null } },
       include: { client: true },
