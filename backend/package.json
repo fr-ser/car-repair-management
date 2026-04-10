@@ -12,9 +12,10 @@
     "start:dev": "dotenv -e .env.development -- nest start --watch",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint",
-    "test:unit": "vitest run src",
-    "test:e2e": "vitest run test --no-file-parallelism",
-    "test:e2e:cov": "vitest run test --no-file-parallelism --coverage"
+    "test:unit": "dotenv -e .env.test -- vitest run src",
+    "generate-pdf-snapshots": "dotenv -e .env.test -- tsx src/documents/generate-snapshot-pdfs.ts",
+    "test:e2e": "dotenv -e .env.test -- vitest run test --no-file-parallelism",
+    "test:e2e:cov": "dotenv -e .env.test -- vitest run test --no-file-parallelism --coverage"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

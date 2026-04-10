@@ -682,13 +682,17 @@ function createInvoice(doc: PDFKit.PDFDocument, data: InvoiceData): void {
 
 interface RenderOptions {
   savePath?: string;
+  compress?: boolean;
 }
 
 function initPdfStream(options: RenderOptions): {
   pdfDoc: PDFKit.PDFDocument;
   result: Promise<Buffer>;
 } {
-  const pdfDoc = new PDFDocument(pageOptions);
+  const pdfDoc = new PDFDocument({
+    ...pageOptions,
+    compress: options.compress ?? true,
+  });
   if (options.savePath) pdfDoc.pipe(fs.createWriteStream(options.savePath));
 
   const chunks: Buffer[] = [];
