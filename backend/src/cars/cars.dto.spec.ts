@@ -12,6 +12,14 @@ describe('CreateCarDto - TireFormat integration', () => {
     expect(errors).toHaveLength(0);
   });
 
+  test('should pass validation with commercial tire format (R__C)', async () => {
+    const dto = new UpdateCarDto();
+    dto.tires = '205/75 R16C 113R';
+
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+
   test('should fail validation with invalid tire format in DTO', async () => {
     const dto = new UpdateCarDto();
     dto.tires = 'invalid';
