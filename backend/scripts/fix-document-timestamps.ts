@@ -12,10 +12,8 @@
  *
  *   yarn tsx scripts/fix-document-timestamps.ts --db ./production.db
  */
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import Database from 'better-sqlite3';
 import * as path from 'path';
-
-import { PrismaClient } from '../src/generated/prisma/client';
 
 function parseArg(flag: string): string | undefined {
   const idx = process.argv.indexOf(flag);
@@ -30,68 +28,65 @@ if (!dbArg) {
   process.exit(1);
 }
 
-const dbPath = path.resolve(dbArg);
-const databaseUrl = `file:${dbPath}`;
+const db = new Database(path.resolve(dbArg));
 
-const prisma = new PrismaClient({
-  adapter: new PrismaBetterSqlite3({ url: databaseUrl }),
-});
+const documents = db
+  .prepare(`SELECT id, documentNumber, documentDate FROM "Document"`)
+  .all() as Array<{
+  id: number;
+  documentNumber: string | null;
+  documentDate: string | null;
+}>;
 
-const run = async () => {
-  const documents = await prisma.document.findMany({
-    select: { id: true, documentNumber: true, documentDate: true },
-  });
+console.log(`Found ${documents.length} documents.`);
 
-  console.log(`Found ${documents.length} documents.`);
+const updates: Array<{ id: number; createdAt: string }> = [];
+let skipped = 0;
 
-  let updated = 0;
-  let skipped = 0;
-
-  for (const doc of documents) {
-    if (!doc.documentNumber || !doc.documentDate) {
-      skipped++;
-      continue;
-    }
-
-    // documentNumber format: "YY-MM-###" or "YY-MM-###-K"
-    const parts = doc.documentNumber.split('-');
-    const seq = parseInt(parts[2], 10);
-    if (isNaN(seq)) {
-      console.warn(
-        `  Skipping id=${doc.id}: cannot parse sequence from "${doc.documentNumber}"`,
-      );
-      skipped++;
-      continue;
-    }
-
-    // documentDate is "YYYY-MM-DD" (legacy data may omit zero-padding).
-    // Normalise to "YYYY-MM-DD" before parsing as ISO UTC.
-    const [yyyy, mm, dd] = doc.documentDate.split('-');
-    const normalised = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-    const base = new Date(`${normalised}T00:00:00.000Z`);
-    if (isNaN(base.getTime())) {
-      console.warn(
-        `  Skipping id=${doc.id}: invalid documentDate "${doc.documentDate}"`,
-      );
-      skipped++;
-      continue;
-    }
-
-    const syntheticDate = new Date(base.getTime() + seq * 60 * 1000);
-
-    await prisma.document.update({
-      where: { id: doc.id },
-      data: { createdAt: syntheticDate },
-    });
-    updated++;
+for (const doc of documents) {
+  if (!doc.documentNumber || !doc.documentDate) {
+    skipped++;
+    continue;
   }
 
-  console.log(`\nDone. Updated: ${updated}, skipped: ${skipped}`);
-};
+  // documentNumber format: "YY-MM-###" or "YY-MM-###-K"
+  const parts = doc.documentNumber.split('-');
+  const seq = parseInt(parts[2], 10);
+  if (isNaN(seq)) {
+    console.warn(
+      `  Skipping id=${doc.id}: cannot parse sequence from "${doc.documentNumber}"`,
+    );
+    skipped++;
+    continue;
+  }
 
-run()
-  .catch((err) => {
-    console.error('\nFailed:', err);
-    process.exit(1);
-  })
-  .finally(() => void prisma.$disconnect());
+  // documentDate is "YYYY-MM-DD" (legacy data may omit zero-padding).
+  // Normalise to "YYYY-MM-DD" before parsing as ISO UTC.
+  const [yyyy, mm, dd] = doc.documentDate.split('-');
+  const normalised = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+  const base = new Date(`${normalised}T00:00:00.000Z`);
+  if (isNaN(base.getTime())) {
+    console.warn(
+      `  Skipping id=${doc.id}: invalid documentDate "${doc.documentDate}"`,
+    );
+    skipped++;
+    continue;
+  }
+
+  updates.push({
+    id: doc.id,
+    createdAt: new Date(base.getTime() + seq * 60 * 1000).toISOString(),
+  });
+}
+
+const setCreatedAt = db.prepare(
+  `UPDATE "Document" SET createdAt = ? WHERE id = ?`,
+);
+db.transaction(() => {
+  for (const { id, createdAt } of updates) {
+    setCreatedAt.run(createdAt, id);
+  }
+})();
+
+console.log(`\nDone. Updated: ${updates.length}, skipped: ${skipped}`);
+db.close();
