@@ -7,10 +7,10 @@ This is an application to manage a small car repair shop.
 Make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (recommended via [asdf](https://asdf-vm.com))
-- [Yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com/) (bundled with Node.js)
 - [Make](https://www.gnu.org/software/make/)
 
-You can run the following command `./check-prereqs.sh` to check the requirements or simply rum `make install`, requirements will be checked before trying to install the env!
+You can run the following command `./check-prereqs.sh` to check the requirements or simply run `make install`, requirements will be checked before trying to install the env!
 
 ---
 
@@ -79,4 +79,22 @@ make build
 
 Run Playwright end-to-end tests: `make test-e2e-playwright`
 
-In order to run tests with a UI use: `yarn run playwright test --ui`
+In order to run tests with a UI use: `npx playwright test --ui`
+
+---
+
+## Architecture Decision Records
+
+### ADR-001: npm instead of yarn
+
+**Date:** 2026-04-11
+
+**Decision:** Use npm as the package manager for all three packages (root, backend, frontend).
+
+**Context:** The project originally used yarn v1.
+The production server (Raspberry Pi ARMv7) runs `yarn install` during deployment, and the linking step consistently took 10+ minutes due to yarn v1's parallel filesystem writes on the Pi's SD card storage.
+
+**Consequences:** `npm ci` replaced `yarn install --production --frozen-lockfile` in the deployment script.
+npm performs sequential writes during linking, which is significantly faster on SD-card-backed storage.
+`package-lock.json` files replace `yarn.lock` files in each package directory.
+The deployment script only runs `npm ci` when the lockfile has changed; code-only deploys skip the install entirely via a hardlinked `node_modules` copy.

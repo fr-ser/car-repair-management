@@ -6,7 +6,7 @@ help: ## Show help
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
-	
+
 	@echo ""
 	@echo "[backend]"
 	@$(MAKE) --directory backend help
@@ -17,7 +17,7 @@ help: ## Show help
 
 install: ## install all the dependencies for both BE and FE and setup local database
 	./check-prereqs.sh
-	yarn install
+	npm install
 	@$(MAKE) --directory backend install
 	@$(MAKE) --directory frontend install
 	@$(MAKE) --directory backend init_db
@@ -31,34 +31,34 @@ up-fe: ## start FE locally
 # this command is used by playwright to start all services for testing
 start-playwright-services:
 	@$(MAKE) --directory backend setup-clean-test-database
-	cd backend && yarn run dotenv -e .env.test tsx prisma/seed/playwright.ts
+	cd backend && npx dotenv -e .env.test tsx prisma/seed/playwright.ts
 	cd backend && DISABLE_REQUEST_LOGGING=false CONFIG_PATH=.env.test node dist/main
 
 test-e2e-playwright: ## run playwright e2e tests
-	cd backend && yarn run dotenv -e .env.test prisma generate
-	cd frontend && yarn run build --mode test
-	cd backend && yarn run build
-	yarn run playwright test
+	cd backend && npx dotenv -e .env.test prisma generate
+	cd frontend && npm run build -- --mode test
+	cd backend && npm run build
+	npx playwright test
 
 test-e2e-playwright-dev: ## run playwright UI tests against the running development instance
-	CONFIG_PATH=./backend/.env.development PLAYWRIGHT_PORT=5173 yarn run playwright test --ui
+	CONFIG_PATH=./backend/.env.development PLAYWRIGHT_PORT=5173 npx playwright test --ui
 
 format: ## Format files (root only)
-	yarn run eslint --fix
+	npx eslint --fix
 
 format-all: ## Format files in root, backend, and frontend
-	yarn run eslint --fix
-	cd backend && yarn run eslint --fix
-	cd frontend && yarn run eslint --fix
+	npx eslint --fix
+	cd backend && npm run format
+	cd frontend && npm run format
 
 test: ## run all tests
-	yarn run eslint
+	npx eslint
 	@$(MAKE) test-e2e-playwright
 
 
 build: ## build backend and frontend for production
-	cd backend && yarn run build
-	cd frontend && yarn run build
+	cd backend && npm run build
+	cd frontend && npm run build
 	mkdir -p backend/dist/static
 	cp -r frontend/dist/. backend/dist/static
 
@@ -67,7 +67,7 @@ deploy-build: test-all build ## build, test, and upload to production machine
 
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
 	scp -P $${SSH_PORT} -r ./backend/dist $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
-	scp -P $${SSH_PORT} ./backend/package.json ./backend/yarn.lock $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
+	scp -P $${SSH_PORT} ./backend/package.json ./backend/package-lock.json $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
 	scp -P $${SSH_PORT} -r ./backend/scripts $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
 	scp -P $${SSH_PORT} -r ./deployment-car-repair $${SSH_USER}@$${SSH_ADDRESS}:~/apps
 
