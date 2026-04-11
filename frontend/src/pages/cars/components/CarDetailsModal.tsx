@@ -1,4 +1,8 @@
-import { Person as PersonIcon, Save as SaveIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  Person as PersonIcon,
+  Save as SaveIcon,
+} from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -10,6 +14,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -101,6 +106,13 @@ export default function CarDetailsModal({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <PersonIcon />
           Auto bearbeiten/erstellen
+          <IconButton
+            onClick={onCleanAndClose}
+            sx={{ ml: 'auto' }}
+            aria-label="Schließen"
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
       </DialogTitle>
       <DialogContent>
