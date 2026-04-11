@@ -34,6 +34,10 @@ class EnvironmentVariables {
   @IsString()
   declare PASSWORD: string;
 
+  @IsNotEmpty()
+  @IsString()
+  declare LOG_FILE_PATH: string;
+
   // Document company info
   @IsNotEmpty() @IsString() declare DOC_COMPANY_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_COMPANY_SUB_TITLE: string;
@@ -57,6 +61,7 @@ export type AppConfig = {
   JWT_SECRET: string;
   USERNAME: string;
   PASSWORD: string;
+  LOG_FILE_PATH: string;
   DOC_COMPANY_TITLE: string;
   DOC_COMPANY_SUB_TITLE: string;
   DOC_STREET_AND_NUMBER: string;
@@ -79,6 +84,7 @@ export function getConfig(): AppConfig {
       JWT_SECRET: process.env.JWT_SECRET!,
       USERNAME: process.env.USERNAME!,
       PASSWORD: process.env.PASSWORD!,
+      LOG_FILE_PATH: process.env.LOG_FILE_PATH!,
       DOC_COMPANY_TITLE: process.env.DOC_COMPANY_TITLE!,
       DOC_COMPANY_SUB_TITLE: process.env.DOC_COMPANY_SUB_TITLE!,
       DOC_STREET_AND_NUMBER: process.env.DOC_STREET_AND_NUMBER!,

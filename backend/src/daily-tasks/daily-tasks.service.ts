@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 
 import { BackupService } from './backup.service';
+import { LogTrimService } from './log-trim.service';
 import { NotificationsService } from './notifications.service';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class DailyTasksService {
   constructor(
     private notifications: NotificationsService,
     private backup: BackupService,
+    private logTrim: LogTrimService,
   ) {}
 
   @Cron('0 4 * * *')
@@ -20,6 +22,7 @@ export class DailyTasksService {
     const results = await Promise.allSettled([
       this.notifications.run(),
       this.backup.run(),
+      this.logTrim.run(),
     ]);
 
     for (const result of results) {
