@@ -1,3 +1,5 @@
+const logFile = `${process.env.HOME}/apps/car-repair/app.log`;
+
 module.exports = {
   apps: [
     {
@@ -5,8 +7,8 @@ module.exports = {
       name: 'car-repair',
       script: './dist/main.js',
       cwd: '../car-repair/',
-      error_file: '~/apps/car-repair/app.log',
-      out_file: '~/apps/car-repair/app.log',
+      error_file: logFile,
+      out_file: logFile,
     },
   ],
 };
