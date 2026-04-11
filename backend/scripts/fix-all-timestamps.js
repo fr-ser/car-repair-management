@@ -103,10 +103,14 @@ function getMinCreatedAt(table) {
     const windowIds = new Set(orders.map((o) => o.id));
     for (const orderNumber of Object.keys(orderDateFixes)) {
       const row = db
-        .prepare(`SELECT id, orderDate, orderNumber FROM "Order" WHERE orderNumber = ?`)
+        .prepare(
+          `SELECT id, orderDate, orderNumber FROM "Order" WHERE orderNumber = ?`,
+        )
         .get(orderNumber);
       if (row && !windowIds.has(row.id)) {
-        console.log(`  Also including order ${orderNumber} with date correction (outside window)`);
+        console.log(
+          `  Also including order ${orderNumber} with date correction (outside window)`,
+        );
         orders.push(row);
       }
     }
@@ -131,21 +135,32 @@ function getMinCreatedAt(table) {
       const dateKey = o.orderDate ? normaliseDate(o.orderDate) : '2020-01-01';
       const base = new Date(`${dateKey}T00:00:00.000Z`);
       if (isNaN(base.getTime())) {
-        console.warn(`  Skipping order id=${o.id}: invalid orderDate "${o.orderDate}"`);
+        console.warn(
+          `  Skipping order id=${o.id}: invalid orderDate "${o.orderDate}"`,
+        );
         skipped++;
         continue;
       }
       const rank = (rankPerDate.get(dateKey) ?? 0) + 1;
       rankPerDate.set(dateKey, rank);
-      updates.push({ id: o.id, createdAt: new Date(base.getTime() + rank * 60_000).toISOString() });
+      updates.push({
+        id: o.id,
+        createdAt: new Date(base.getTime() + rank * 60_000).toISOString(),
+      });
     }
 
-    const setOrderDate = db.prepare(`UPDATE "Order" SET orderDate = ? WHERE orderNumber = ?`);
-    const setCreatedAt = db.prepare(`UPDATE "Order" SET createdAt = ? WHERE id = ?`);
+    const setOrderDate = db.prepare(
+      `UPDATE "Order" SET orderDate = ? WHERE orderNumber = ?`,
+    );
+    const setCreatedAt = db.prepare(
+      `UPDATE "Order" SET createdAt = ? WHERE id = ?`,
+    );
 
     db.prepare('BEGIN').run();
     try {
-      for (const [orderNumber, correctedDate] of Object.entries(orderDateFixes)) {
+      for (const [orderNumber, correctedDate] of Object.entries(
+        orderDateFixes,
+      )) {
         setOrderDate.run(correctedDate, orderNumber);
       }
       for (const { id, createdAt } of updates) {
@@ -157,7 +172,9 @@ function getMinCreatedAt(table) {
       throw err;
     }
 
-    console.log(`Orders: updated ${updates.length}${skipped ? `, skipped ${skipped}` : ''}`);
+    console.log(
+      `Orders: updated ${updates.length}${skipped ? `, skipped ${skipped}` : ''}`,
+    );
   }
 }
 
@@ -179,10 +196,14 @@ function getMinCreatedAt(table) {
 
     const updates = clients.map((c) => ({
       id: c.id,
-      createdAt: new Date(LEGACY_BASE_MS + (numericSeq(c.clientNumber) ?? c.id) * 60_000).toISOString(),
+      createdAt: new Date(
+        LEGACY_BASE_MS + (numericSeq(c.clientNumber) ?? c.id) * 60_000,
+      ).toISOString(),
     }));
 
-    const setCreatedAt = db.prepare(`UPDATE "Client" SET createdAt = ? WHERE id = ?`);
+    const setCreatedAt = db.prepare(
+      `UPDATE "Client" SET createdAt = ? WHERE id = ?`,
+    );
     db.prepare('BEGIN').run();
     try {
       for (const { id, createdAt } of updates) setCreatedAt.run(createdAt, id);
@@ -213,10 +234,14 @@ function getMinCreatedAt(table) {
 
     const updates = cars.map((c) => ({
       id: c.id,
-      createdAt: new Date(LEGACY_BASE_MS + (numericSeq(c.carNumber) ?? c.id) * 60_000).toISOString(),
+      createdAt: new Date(
+        LEGACY_BASE_MS + (numericSeq(c.carNumber) ?? c.id) * 60_000,
+      ).toISOString(),
     }));
 
-    const setCreatedAt = db.prepare(`UPDATE "Car" SET createdAt = ? WHERE id = ?`);
+    const setCreatedAt = db.prepare(
+      `UPDATE "Car" SET createdAt = ? WHERE id = ?`,
+    );
     db.prepare('BEGIN').run();
     try {
       for (const { id, createdAt } of updates) setCreatedAt.run(createdAt, id);
@@ -254,10 +279,15 @@ function getMinCreatedAt(table) {
         skipped++;
         continue;
       }
-      updates.push({ id: a.id, createdAt: new Date(LEGACY_BASE_MS + seq * 60_000).toISOString() });
+      updates.push({
+        id: a.id,
+        createdAt: new Date(LEGACY_BASE_MS + seq * 60_000).toISOString(),
+      });
     }
 
-    const setCreatedAt = db.prepare(`UPDATE "Article" SET createdAt = ? WHERE id = ?`);
+    const setCreatedAt = db.prepare(
+      `UPDATE "Article" SET createdAt = ? WHERE id = ?`,
+    );
     db.prepare('BEGIN').run();
     try {
       for (const { id, createdAt } of updates) setCreatedAt.run(createdAt, id);
@@ -266,7 +296,9 @@ function getMinCreatedAt(table) {
       db.prepare('ROLLBACK').run();
       throw err;
     }
-    console.log(`Articles: updated ${updates.length}${skipped ? `, skipped ${skipped}` : ''}`);
+    console.log(
+      `Articles: updated ${updates.length}${skipped ? `, skipped ${skipped}` : ''}`,
+    );
   }
 }
 
