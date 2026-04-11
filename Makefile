@@ -68,6 +68,7 @@ deploy-build: test-all build ## build, test, and upload to production machine
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
 	scp -P $${SSH_PORT} -r ./backend/dist $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
 	scp -P $${SSH_PORT} ./backend/package.json ./backend/yarn.lock $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
+	scp -P $${SSH_PORT} -r ./backend/scripts $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
 	scp -P $${SSH_PORT} -r ./deployment-car-repair $${SSH_USER}@$${SSH_ADDRESS}:~/apps
 
 	@echo "To replace the old version run 'make deploy-upgrade' here or"
@@ -83,6 +84,9 @@ deploy-router: ## open Fritz!Box UI via SSH tunnel (set ROUTER_ADDRESS, e.g. 192
 	@echo "Tunnelling to Fritz!Box at $${ROUTER_ADDRESS} via $${SSH_USER}@$${SSH_ADDRESS}:$${SSH_PORT}"
 	@echo "Open http://fritz.box:8080 in your browser (requires '127.0.0.1 fritz.box' in /etc/hosts)"
 	ssh -p $${SSH_PORT} -L 8080:$${ROUTER_ADDRESS}:80 $${SSH_USER}@$${SSH_ADDRESS} -N
+
+deploy-script: ## copy backend scripts to the production machine
+	scp -P $${SSH_PORT} -r ./backend/scripts $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair
 
 deploy-database-to-local: ## copy the production database to the local machine
 	scp -P $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.db ./backend/production.db
