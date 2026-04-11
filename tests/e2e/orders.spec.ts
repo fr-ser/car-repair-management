@@ -81,9 +81,9 @@ test('create-edit-delete-order', async ({ page }) => {
   await page.getByLabel('Menge').nth(1).fill('1');
 
   await page.getByTestId('button-order-save').click();
-  await expect(page.getByTestId(/order-row-.*/).first()).toContainText(
-    updatedTitle,
-  );
+  await expect(
+    page.getByTestId(/order-row-.*/).filter({ hasText: updatedTitle }),
+  ).toHaveCount(1);
 
   // check that the article inventory was reduced by the ordered amount
   await page.goto('articles');

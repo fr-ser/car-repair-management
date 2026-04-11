@@ -62,28 +62,33 @@ build: ## build backend and frontend for production
 	mkdir -p backend/dist/static
 	cp -r frontend/dist/. backend/dist/static
 
-deploy-build: build test-all ## build, test, and upload to production machine
+deploy-build: test-all build ## build, test, and upload to production machine
 	@test -f backend/.env.production || (echo "Production env for the frontend not found!" && exit 1)
 
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
 	scp -P $${SSH_PORT} -r ./backend/dist $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
 	scp -P $${SSH_PORT} ./backend/package.json ./backend/yarn.lock $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
-	scp -P $${SSH_PORT} -r ./deployment $${SSH_USER}@$${SSH_ADDRESS}:~/apps
+	scp -P $${SSH_PORT} -r ./deployment-car-repair $${SSH_USER}@$${SSH_ADDRESS}:~/apps
 
 	@echo "To replace the old version run 'make deploy-upgrade' here or"
 	@echo "'cd ~/apps/deployment && make update' on the deployment target"
 
 deploy-upgrade: ## update the application on the production machine (causes downtime)
-	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'cd ~/apps/deployment && make update'
+	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'cd ~/apps/deployment-car-repair && make update'
 
 deploy-ssh: ## open SSH terminal on production machine
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}
 
-scp-database-to-local: ## copy the production database to the local machine
-	scp -P $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.db ./production.db
+deploy-router: ## open Fritz!Box UI via SSH tunnel (set ROUTER_ADDRESS, e.g. 192.168.178.1)
+	@echo "Tunnelling to Fritz!Box at $${ROUTER_ADDRESS} via $${SSH_USER}@$${SSH_ADDRESS}:$${SSH_PORT}"
+	@echo "Open http://fritz.box:8080 in your browser (requires '127.0.0.1 fritz.box' in /etc/hosts)"
+	ssh -p $${SSH_PORT} -L 8080:$${ROUTER_ADDRESS}:80 $${SSH_USER}@$${SSH_ADDRESS} -N
 
-scp-database-to-deploy: ## copy the local database to the production machine
-	scp -P $${SSH_PORT} ./production.db $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.copy.db
+deploy-database-to-local: ## copy the production database to the local machine
+	scp -P $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.db ./backend/production.db
+
+deploy-database-to-remote: ## copy the local database to the production machine
+	scp -P $${SSH_PORT} ./backend/production.db $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.copy.db
 
 test-all: ## run all tests (including backend and frontend)
 	@$(MAKE) --directory frontend test

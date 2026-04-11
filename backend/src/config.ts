@@ -26,6 +26,14 @@ class EnvironmentVariables {
   @IsString()
   declare JWT_SECRET: string;
 
+  @IsNotEmpty()
+  @IsString()
+  declare USERNAME: string;
+
+  @IsNotEmpty()
+  @IsString()
+  declare PASSWORD: string;
+
   // Document company info
   @IsNotEmpty() @IsString() declare DOC_COMPANY_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_COMPANY_SUB_TITLE: string;
@@ -47,6 +55,8 @@ export type AppConfig = {
   PORT: number;
   STATIC_FILE_ROOT: string;
   JWT_SECRET: string;
+  USERNAME: string;
+  PASSWORD: string;
   DOC_COMPANY_TITLE: string;
   DOC_COMPANY_SUB_TITLE: string;
   DOC_STREET_AND_NUMBER: string;
@@ -67,6 +77,8 @@ export function getConfig(): AppConfig {
       PORT: Number(process.env.PORT),
       STATIC_FILE_ROOT: process.env.STATIC_FILE_ROOT!,
       JWT_SECRET: process.env.JWT_SECRET!,
+      USERNAME: process.env.USERNAME!,
+      PASSWORD: process.env.PASSWORD!,
       DOC_COMPANY_TITLE: process.env.DOC_COMPANY_TITLE!,
       DOC_COMPANY_SUB_TITLE: process.env.DOC_COMPANY_SUB_TITLE!,
       DOC_STREET_AND_NUMBER: process.env.DOC_STREET_AND_NUMBER!,

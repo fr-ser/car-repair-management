@@ -31,10 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     if (timeUntilExpiry > JWT_RENEW_THRESHOLD_S) return payload;
 
-    const newToken = await this.authService.getSignedToken(
-      payload.sub,
-      payload.userName,
-    );
+    const newToken = await this.authService.getSignedToken(payload.userName);
 
     this.authService.setAuthCookie(req.res as Response, newToken);
 

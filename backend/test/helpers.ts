@@ -11,7 +11,6 @@ import { PrismaService } from '@/src/prisma/prisma.service';
 export async function resetDatabase(prisma: PrismaService) {
   return prisma.$transaction([
     prisma.order.deleteMany(),
-    prisma.user.deleteMany(),
     prisma.article.deleteMany(),
     prisma.car.deleteMany(),
     prisma.client.deleteMany(),

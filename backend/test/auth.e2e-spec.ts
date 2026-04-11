@@ -1,6 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as argon from 'argon2';
 import { IncomingMessage } from 'http';
 import pactum from 'pactum';
 import { createTestClientApp, resetDatabase } from 'test/helpers';
@@ -14,13 +13,13 @@ import { PrismaService } from '@/src/prisma/prisma.service';
 describe('Auth e2e', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let userId: number;
+  let config: ConfigService;
 
   beforeAll(async () => {
     [, app] = await createTestClientApp();
 
     prisma = app.get(PrismaService);
-    const config = app.get(ConfigService);
+    config = app.get(ConfigService);
     pactum.request.setBaseUrl(`http://localhost:${config.get('PORT')}`);
   });
 
@@ -34,19 +33,13 @@ describe('Auth e2e', () => {
   });
 
   describe('Authentication', () => {
-    const testCredentials: LoginDto = {
-      userName: 'test-user',
-      password: 'test-pass',
-    };
+    let testCredentials: LoginDto;
 
-    beforeEach(async () => {
-      const user = await prisma.user.create({
-        data: {
-          userName: testCredentials.userName,
-          hash: await argon.hash(testCredentials.password),
-        },
-      });
-      userId = user.id;
+    beforeAll(() => {
+      testCredentials = {
+        userName: config.getOrThrow('USERNAME'),
+        password: config.getOrThrow('PASSWORD'),
+      };
     });
 
     it('should sign in with right credentials and set JWT cookie', async () => {
@@ -78,7 +71,7 @@ describe('Auth e2e', () => {
       it('should allow access to protected endpoints with valid cookie', async () => {
         const jwt = await app
           .get(AuthService)
-          .getSignedToken(userId, testCredentials.userName);
+          .getSignedToken(testCredentials.userName);
 
         await pactum
           .spec()
