@@ -4,9 +4,9 @@ update:
 	# Hardlink node_modules from the current install instead of copying — near-instant, no extra disk usage.
 	# Falls back silently (-) if car-repair does not exist yet (first deploy).
 	-cp -rl ~/apps/car-repair/node_modules ~/apps/next-car-repair
-	# Only run yarn install when the lockfile changed; skips the slow linking step on code-only deploys.
-	-if ! diff -q ~/apps/car-repair/yarn.lock ~/apps/next-car-repair/yarn.lock > /dev/null 2>&1; then \
-		cd ~/apps/next-car-repair && yarn install --production --frozen-lockfile; \
+	# Only run npm ci when the lockfile changed; skips the slow linking step on code-only deploys.
+	-if ! diff -q ~/apps/car-repair/package-lock.json ~/apps/next-car-repair/package-lock.json > /dev/null 2>&1; then \
+		cd ~/apps/next-car-repair && npm ci --omit=dev; \
 	fi
 	rm -rf ~/apps/backup-car-repair
 	-mv ~/apps/car-repair ~/apps/backup-car-repair

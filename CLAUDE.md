@@ -126,3 +126,8 @@ All non-user-facing values must be in English: variable names, constants, enum v
 - **IMPORTANT: Never read or write gitignored files.**
   This includes production environment files (`.env`, `.env.production`, `deployment/production/`, `.envrc`) and any other file listed in `.gitignore`.
   These may contain secrets or production configuration that must not be accessed or modified by an agent.
+
+- **Backend scripts (`backend/scripts/`) must be plain `.js` files using only Node.js built-ins.**
+  The production machine (Raspberry Pi ARMv7) cannot compile native addons and `prisma generate` fails there.
+  Use `node:sqlite` (built into Node.js ≥ 22.5) for database access.
+  Run with `node scripts/foo.js`, not `yarn tsx`.

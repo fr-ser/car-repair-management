@@ -14,7 +14,7 @@ const TireInputMask = React.forwardRef<HTMLInputElement, CustomProps>(
     return (
       <IMaskInput
         {...other}
-        mask={'000/00 R00 000A'}
+        mask={'000/00 R00[C] 000A'}
         definitions={{
           '0': /[0-9]/,
           A: /[A-Z]/,

@@ -5,40 +5,40 @@ help: ## Show help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-	@echo "Available npm/yarn commands:"
+	@echo "Available npm commands:"
 	@npm run
 
 up: ## starts the BE server
-	yarn start:dev
+	npm run start:dev
 
 setup-clean-test-database: ## (re)create a clean test database
 	rm -f test.db
-	yarn run dotenv -e .env.test prisma migrate dev
+	npx dotenv -e .env.test prisma migrate dev
 
 test: ## runs all tests
-	yarn run dotenv -e .env.test prisma generate
-	yarn run test:unit
-	yarn run lint
-	yarn tsc --noEmit
+	npx dotenv -e .env.test prisma generate
+	npm run test:unit
+	npm run lint
+	npx tsc --noEmit
 	@$(MAKE) setup-clean-test-database
-	yarn run test:e2e
+	npm run test:e2e
 
 test-cov: ## runs all tests once with coverage report
-	yarn run dotenv -e .env.test prisma generate
-	yarn run test:unit
-	yarn run lint
-	yarn tsc --noEmit
+	npx dotenv -e .env.test prisma generate
+	npm run test:unit
+	npm run lint
+	npx tsc --noEmit
 	@$(MAKE) setup-clean-test-database
-	yarn run test:e2e:cov
+	npm run test:e2e:cov
 
 run-prisma-studio: ## start prisma studio
-	yarn run dotenv -e .env.development prisma studio
+	npx dotenv -e .env.development prisma studio
 
 install: ## install all the dependencies
-	yarn install
+	npm install
 
 db-create-migration: ## create prisma client and migrate DB
-	yarn run dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
+	npx dotenv -e $${CONFIG_PATH:-.env.development} prisma migrate dev
 
 _login: ## (internal) authenticate and store session cookie
 	@/usr/bin/curl -s -c /tmp/.car-repair-session \
@@ -63,5 +63,5 @@ trigger-tuev: _login ## manually trigger TÜV reminders (requires running dev se
 
 db-init: ## initialise a new dev database
 	rm -f ./dev.db
-	yarn run dotenv -e .env.development prisma migrate dev
-	yarn run dotenv -e .env.development tsx prisma/seed/dev.ts
+	npx dotenv -e .env.development prisma migrate dev
+	npx dotenv -e .env.development tsx prisma/seed/dev.ts

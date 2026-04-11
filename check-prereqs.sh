@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- Minimum required versions ---
 MIN_NODE="22.0.0"
-MIN_YARN="1.22.0"
+MIN_NPM="10.0.0"
 MIN_MAKE="3.0"
 
 # --- Helper function to compare versions ---
@@ -38,7 +38,7 @@ echo "🔍 Checking required tools..."
 MISSING=0
 
 check_tool "node" "$MIN_NODE" "node --version"
-check_tool "yarn" "$MIN_YARN" "yarn --version"
+check_tool "npm" "$MIN_NPM" "npm --version"
 check_tool "make" "$MIN_MAKE" "make --version"
 
 echo

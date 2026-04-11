@@ -62,7 +62,7 @@ export class OrdersService {
 
       const updated = await tx.order.update({
         where: { id: order.id },
-        data: { orderNumber: `A${order.id}` },
+        data: { orderNumber: `Auf${order.id}` },
         include: orderInclude,
       });
 
