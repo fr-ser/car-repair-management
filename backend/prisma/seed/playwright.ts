@@ -1,6 +1,5 @@
 // This seed file is used for the playwright e2e tests
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import * as argon from 'argon2';
 
 import { PrismaClient } from '../../src/generated/prisma/client';
 
@@ -16,14 +15,6 @@ const seed = async () => {
   await prisma.car.deleteMany();
   await prisma.client.deleteMany();
   await prisma.article.deleteMany();
-  await prisma.user.deleteMany();
-
-  await prisma.user.create({
-    data: {
-      userName: process.env.USERNAME as string,
-      hash: await argon.hash(process.env.PASSWORD as string),
-    },
-  });
 
   await prisma.client.createMany({
     data: [
