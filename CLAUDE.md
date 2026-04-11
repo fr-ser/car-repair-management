@@ -118,4 +118,11 @@ All non-user-facing values must be in English: variable names, constants, enum v
 
 ## AI Agent instructions
 
-Plans should not include manual testing steps. Verification sections should only reference automated tests (unit, e2e).
+- Plans should not include manual testing steps.
+  Verification sections should only reference automated tests (unit, e2e).
+
+- In markdown files, use one sentence per line in prose paragraphs.
+
+- **IMPORTANT: Never read or write gitignored files.**
+  This includes production environment files (`.env`, `.env.production`, `deployment/production/`, `.envrc`) and any other file listed in `.gitignore`.
+  These may contain secrets or production configuration that must not be accessed or modified by an agent.

@@ -56,6 +56,35 @@ test: ## run all tests
 	@$(MAKE) test-e2e-playwright
 
 
+build: ## build backend and frontend for production
+	cd backend && yarn run build
+	cd frontend && yarn run build
+	mkdir -p backend/dist/static
+	cp -r frontend/dist/. backend/dist/static
+
+deploy-build: build test-all ## build, test, and upload to production machine
+	@test -f backend/.env.production || (echo "Production env for the frontend not found!" && exit 1)
+
+	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
+	scp -P $${SSH_PORT} -r ./backend/dist $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
+	scp -P $${SSH_PORT} ./backend/package.json ./backend/yarn.lock $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
+	scp -P $${SSH_PORT} -r ./deployment $${SSH_USER}@$${SSH_ADDRESS}:~/apps
+
+	@echo "To replace the old version run 'make deploy-upgrade' here or"
+	@echo "'cd ~/apps/deployment && make update' on the deployment target"
+
+deploy-upgrade: ## update the application on the production machine (causes downtime)
+	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'cd ~/apps/deployment && make update'
+
+deploy-ssh: ## open SSH terminal on production machine
+	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}
+
+scp-database-to-local: ## copy the production database to the local machine
+	scp -P $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.db ./production.db
+
+scp-database-to-deploy: ## copy the local database to the production machine
+	scp -P $${SSH_PORT} ./production.db $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.copy.db
+
 test-all: ## run all tests (including backend and frontend)
 	@$(MAKE) --directory frontend test
 	@$(MAKE) --directory backend test
