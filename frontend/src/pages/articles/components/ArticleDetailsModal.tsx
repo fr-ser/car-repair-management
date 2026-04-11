@@ -1,4 +1,8 @@
-import { Article as ArticleIcon, Save as SaveIcon } from '@mui/icons-material';
+import {
+  Article as ArticleIcon,
+  Close as CloseIcon,
+  Save as SaveIcon,
+} from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -9,6 +13,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
@@ -82,6 +87,13 @@ export default function ArticleDetailsModal({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ArticleIcon />
           Artikel bearbeiten/erstellen
+          <IconButton
+            onClick={onCleanAndClose}
+            sx={{ ml: 'auto' }}
+            aria-label="Schließen"
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
       </DialogTitle>
       <DialogContent>

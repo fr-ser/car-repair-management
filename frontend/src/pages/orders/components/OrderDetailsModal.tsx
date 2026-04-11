@@ -1,5 +1,6 @@
 import {
   Assignment as AssignmentIcon,
+  Close as CloseIcon,
   OpenInNew as OpenInNewIcon,
   Receipt as ReceiptIcon,
   Save as SaveIcon,
@@ -385,6 +386,13 @@ export default function OrderDetailsModal({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ReceiptIcon />
           Auftrag bearbeiten/erstellen
+          <IconButton
+            onClick={onCleanAndClose}
+            sx={{ ml: 'auto' }}
+            aria-label="Schließen"
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
       </DialogTitle>
       <DialogContent>

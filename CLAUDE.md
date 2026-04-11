@@ -49,7 +49,7 @@ make test  # Lint + unit tests
 - **Frontend**: React 18, React Router v7, TanStack Query v5, MUI v7, Vite
 - **Auth**: JWT in cookies (argon2 password hashing), global `JwtAuthGuard` on all routes
 - **Testing**: Vitest (unit + backend e2e), Playwright (full e2e)
-- **Package manager**: Yarn
+- **Package manager**: npm
 
 ### Backend structure (`backend/src/`)
 
