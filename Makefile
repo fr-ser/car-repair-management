@@ -66,10 +66,10 @@ deploy-build: test-all build ## build, test, and upload to production machine
 	@test -f backend/.env.production || (echo "Production env for the frontend not found!" && exit 1)
 
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
-	scp -P $${SSH_PORT} -r ./backend/dist $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
-	scp -P $${SSH_PORT} ./backend/package.json ./backend/package-lock.json $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
-	scp -P $${SSH_PORT} -r ./backend/scripts $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair
-	scp -P $${SSH_PORT} -r ./deployment-car-repair $${SSH_USER}@$${SSH_ADDRESS}:~/apps
+	rsync -az -e "ssh -p $${SSH_PORT}" ./backend/dist/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair/dist
+	rsync -az -e "ssh -p $${SSH_PORT}" ./backend/package.json ./backend/package-lock.json $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair/
+	rsync -az -e "ssh -p $${SSH_PORT}" ./backend/scripts/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair/scripts
+	rsync -az -e "ssh -p $${SSH_PORT}" ./deployment-car-repair/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/deployment-car-repair
 
 	@echo "To replace the old version run 'make deploy-upgrade' here or"
 	@echo "'cd ~/apps/deployment && make update' on the deployment target"
@@ -86,7 +86,7 @@ deploy-router: ## open Fritz!Box UI via SSH tunnel (set ROUTER_ADDRESS, e.g. 192
 	ssh -p $${SSH_PORT} -L 8080:$${ROUTER_ADDRESS}:80 $${SSH_USER}@$${SSH_ADDRESS} -N
 
 deploy-script: ## copy backend scripts to the production machine
-	scp -P $${SSH_PORT} -r ./backend/scripts $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair
+	rsync -az -e "ssh -p $${SSH_PORT}" ./backend/scripts/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/scripts
 
 deploy-database-to-local: ## copy the production database to the local machine
 	scp -P $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.db ./backend/production.db
