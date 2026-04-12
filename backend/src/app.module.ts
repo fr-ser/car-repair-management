@@ -26,7 +26,10 @@ import { PrismaModule } from './prisma/prisma.module';
       useFactory: (configService: ConfigService) => [
         {
           ttl: 60_000,
-          limit: configService.get<number>('LOGIN_THROTTLE_LIMIT_PER_MINUTE', 10),
+          limit: configService.get<number>(
+            'LOGIN_THROTTLE_LIMIT_PER_MINUTE',
+            10,
+          ),
         },
       ],
     }),

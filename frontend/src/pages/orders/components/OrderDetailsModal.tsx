@@ -53,10 +53,12 @@ type OrderDetailsModalProps = {
 
 function CarAutocomplete({
   carId,
+  filterClientId,
   errorMessage,
   onChange,
 }: {
   carId: number | null;
+  filterClientId: number | null;
   errorMessage?: string;
   onChange: (id: number | null, clientId: number | null) => void;
 }) {
@@ -65,8 +67,12 @@ function CarAutocomplete({
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: carsData } = useQuery({
-    queryKey: ['cars', { search: debouncedSearch }],
-    queryFn: () => apiService.fetchCars(0, 20, debouncedSearch),
+    queryKey: [
+      'cars',
+      { search: debouncedSearch, clientId: filterClientId ?? undefined },
+    ],
+    queryFn: () =>
+      apiService.fetchCars(0, 20, debouncedSearch, filterClientId ?? undefined),
   });
 
   const { data: selectedCarData } = useQuery({
@@ -132,10 +138,12 @@ function CarAutocomplete({
 
 function ClientAutocomplete({
   clientId,
+  filterClientId,
   errorMessage,
   onChange,
 }: {
   clientId: number | null;
+  filterClientId: number | null;
   errorMessage?: string;
   onChange: (id: number | null) => void;
 }) {
@@ -146,6 +154,7 @@ function ClientAutocomplete({
   const { data: clientsData } = useQuery({
     queryKey: ['clients', { search: debouncedSearch }],
     queryFn: () => apiService.fetchClients(0, 20, debouncedSearch),
+    enabled: filterClientId == null,
   });
 
   const { data: selectedClientData } = useQuery({
@@ -154,7 +163,18 @@ function ClientAutocomplete({
     enabled: clientId != null,
   });
 
-  const clientOptions = clientsData?.data ?? [];
+  const { data: filteredClientData } = useQuery({
+    queryKey: ['client', filterClientId],
+    queryFn: () => apiService.fetchClient(filterClientId!),
+    enabled: filterClientId != null,
+  });
+
+  const clientOptions: BackendClient[] =
+    filterClientId != null
+      ? filteredClientData
+        ? [filteredClientData]
+        : []
+      : (clientsData?.data ?? []);
 
   const selectedClient =
     clientId != null
@@ -188,7 +208,7 @@ function ClientAutocomplete({
       inputValue={inputValue}
       onInputChange={(_, value) => {
         setInputValue(value);
-        setSearch(value);
+        if (filterClientId == null) setSearch(value);
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (
@@ -290,6 +310,7 @@ export default function OrderDetailsModal({
 }: OrderDetailsModalProps) {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
+  const [carClientId, setCarClientId] = React.useState<number | null>(null);
 
   const { data: selectedOrder, isLoading: isOrderLoading } = useQuery({
     queryKey: ['order', selectedOrderId],
@@ -364,11 +385,13 @@ export default function OrderDetailsModal({
 
   const onCleanAndClose = () => {
     reloadForm();
+    setCarClientId(null);
     onClose();
   };
 
   React.useEffect(() => {
     reloadForm(selectedOrder);
+    setCarClientId(selectedOrder?.clientId ?? null);
   }, [selectedOrder, reloadForm]);
 
   const { data: clientForAutoFill } = useQuery({
@@ -380,6 +403,7 @@ export default function OrderDetailsModal({
   React.useEffect(() => {
     if (clientForAutoFill?.cars.length === 1 && formData.carId.value === null) {
       onFormInputChange('carId', clientForAutoFill.cars[0].id);
+      setCarClientId(clientForAutoFill.id);
     }
   }, [clientForAutoFill, formData.carId.value, onFormInputChange]);
 
@@ -653,9 +677,11 @@ export default function OrderDetailsModal({
                   </Box>
                   <CarAutocomplete
                     carId={formData.carId.value}
+                    filterClientId={formData.clientId.value}
                     errorMessage={formData.carId.errorMessage}
                     onChange={(id, clientId) => {
                       onFormInputChange('carId', id);
+                      setCarClientId(id !== null ? clientId : null);
                       if (
                         id !== null &&
                         clientId != null &&
@@ -701,6 +727,7 @@ export default function OrderDetailsModal({
                   </Box>
                   <ClientAutocomplete
                     clientId={formData.clientId.value}
+                    filterClientId={carClientId}
                     errorMessage={formData.clientId.errorMessage}
                     onChange={(id) => onFormInputChange('clientId', id)}
                   />

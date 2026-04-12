@@ -1,15 +1,28 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
+  Min,
   Validate,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
+
+import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
+
+export class CarsQueryDto extends SearchPaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  clientId?: number;
+}
 
 @ValidatorConstraint({ name: 'tireFormat', async: false })
 export class TireFormat implements ValidatorConstraintInterface {
