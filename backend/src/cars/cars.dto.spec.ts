@@ -20,6 +20,14 @@ describe('CreateCarDto - TireFormat integration', () => {
     expect(errors).toHaveLength(0);
   });
 
+  test('should pass validation with runflat suffix (e.g. 196/65 R15 95T RF)', async () => {
+    const dto = new UpdateCarDto();
+    dto.tires = '196/65 R15 95T RF';
+
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+
   test('should fail validation with invalid tire format in DTO', async () => {
     const dto = new UpdateCarDto();
     dto.tires = 'invalid';

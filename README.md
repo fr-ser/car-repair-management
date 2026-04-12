@@ -7,7 +7,6 @@ This is an application to manage a small car repair shop.
 Make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (recommended via [asdf](https://asdf-vm.com))
-- [npm](https://www.npmjs.com/) (bundled with Node.js)
 - [Make](https://www.gnu.org/software/make/)
 
 You can run the following command `./check-prereqs.sh` to check the requirements or simply run `make install`, requirements will be checked before trying to install the env!
