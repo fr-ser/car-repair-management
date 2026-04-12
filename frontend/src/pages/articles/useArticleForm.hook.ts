@@ -8,8 +8,12 @@ function getFormFromArticle(data?: BackendArticle): ArticleForm {
   return {
     id: { value: data?.id ?? '' },
     description: { value: data?.description ?? '' },
-    price: { value: data?.price != null ? formatNumber(Number(data.price)) : '' },
-    amount: { value: data?.amount != null ? formatNumber(Number(data.amount)) : '' },
+    price: {
+      value: data?.price != null ? formatNumber(Number(data.price)) : '',
+    },
+    amount: {
+      value: data?.amount != null ? formatNumber(Number(data.amount)) : '',
+    },
   };
 }
 

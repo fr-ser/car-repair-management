@@ -69,7 +69,7 @@ function ItemRow({
 
   const { data: articlesData } = useQuery({
     queryKey: ['articles', { search: debouncedSearch }],
-    queryFn: () => apiService.fetchArticles(0, 20, debouncedSearch),
+    queryFn: () => apiService.fetchArticles(0, 50, debouncedSearch),
   });
 
   const articleOptions = React.useMemo(
@@ -88,7 +88,7 @@ function ItemRow({
     const found = articleOptions.find((a) => a.id === pos.articleId.value);
     if (found) {
       setLocalSelectedArticle(found);
-      setArticleInputValue(`${found.id} – ${found.description}`);
+      setArticleInputValue(found.id);
     } else {
       setArticleInputValue(pos.articleId.value);
     }
@@ -108,7 +108,7 @@ function ItemRow({
       onUpdate(index, 'articleId', value.id);
       onUpdate(index, 'description', value.description);
       onUpdate(index, 'pricePerUnit', formatNumber(Number(value.price)));
-      setArticleInputValue(`${value.id} – ${value.description}`);
+      setArticleInputValue(value.id);
     } else if (typeof value === 'string') {
       setLocalSelectedArticle(null);
       onUpdate(index, 'articleId', value);
@@ -120,7 +120,18 @@ function ItemRow({
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', mb: 1 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 1,
+        alignItems: 'flex-start',
+        mb: 1,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 1,
+      }}
+    >
       {/* Move buttons stay anchored left, outside the wrapping flow */}
       <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <IconButton
@@ -150,17 +161,35 @@ function ItemRow({
       >
         <Autocomplete
           freeSolo
-          sx={{ width: 180, flexShrink: 0 }}
+          sx={{ width: 160, flexShrink: 0 }}
           options={articleOptions}
           getOptionLabel={(option) =>
             typeof option === 'string'
               ? option
               : `${option.id} – ${option.description}`
           }
+          renderOption={(props, option) => (
+            <li
+              {...props}
+              key={typeof option === 'string' ? option : option.id}
+            >
+              <Box>
+                <Typography variant="body2" fontWeight="bold">
+                  {typeof option === 'string' ? option : option.id}
+                </Typography>
+                {typeof option !== 'string' && (
+                  <Typography variant="caption" color="text.secondary">
+                    {option.description}
+                  </Typography>
+                )}
+              </Box>
+            </li>
+          )}
           value={selectedArticle}
           onChange={handleArticleChange}
           inputValue={articleInputValue}
           onInputChange={(_, value, reason) => {
+            if (reason === 'reset') return;
             setArticleInputValue(value);
             if (reason === 'input') {
               hasUserEdited.current = true;
@@ -173,6 +202,7 @@ function ItemRow({
             }
           }}
           filterOptions={(x) => x}
+          slotProps={{ popper: { style: { minWidth: 320 } } }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -220,6 +250,8 @@ function ItemRow({
         <TextField
           label="Beschreibung"
           size="small"
+          multiline
+          minRows={1}
           value={pos.description.value}
           onChange={(e) => onUpdate(index, 'description', e.target.value)}
           error={!!pos.description.errorMessage}
@@ -304,7 +336,18 @@ function HeadingRow({
   isLast,
 }: HeadingRowProps) {
   return (
-    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 1,
+        alignItems: 'center',
+        mb: 1,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        p: 1,
+      }}
+    >
       {/* Move buttons stay anchored left, outside the wrapping flow */}
       <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <IconButton
