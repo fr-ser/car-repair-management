@@ -30,19 +30,11 @@ import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendArticle } from '@/src/types/backend-contracts';
 import { formatNumber } from '@/src/utils/numbers';
+import { tableRowStyles } from '@/src/utils/tableStyles';
 
 type ArticlesTableProps = {
   handleEditArticle: (article: BackendArticle) => void;
   handleCreateArticle: () => void;
-};
-
-const tableRowStyles = {
-  '& .deleteButton': {
-    visibility: 'hidden',
-  },
-  '&:hover .deleteButton': {
-    visibility: 'visible',
-  },
 };
 
 export default function ArticlesTable({
@@ -86,11 +78,7 @@ export default function ArticlesTable({
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <ArticleIcon />
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ fontWeight: 500, pr: 14 }}
-              >
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
                 Artikel
               </Typography>
             </Box>
@@ -103,11 +91,21 @@ export default function ArticlesTable({
               size="small"
               onClick={handleCreateArticle}
               data-testid="button-article-create"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Artikel erstellen
             </Button>
           }
-          sx={{ pb: 1 }}
+          sx={{
+            pb: 1,
+            flexWrap: { xs: 'wrap', sm: 'nowrap' },
+            '& .MuiCardHeader-action': {
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 0, sm: '-4px' },
+              mr: { xs: 0, sm: '-8px' },
+              mb: { xs: 0.5, sm: '-4px' },
+            },
+          }}
         />
         <CardContent sx={{ pt: 0 }}>
           <TextField
@@ -137,10 +135,18 @@ export default function ArticlesTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Artikel-Nr</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Artikel-Nr
+                      </TableCell>
                       <TableCell>Bezeichnung</TableCell>
                       <TableCell>Preis / Einheit</TableCell>
-                      <TableCell>Menge</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Menge
+                      </TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
@@ -156,7 +162,10 @@ export default function ArticlesTable({
                         data-testid={`article-row-${article.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell data-testid={`article-id-${article.id}`}>
+                        <TableCell
+                          data-testid={`article-id-${article.id}`}
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           {article.id}
                         </TableCell>
                         <TableCell
@@ -169,7 +178,10 @@ export default function ArticlesTable({
                             currency: true,
                           })}
                         </TableCell>
-                        <TableCell data-testid={`article-amount-${article.id}`}>
+                        <TableCell
+                          data-testid={`article-amount-${article.id}`}
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
                           {article.amount != null
                             ? formatNumber(Number(article.amount))
                             : '–'}
@@ -202,6 +214,14 @@ export default function ArticlesTable({
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}

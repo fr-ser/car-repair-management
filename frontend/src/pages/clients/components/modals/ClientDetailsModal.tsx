@@ -73,7 +73,6 @@ export default function ClientDetailsModal({
             ? 'Kundendaten aktualisiert'
             : 'Kunde erstellt',
       });
-      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     onError: (error: unknown) => {

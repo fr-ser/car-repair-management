@@ -29,6 +29,7 @@ test('get-create-edit-delete-article', async ({ page }) => {
   await page.getByLabel('Bezeichnung').fill(uniqueDescription);
   await page.getByLabel('Preis / Einheit').fill('12,50');
   await page.getByTestId('button-article-save').click();
+  await page.keyboard.press('Escape');
 
   await expect(page.getByTestId(/article-row-.*/)).toHaveCount(
     initialArticleCount + 1,
@@ -50,6 +51,7 @@ test('get-create-edit-delete-article', async ({ page }) => {
   await page.getByLabel('Bezeichnung').click({ clickCount: 3 });
   await page.getByLabel('Bezeichnung').fill(updatedDescription);
   await page.getByTestId('button-article-save').click();
+  await page.keyboard.press('Escape');
 
   await expect(page.getByTestId(`article-description-${uniqueId}`)).toHaveText(
     updatedDescription,

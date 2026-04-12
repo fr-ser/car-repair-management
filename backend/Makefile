@@ -65,3 +65,6 @@ db-init: ## initialise a new dev database
 	rm -f ./dev.db
 	npx dotenv -e .env.development prisma migrate dev
 	npx dotenv -e .env.development tsx prisma/seed/dev.ts
+
+dropbox-refresh-token: ## get a Dropbox refresh token (requires DROPBOX_CLIENT_ID and DROPBOX_CLIENT_SECRET)
+	node scripts/1970-01-01-dropbox-get-refresh-token.js

@@ -31,6 +31,7 @@ test('get-create-delete-clients', async ({ page }) => {
   await page.getByLabel('Firma').fill('Test Company');
   await page.getByLabel('Festnetz').fill('123456');
   await page.getByTestId('button-client-save').click();
+  await page.keyboard.press('Escape');
 
   await expect(page.getByTestId(/client-row-.*/)).toHaveCount(
     initialClientCount + 1,
@@ -67,6 +68,7 @@ test('get-create-delete-clients', async ({ page }) => {
   // change first name
   await page.getByLabel('Vorname').fill('ChangedName');
   await page.getByTestId('button-client-save').click();
+  await page.keyboard.press('Escape');
 
   // check that the first client's first name is changed
   await expect(firstClient.getByTestId(/client-name-.*/)).toContainText(

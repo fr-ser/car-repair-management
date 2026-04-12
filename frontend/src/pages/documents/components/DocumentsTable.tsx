@@ -32,15 +32,7 @@ import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendDocument } from '@/src/types/backend-contracts';
 import { DOCUMENT_TYPE } from '@/src/types/documents';
-
-const tableRowStyles = {
-  '& .deleteButton': {
-    visibility: 'hidden',
-  },
-  '&:hover .deleteButton': {
-    visibility: 'visible',
-  },
-};
+import { tableRowStyles } from '@/src/utils/tableStyles';
 
 function documentTypeLabel(type: string) {
   if (type === DOCUMENT_TYPE.INVOICE) return 'Rechnung';
@@ -185,10 +177,22 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                         />
                       </TableCell>
                       <TableCell>Nummer</TableCell>
-                      <TableCell>Typ</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Typ
+                      </TableCell>
                       <TableCell>Datum</TableCell>
-                      <TableCell>Kunde</TableCell>
-                      <TableCell>Fahrzeug</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Kunde
+                      </TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Fahrzeug
+                      </TableCell>
                       <TableCell>{/* actions */}</TableCell>
                     </TableRow>
                   </TableHead>
@@ -210,9 +214,15 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                           />
                         </TableCell>
                         <TableCell>{doc.documentNumber}</TableCell>
-                        <TableCell>{documentTypeLabel(doc.type)}</TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
+                          {documentTypeLabel(doc.type)}
+                        </TableCell>
                         <TableCell>{doc.documentDate}</TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           {[
                             doc.clientCompany,
                             doc.clientFirstName,
@@ -221,7 +231,11 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                             .filter(Boolean)
                             .join(' ')}
                         </TableCell>
-                        <TableCell>{doc.carLicensePlate}</TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
+                          {doc.carLicensePlate}
+                        </TableCell>
                         <TableCell>
                           <IconButton
                             className="deleteButton"
@@ -250,6 +264,14 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}

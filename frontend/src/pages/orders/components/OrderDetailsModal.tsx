@@ -350,7 +350,6 @@ export default function OrderDetailsModal({
             ? 'Auftrag aktualisiert'
             : 'Auftrag erstellt',
       });
-      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError: (error: unknown) => {
@@ -438,7 +437,7 @@ export default function OrderDetailsModal({
           </Box>
         ) : (
           <Grid container spacing={4} pt={1}>
-            <Grid size={{ xs: 12, lg: 8 }}>
+            <Grid size={{ xs: 12 }}>
               {/* Daten card */}
               <Card elevation={2} sx={{ mb: 3 }}>
                 <CardContent>
@@ -598,8 +597,104 @@ export default function OrderDetailsModal({
                 </CardContent>
               </Card>
 
+              {/* Fahrzeug + Kunde */}
+              <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  {/* Fahrzeug card */}
+                  <Card elevation={2}>
+                    <CardContent>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant="overline"
+                          sx={{ color: 'text.secondary', fontWeight: 600 }}
+                        >
+                          Fahrzeug
+                        </Typography>
+                        {formData.carId.value != null && (
+                          <Tooltip title="In neuem Tab öffnen">
+                            <IconButton
+                              component="a"
+                              href={`/cars/${formData.carId.value}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              size="small"
+                              sx={{ color: 'action.active' }}
+                            >
+                              <OpenInNewIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                      <CarAutocomplete
+                        carId={formData.carId.value}
+                        filterClientId={formData.clientId.value}
+                        errorMessage={formData.carId.errorMessage}
+                        onChange={(id, clientId) => {
+                          onFormInputChange('carId', id);
+                          setCarClientId(id !== null ? clientId : null);
+                          if (
+                            id !== null &&
+                            clientId != null &&
+                            formData.clientId.value === null
+                          ) {
+                            onFormInputChange('clientId', clientId);
+                          }
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  {/* Kunde card */}
+                  <Card elevation={2}>
+                    <CardContent>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <Typography
+                          variant="overline"
+                          sx={{ color: 'text.secondary', fontWeight: 600 }}
+                        >
+                          Kunde
+                        </Typography>
+                        {formData.clientId.value != null && (
+                          <Tooltip title="In neuem Tab öffnen">
+                            <IconButton
+                              component="a"
+                              href={`/clients/${formData.clientId.value}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              size="small"
+                              sx={{ color: 'action.active' }}
+                            >
+                              <OpenInNewIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                      <ClientAutocomplete
+                        clientId={formData.clientId.value}
+                        filterClientId={carClientId}
+                        errorMessage={formData.clientId.errorMessage}
+                        onChange={(id) => onFormInputChange('clientId', id)}
+                      />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+
               {/* Positionen card */}
-              <Card elevation={2}>
+              <Card elevation={2} sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography
                     variant="overline"
@@ -641,98 +736,6 @@ export default function OrderDetailsModal({
                   </Box>
                 </CardContent>
               </Card>
-            </Grid>
-
-            <Grid size={{ xs: 12, lg: 4 }}>
-              {/* Fahrzeug card */}
-              <Card elevation={2} sx={{ mb: 3 }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      variant="overline"
-                      sx={{ color: 'text.secondary', fontWeight: 600 }}
-                    >
-                      Fahrzeug
-                    </Typography>
-                    {formData.carId.value != null && (
-                      <Tooltip title="In neuem Tab öffnen">
-                        <IconButton
-                          component="a"
-                          href={`/cars/${formData.carId.value}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          size="small"
-                          sx={{ color: 'action.active' }}
-                        >
-                          <OpenInNewIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </Box>
-                  <CarAutocomplete
-                    carId={formData.carId.value}
-                    filterClientId={formData.clientId.value}
-                    errorMessage={formData.carId.errorMessage}
-                    onChange={(id, clientId) => {
-                      onFormInputChange('carId', id);
-                      setCarClientId(id !== null ? clientId : null);
-                      if (
-                        id !== null &&
-                        clientId != null &&
-                        formData.clientId.value === null
-                      ) {
-                        onFormInputChange('clientId', clientId);
-                      }
-                    }}
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Kunde card */}
-              <Card elevation={2} sx={{ mb: 3 }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      variant="overline"
-                      sx={{ color: 'text.secondary', fontWeight: 600 }}
-                    >
-                      Kunde
-                    </Typography>
-                    {formData.clientId.value != null && (
-                      <Tooltip title="In neuem Tab öffnen">
-                        <IconButton
-                          component="a"
-                          href={`/clients/${formData.clientId.value}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          size="small"
-                          sx={{ color: 'action.active' }}
-                        >
-                          <OpenInNewIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </Box>
-                  <ClientAutocomplete
-                    clientId={formData.clientId.value}
-                    filterClientId={carClientId}
-                    errorMessage={formData.clientId.errorMessage}
-                    onChange={(id) => onFormInputChange('clientId', id)}
-                  />
-                </CardContent>
-              </Card>
 
               {/* Dokumente card — only when editing an existing order */}
               {selectedOrderId != undefined && (
@@ -742,7 +745,7 @@ export default function OrderDetailsModal({
           </Grid>
         )}
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ flexWrap: 'wrap', gap: 1, px: 2, pb: 2 }}>
         <Button onClick={onCleanAndClose}>Abbrechen</Button>
         {selectedOrderId != undefined && (
           <>

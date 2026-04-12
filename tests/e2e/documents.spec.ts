@@ -43,6 +43,9 @@ test('create-view-delete-document', async ({ page }) => {
   await page.getByTestId('button-order-save').click();
   await page.waitForTimeout(500);
 
+  // Close the dialog (save keeps it open by design)
+  await page.getByRole('button', { name: 'Schließen' }).click();
+
   // Open the newly created order
   const newRow = page.getByTestId(/order-row-.*/).first();
   await newRow.click();
