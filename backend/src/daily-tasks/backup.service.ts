@@ -58,8 +58,8 @@ export class BackupService {
 
     const keep = new Set<string>();
 
-    // Last 7 days
-    for (let i = 0; i < 7; i++) {
+    // Last 14 days
+    for (let i = 0; i < 14; i++) {
       keep.add(`${today.subtract(i, 'day').format('YYYY-MM-DD')}.db`);
     }
 
