@@ -112,7 +112,10 @@ function DocumentDetailContent() {
       )}
 
       {document && (
-        <Card elevation={2} sx={{ maxWidth: '210mm', mx: 'auto' }}>
+        <Card
+          elevation={2}
+          sx={{ maxWidth: '210mm', mx: 'auto', overflowX: 'auto' }}
+        >
           <DocumentView document={document} />
         </Card>
       )}
