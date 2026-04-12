@@ -58,7 +58,7 @@ function CarAutocomplete({
 }: {
   carId: number | null;
   errorMessage?: string;
-  onChange: (id: number | null) => void;
+  onChange: (id: number | null, clientId: number | null) => void;
 }) {
   const [search, setSearch] = React.useState('');
   const [inputValue, setInputValue] = React.useState('');
@@ -91,7 +91,7 @@ function CarAutocomplete({
   }, [selectedCar]);
 
   const handleChange = (_: React.SyntheticEvent, value: BackendCar | null) => {
-    onChange(value?.id ?? null);
+    onChange(value?.id ?? null, value?.clientId ?? null);
     if (value) {
       setInputValue(`${value.carNumber ?? ''} – ${value.licensePlate}`);
     }
@@ -371,6 +371,18 @@ export default function OrderDetailsModal({
     reloadForm(selectedOrder);
   }, [selectedOrder, reloadForm]);
 
+  const { data: clientForAutoFill } = useQuery({
+    queryKey: ['client', formData.clientId.value],
+    queryFn: () => apiService.fetchClient(formData.clientId.value!),
+    enabled: formData.clientId.value != null && formData.carId.value === null,
+  });
+
+  React.useEffect(() => {
+    if (clientForAutoFill?.cars.length === 1 && formData.carId.value === null) {
+      onFormInputChange('carId', clientForAutoFill.cars[0].id);
+    }
+  }, [clientForAutoFill, formData.carId.value, onFormInputChange]);
+
   const netTotal = formData.positions
     .filter((p) => p.type === 'item')
     .reduce((s, p) => s + (p.netSum ?? 0), 0);
@@ -642,7 +654,16 @@ export default function OrderDetailsModal({
                   <CarAutocomplete
                     carId={formData.carId.value}
                     errorMessage={formData.carId.errorMessage}
-                    onChange={(id) => onFormInputChange('carId', id)}
+                    onChange={(id, clientId) => {
+                      onFormInputChange('carId', id);
+                      if (
+                        id !== null &&
+                        clientId != null &&
+                        formData.clientId.value === null
+                      ) {
+                        onFormInputChange('clientId', clientId);
+                      }
+                    }}
                   />
                 </CardContent>
               </Card>
