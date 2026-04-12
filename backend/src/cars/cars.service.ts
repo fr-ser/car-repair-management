@@ -2,13 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { Car } from '@/src/generated/prisma/client';
 
-import {
-  PaginatedResponseDto,
-  SearchPaginationQueryDto,
-} from '@/src/common/dto/pagination.dto';
+import { PaginatedResponseDto } from '@/src/common/dto/pagination.dto';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
-import { CreateCarDto, UpdateCarDto } from './cars.dto';
+import { CarsQueryDto, CreateCarDto, UpdateCarDto } from './cars.dto';
 
 @Injectable()
 export class CarsService {
@@ -31,17 +28,20 @@ export class CarsService {
     });
   }
 
-  async findAll(query: SearchPaginationQueryDto) {
-    const { page, limit, search } = query;
+  async findAll(query: CarsQueryDto) {
+    const { page, limit, search, clientId } = query;
 
-    const where = search
-      ? {
-          OR: [
-            { carNumber: { contains: search } },
-            { licensePlate: { contains: search } },
-          ],
-        }
-      : {};
+    const where = {
+      ...(search
+        ? {
+            OR: [
+              { carNumber: { contains: search } },
+              { licensePlate: { contains: search } },
+            ],
+          }
+        : {}),
+      ...(clientId != null ? { clientId } : {}),
+    };
 
     const [total, data] = await Promise.all([
       this.prisma.car.count({ where }),

@@ -29,7 +29,6 @@ import OrdersCard from '@/src/pages/clients/components/OrdersCard';
 import * as apiService from '@/src/services/backend-service';
 
 import OwnerCard from './OwnerCard';
-import TireTextField from './TireTextField';
 
 type CarDetailsPageProps = {
   selectedCarId?: number;
@@ -244,14 +243,17 @@ export default function CarDetailsModal({
                         />
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>
-                        <TireTextField
-                          value={formData.tires.value}
-                          onChange={(value) =>
-                            onFormInputChange('tires', value)
-                          }
+                        <TextField
+                          fullWidth
                           id="tires"
                           label="Reifen"
-                          error={formData.tires.errorMessage}
+                          placeholder="265/60 R18 110H"
+                          value={formData.tires.value}
+                          onChange={(e) =>
+                            onFormInputChange('tires', e.target.value)
+                          }
+                          error={!!formData.tires.errorMessage}
+                          helperText={formData.tires.errorMessage}
                         />
                       </Grid>
                     </Grid>

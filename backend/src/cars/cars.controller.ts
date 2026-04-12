@@ -9,9 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
-
-import { CreateCarDto, UpdateCarDto } from './cars.dto';
+import { CarsQueryDto, CreateCarDto, UpdateCarDto } from './cars.dto';
 import { CarsService } from './cars.service';
 
 @Controller('cars')
@@ -24,7 +22,7 @@ export class CarsController {
   }
 
   @Get()
-  findAll(@Query() query: SearchPaginationQueryDto) {
+  findAll(@Query() query: CarsQueryDto) {
     return this.carsService.findAll(query);
   }
 

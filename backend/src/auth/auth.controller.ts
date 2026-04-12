@@ -1,4 +1,5 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import type { Response } from 'express';
 
 import { Public } from './auth.decorator';
@@ -10,6 +11,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
+  @UseGuards(ThrottlerGuard)
   @Post('sign-in')
   async signIn(
     @Body() dto: LoginDto,

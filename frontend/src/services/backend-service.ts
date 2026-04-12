@@ -96,10 +96,15 @@ export function updateCar(carId: number, car: UpdateCarRequest) {
   });
 }
 
-export function fetchCars(page = 0, limit = 10, search = '') {
-  return apiFetch<BackendPaginatedResponse<BackendCar>>(
-    paginatedUrl('/api/cars', page, limit, search),
-  );
+export function fetchCars(
+  page = 0,
+  limit = 10,
+  search = '',
+  clientId?: number,
+) {
+  let url = paginatedUrl('/api/cars', page, limit, search);
+  if (clientId != null) url += `&clientId=${clientId}`;
+  return apiFetch<BackendPaginatedResponse<BackendCar>>(url);
 }
 
 export function fetchCar(carId: number) {

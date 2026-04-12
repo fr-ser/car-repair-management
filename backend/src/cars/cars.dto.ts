@@ -1,32 +1,36 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
+  Min,
   Validate,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
 
+import { SearchPaginationQueryDto } from '@/src/common/dto/pagination.dto';
+
+export class CarsQueryDto extends SearchPaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  clientId?: number;
+}
+
 @ValidatorConstraint({ name: 'tireFormat', async: false })
 export class TireFormat implements ValidatorConstraintInterface {
   validate(text: string) {
-    if (text.length < 14) return false;
-
-    const positionsToCheck = [0, 1, 2, 4, 5, 8, 9];
-    for (const pos of positionsToCheck) {
-      if (!RegExp('\\d').test(text.charAt(pos))) {
-        return false;
-      }
-    }
-
-    return true;
+    return /^\d{3}\/\d{2} R\d{2}C? \d{2,3}[A-Z]( RF)?$/.test(text);
   }
   defaultMessage() {
-    return 'Must be at least 14 characters long and positions 0, 1, 2, 4, 5, 8, and 9 must be digits';
+    return 'Invalid tire format. Expected format: 195/60 R16 93H or 205/75 R16C 113R';
   }
 }
 
