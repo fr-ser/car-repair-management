@@ -69,23 +69,39 @@ export function PendingOrdersTable() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Auftrags-Nr</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Auftrags-Nr
+                      </TableCell>
                       <TableCell>Titel</TableCell>
-                      <TableCell>Fahrzeug</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Fahrzeug
+                      </TableCell>
                       <TableCell>Kunde/Unternehmen</TableCell>
-                      <TableCell>Datum</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Datum
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {orders.map((order) => (
                       <TableRow key={order.id}>
-                        <TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           <EntityLink href={`/orders/${order.id}`}>
                             {order.orderNumber}
                           </EntityLink>
                         </TableCell>
                         <TableCell>{order.title}</TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
                           <EntityLink href={`/cars/${order.carId}`}>
                             {[order.car.carNumber, order.car.licensePlate]
                               .filter(Boolean)
@@ -97,7 +113,11 @@ export function PendingOrdersTable() {
                             {clientOptionLabel(order.client)}
                           </EntityLink>
                         </TableCell>
-                        <TableCell>{order.orderDate}</TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
+                          {order.orderDate}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -111,6 +131,14 @@ export function PendingOrdersTable() {
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}

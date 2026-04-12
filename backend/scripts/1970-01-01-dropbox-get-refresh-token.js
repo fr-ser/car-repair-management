@@ -9,7 +9,9 @@ const clientSecret = process.env.DROPBOX_CLIENT_SECRET;
 const redirectUri = 'http://localhost';
 
 if (!clientId || !clientSecret) {
-  console.error('Error: DROPBOX_CLIENT_ID and DROPBOX_CLIENT_SECRET must be set.');
+  console.error(
+    'Error: DROPBOX_CLIENT_ID and DROPBOX_CLIENT_SECRET must be set.',
+  );
   process.exit(1);
 }
 
@@ -22,10 +24,17 @@ const authUrl =
 
 console.log('Open this URL in your browser and authorize the app:\n');
 console.log(authUrl);
-console.log('\nAfter authorizing, your browser will redirect to localhost (it will fail — that is expected).');
-console.log('Copy the value of the "code" query parameter from the address bar.\n');
+console.log(
+  '\nAfter authorizing, your browser will redirect to localhost (it will fail — that is expected).',
+);
+console.log(
+  'Copy the value of the "code" query parameter from the address bar.\n',
+);
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 rl.question('Paste the authorization code here: ', (code) => {
   rl.close();
@@ -37,7 +46,9 @@ rl.question('Paste the authorization code here: ', (code) => {
     redirect_uri: redirectUri,
   }).toString();
 
-  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+    'base64',
+  );
 
   const options = {
     hostname: 'api.dropboxapi.com',

@@ -29,19 +29,11 @@ import useNotification from '@/src/hooks/notification/useNotification';
 import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendCar } from '@/src/types/backend-contracts';
+import { tableRowStyles } from '@/src/utils/tableStyles';
 
 type CarsTableProps = {
   handleEditCar: (carId: number) => void;
   handleCreateCar: () => void;
-};
-
-const tableRowStyles = {
-  '& .deleteButton': {
-    visibility: 'hidden',
-  },
-  '&:hover .deleteButton': {
-    visibility: 'visible',
-  },
 };
 
 export default function CarsTable({
@@ -86,11 +78,7 @@ export default function CarsTable({
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CarIcon />
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ fontWeight: 500, pr: 14 }}
-              >
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
                 Autos
               </Typography>
             </Box>
@@ -103,11 +91,21 @@ export default function CarsTable({
               size="small"
               onClick={handleCreateCar}
               data-testid="button-car-create"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Auto erstellen
             </Button>
           }
-          sx={{ pb: 1 }}
+          sx={{
+            pb: 1,
+            flexWrap: { xs: 'wrap', sm: 'nowrap' },
+            '& .MuiCardHeader-action': {
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 0, sm: '-4px' },
+              mr: { xs: 0, sm: '-8px' },
+              mb: { xs: 0.5, sm: '-4px' },
+            },
+          }}
         />
         <CardContent sx={{ pt: 0 }}>
           <TextField
@@ -137,10 +135,22 @@ export default function CarsTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Autonummer</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Autonummer
+                      </TableCell>
                       <TableCell>Kennzeichen</TableCell>
-                      <TableCell>Hersteller</TableCell>
-                      <TableCell>Modell</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Hersteller
+                      </TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Modell
+                      </TableCell>
                       <TableCell>
                         {/* placeholder for actions, e.g. delete */}
                       </TableCell>
@@ -156,16 +166,25 @@ export default function CarsTable({
                         data-testid={`car-row-${car.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell data-testid={`car-number-${car.id}`}>
+                        <TableCell
+                          data-testid={`car-number-${car.id}`}
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           {car.carNumber}
                         </TableCell>
                         <TableCell data-testid={`car-license-plate-${car.id}`}>
                           {car.licensePlate}
                         </TableCell>
-                        <TableCell data-testid={`car-manufacturer-${car.id}`}>
+                        <TableCell
+                          data-testid={`car-manufacturer-${car.id}`}
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
                           {car.manufacturer}
                         </TableCell>
-                        <TableCell data-testid={`car-model-${car.id}`}>
+                        <TableCell
+                          data-testid={`car-model-${car.id}`}
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
                           {car.model}
                         </TableCell>
                         <TableCell>
@@ -196,6 +215,14 @@ export default function CarsTable({
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}

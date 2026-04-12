@@ -29,19 +29,11 @@ import useNotification from '@/src/hooks/notification/useNotification';
 import useTableData from '@/src/hooks/useTableData';
 import * as apiClient from '@/src/services/backend-service';
 import { BackendClient } from '@/src/types/backend-contracts';
+import { tableRowStyles } from '@/src/utils/tableStyles';
 
 type ClientsTableProps = {
   handleEditClient: (clientId: number) => void;
   handleCreateClient: () => void;
-};
-
-const tableRowStyles = {
-  '& .deleteButton': {
-    visibility: 'hidden',
-  },
-  '&:hover .deleteButton': {
-    visibility: 'visible',
-  },
 };
 
 export default function ClientsTable({
@@ -86,11 +78,7 @@ export default function ClientsTable({
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <PeopleIcon />
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ fontWeight: 500, pr: 14 }}
-              >
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
                 Kunden
               </Typography>
             </Box>
@@ -103,11 +91,21 @@ export default function ClientsTable({
               size="small"
               onClick={handleCreateClient}
               data-testid="button-client-create"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Kunden erstellen
             </Button>
           }
-          sx={{ pb: 1 }}
+          sx={{
+            pb: 1,
+            flexWrap: { xs: 'wrap', sm: 'nowrap' },
+            '& .MuiCardHeader-action': {
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 0, sm: '-4px' },
+              mr: { xs: 0, sm: '-8px' },
+              mb: { xs: 0.5, sm: '-4px' },
+            },
+          }}
         />
         <CardContent sx={{ pt: 0 }}>
           <TextField
@@ -137,7 +135,11 @@ export default function ClientsTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Kundennummer</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Kundennummer
+                      </TableCell>
                       <TableCell>Name</TableCell>
                       <TableCell>Firma</TableCell>
                       <TableCell>
@@ -155,7 +157,10 @@ export default function ClientsTable({
                         data-testid={`client-row-${client.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell data-testid={`client-number-${client.id}`}>
+                        <TableCell
+                          data-testid={`client-number-${client.id}`}
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           {client.clientNumber}
                         </TableCell>
                         <TableCell data-testid={`client-name-${client.id}`}>
@@ -193,6 +198,14 @@ export default function ClientsTable({
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}

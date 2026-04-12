@@ -35,6 +35,7 @@ import * as apiClient from '@/src/services/backend-service';
 import { BackendOrderWithPositions } from '@/src/types/backend-contracts';
 import { ORDER_STATUS, OrderStatus } from '@/src/types/orders';
 import { clientDisplayName, clientOptionLabel } from '@/src/utils/clients';
+import { tableRowStyles } from '@/src/utils/tableStyles';
 
 const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   [ORDER_STATUS.IN_PROGRESS]: 'In Arbeit',
@@ -50,15 +51,6 @@ type OrdersTableProps = {
   onClearClientFilter?: () => void;
   carId?: number;
   onClearCarFilter?: () => void;
-};
-
-const tableRowStyles = {
-  '& .deleteButton': {
-    visibility: 'hidden',
-  },
-  '&:hover .deleteButton': {
-    visibility: 'visible',
-  },
 };
 
 function statusColor(
@@ -130,11 +122,7 @@ export default function OrdersTable({
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <ReceiptIcon />
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{ fontWeight: 500, pr: 14 }}
-              >
+              <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
                 Aufträge
               </Typography>
             </Box>
@@ -147,11 +135,21 @@ export default function OrdersTable({
               size="small"
               onClick={handleCreateOrder}
               data-testid="button-order-create"
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Auftrag erstellen
             </Button>
           }
-          sx={{ pb: 1 }}
+          sx={{
+            pb: 1,
+            flexWrap: { xs: 'wrap', sm: 'nowrap' },
+            '& .MuiCardHeader-action': {
+              width: { xs: '100%', sm: 'auto' },
+              mt: { xs: 0, sm: '-4px' },
+              mr: { xs: 0, sm: '-8px' },
+              mb: { xs: 0.5, sm: '-4px' },
+            },
+          }}
         />
         <CardContent sx={{ pt: 0 }}>
           {(clientId || carId) && (
@@ -211,11 +209,27 @@ export default function OrdersTable({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Auftrags-Nr</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Auftrags-Nr
+                      </TableCell>
                       <TableCell>Titel</TableCell>
-                      <TableCell>Kennzeichen</TableCell>
-                      <TableCell>Kunde</TableCell>
-                      <TableCell>Datum</TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Kennzeichen
+                      </TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                      >
+                        Kunde
+                      </TableCell>
+                      <TableCell
+                        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                      >
+                        Datum
+                      </TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>{/* actions */}</TableCell>
                     </TableRow>
@@ -230,9 +244,15 @@ export default function OrdersTable({
                         data-testid={`order-row-${order.id}`}
                         sx={tableRowStyles}
                       >
-                        <TableCell>{order.orderNumber}</TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
+                          {order.orderNumber}
+                        </TableCell>
                         <TableCell>{order.title}</TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
                           <Box
                             component="span"
                             sx={{
@@ -262,7 +282,9 @@ export default function OrdersTable({
                             </Tooltip>
                           </Box>
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
                           <Box
                             component="span"
                             sx={{
@@ -290,7 +312,11 @@ export default function OrdersTable({
                             </Tooltip>
                           </Box>
                         </TableCell>
-                        <TableCell>{order.orderDate}</TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+                        >
+                          {order.orderDate}
+                        </TableCell>
                         <TableCell>
                           <Chip
                             label={
@@ -329,6 +355,14 @@ export default function OrdersTable({
                 page={page}
                 onPageChange={handlers.onPageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
+                sx={{
+                  '& .MuiTablePagination-selectLabel': {
+                    display: { xs: 'none', sm: 'block' },
+                  },
+                  '& .MuiInputBase-root': {
+                    display: { xs: 'none', sm: 'flex' },
+                  },
+                }}
               />
             </Box>
           )}
