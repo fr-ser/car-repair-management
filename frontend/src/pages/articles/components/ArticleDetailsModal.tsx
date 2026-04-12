@@ -60,7 +60,6 @@ export default function ArticleDetailsModal({
             ? 'Artikel aktualisiert'
             : 'Artikel erstellt',
       });
-      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['articles'] });
     },
     onError: (error: unknown) => {

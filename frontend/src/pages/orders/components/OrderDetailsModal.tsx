@@ -350,7 +350,6 @@ export default function OrderDetailsModal({
             ? 'Auftrag aktualisiert'
             : 'Auftrag erstellt',
       });
-      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
     onError: (error: unknown) => {

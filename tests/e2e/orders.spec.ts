@@ -50,6 +50,7 @@ test('create-edit-delete-order', async ({ page }) => {
     .click();
 
   await page.getByTestId('button-order-save').click();
+  await page.keyboard.press('Escape');
   await expect(
     page.getByTestId(/order-row-.*/).filter({ hasText: uniqueTitle }),
   ).toHaveCount(1);
@@ -81,6 +82,7 @@ test('create-edit-delete-order', async ({ page }) => {
   await page.getByLabel('Menge').nth(1).fill('1');
 
   await page.getByTestId('button-order-save').click();
+  await page.keyboard.press('Escape');
   await expect(
     page.getByTestId(/order-row-.*/).filter({ hasText: updatedTitle }),
   ).toHaveCount(1);

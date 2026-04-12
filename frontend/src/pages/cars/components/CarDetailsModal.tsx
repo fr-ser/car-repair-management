@@ -72,7 +72,6 @@ export default function CarDetailsModal({
             ? 'Autodaten aktualisiert'
             : 'Auto erstellt',
       });
-      onCleanAndClose();
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       queryClient.invalidateQueries({ queryKey: ['car', selectedCarId] });
       if (formData.clientId.value != null) {
