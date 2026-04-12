@@ -82,6 +82,12 @@ In order to run tests with a UI use: `npx playwright test --ui`
 
 ---
 
+## Dropbox Integration
+
+See [backend/README.md](backend/README.md#dropbox-integration) for setup instructions.
+
+---
+
 ## Architecture Decision Records
 
 ### ADR-001: npm instead of yarn

@@ -7,13 +7,6 @@ help: ## Show help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-	@echo ""
-	@echo "[backend]"
-	@$(MAKE) --directory backend help
-
-	@echo ""
-	@echo "[frontend]"
-	@$(MAKE) --directory frontend help
 
 install: ## install all the dependencies for both BE and FE and setup local database
 	./check-prereqs.sh
