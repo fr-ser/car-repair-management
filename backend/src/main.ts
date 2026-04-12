@@ -17,6 +17,19 @@ async function bootstrap() {
   const server = express();
   server.use(requestLogger);
 
+  // Hashed asset files (e.g. /assets/index-abc123.js) are safe to cache indefinitely
+  // because Vite changes the hash whenever the content changes.
+  // All other non-API paths (including index.html) must be revalidated on every request
+  // so the browser always picks up the latest entry point with updated asset references.
+  server.use((req, res, next) => {
+    if (req.path.startsWith('/assets/')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (!req.path.startsWith('/api/')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+    next();
+  });
+
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
   app.use(cookieParser());
