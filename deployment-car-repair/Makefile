@@ -1,16 +1,19 @@
 export PATH := /home/pi/.nvm/versions/node/v22.22.2/bin:$(PATH)
 
 update:
-	# Hardlink node_modules from the current install instead of copying — near-instant, no extra disk usage.
-	# Falls back silently (-) if car-repair does not exist yet (first deploy).
+	@# Hardlink node_modules from the current install instead of copying — near-instant, no extra disk usage.
+	@# Falls back silently (-) if car-repair does not exist yet (first deploy).
 	-cp -rl ~/apps/car-repair/node_modules ~/apps/next-car-repair
-	# Only run npm ci when the lockfile changed; skips the slow linking step on code-only deploys.
+	@# Only run npm install when the lockfile changed; skips the slow linking step on code-only deploys.
 	-if ! diff -q ~/apps/car-repair/package-lock.json ~/apps/next-car-repair/package-lock.json > /dev/null 2>&1; then \
-		cd ~/apps/next-car-repair && npm ci --omit=dev; \
+		echo "package-lock.json changed — running npm install"; \
+		cd ~/apps/next-car-repair && npm install --omit=dev; \
+	else \
+		echo "package-lock.json unchanged — skipping npm install"; \
 	fi
 	rm -rf ~/apps/backup-car-repair
 	-mv ~/apps/car-repair ~/apps/backup-car-repair
-	# Carry over secrets and database from the previous install.
+	@# Carry over secrets and database from the previous install.
 	-cp ~/apps/backup-car-repair/.env ~/apps/next-car-repair
 	-cp ~/apps/backup-car-repair/production.db ~/apps/next-car-repair
 	mv ~/apps/next-car-repair ~/apps/car-repair
