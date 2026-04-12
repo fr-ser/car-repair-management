@@ -107,7 +107,7 @@ function ItemRow({
       setLocalSelectedArticle(value);
       onUpdate(index, 'articleId', value.id);
       onUpdate(index, 'description', value.description);
-      onUpdate(index, 'pricePerUnit', value.price.toString());
+      onUpdate(index, 'pricePerUnit', formatNumber(Number(value.price)));
       setArticleInputValue(`${value.id} – ${value.description}`);
     } else if (typeof value === 'string') {
       setLocalSelectedArticle(null);

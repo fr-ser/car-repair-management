@@ -2,14 +2,14 @@ import React from 'react';
 
 import { ArticleForm, CreateArticleRequest } from '@/src/types/articles';
 import { BackendArticle } from '@/src/types/backend-contracts';
-import { parseNumber } from '@/src/utils/numbers';
+import { formatNumber, parseNumber } from '@/src/utils/numbers';
 
 function getFormFromArticle(data?: BackendArticle): ArticleForm {
   return {
     id: { value: data?.id ?? '' },
     description: { value: data?.description ?? '' },
-    price: { value: data?.price != null ? data.price.toString() : '' },
-    amount: { value: data?.amount != null ? data.amount.toString() : '' },
+    price: { value: data?.price != null ? formatNumber(Number(data.price)) : '' },
+    amount: { value: data?.amount != null ? formatNumber(Number(data.amount)) : '' },
   };
 }
 
