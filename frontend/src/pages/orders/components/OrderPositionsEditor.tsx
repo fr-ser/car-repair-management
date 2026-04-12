@@ -123,8 +123,9 @@ function ItemRow({
     <Box
       sx={{
         display: 'flex',
+        flexWrap: 'wrap',
         gap: 1,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         mb: 1,
         border: '1px solid',
         borderColor: 'divider',
@@ -132,7 +133,6 @@ function ItemRow({
         p: 1,
       }}
     >
-      {/* Move buttons stay anchored left, outside the wrapping flow */}
       <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <IconButton
           size="small"
@@ -150,161 +150,144 @@ function ItemRow({
         </IconButton>
       </Box>
       {/* All input fields wrap among themselves */}
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 1,
-          flexWrap: 'wrap',
-          flex: 1,
-          alignItems: 'flex-start',
-        }}
-      >
-        <Autocomplete
-          freeSolo
-          sx={{ width: 160, flexShrink: 0 }}
-          options={articleOptions}
-          getOptionLabel={(option) =>
-            typeof option === 'string'
-              ? option
-              : `${option.id} – ${option.description}`
-          }
-          renderOption={(props, option) => (
-            <li
-              {...props}
-              key={typeof option === 'string' ? option : option.id}
-            >
-              <Box>
-                <Typography variant="body2" fontWeight="bold">
-                  {typeof option === 'string' ? option : option.id}
+      <Autocomplete
+        freeSolo
+        sx={{ width: 160, flexShrink: 0 }}
+        options={articleOptions}
+        getOptionLabel={(option) =>
+          typeof option === 'string'
+            ? option
+            : `${option.id} – ${option.description}`
+        }
+        renderOption={(props, option) => (
+          <li {...props} key={typeof option === 'string' ? option : option.id}>
+            <Box>
+              <Typography variant="body2" fontWeight="bold">
+                {typeof option === 'string' ? option : option.id}
+              </Typography>
+              {typeof option !== 'string' && (
+                <Typography variant="caption" color="text.secondary">
+                  {option.description}
                 </Typography>
-                {typeof option !== 'string' && (
-                  <Typography variant="caption" color="text.secondary">
-                    {option.description}
-                  </Typography>
-                )}
-              </Box>
-            </li>
-          )}
-          value={selectedArticle}
-          onChange={handleArticleChange}
-          inputValue={articleInputValue}
-          onInputChange={(_, value, reason) => {
-            if (reason === 'reset') return;
-            setArticleInputValue(value);
-            if (reason === 'input') {
-              hasUserEdited.current = true;
-              setArticleSearch(value);
-              setLocalSelectedArticle(null);
-            } else if (reason === 'clear') {
-              setArticleSearch('');
-              setLocalSelectedArticle(null);
-              onUpdate(index, 'articleId', '');
-            }
-          }}
-          filterOptions={(x) => x}
-          slotProps={{ popper: { style: { minWidth: 320 } } }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Artikel"
-              size="small"
-              error={!!pos.articleId.errorMessage}
-              helperText={pos.articleId.errorMessage}
-              onBlur={() => {
-                if (!localSelectedArticle) {
-                  onUpdate(index, 'articleId', articleInputValue);
-                }
-              }}
-              slotProps={{
-                htmlInput: {
-                  ...params.inputProps,
-                  'data-testid': `position-article-${index}`,
-                },
-                input: {
-                  ...params.InputProps,
-                  startAdornment: pos.articleId.value ? (
-                    <InputAdornment position="start">
-                      <Tooltip
-                        title={
-                          localSelectedArticle
-                            ? 'Bestandsartikel'
-                            : 'Kein Bestandsartikel'
-                        }
-                      >
-                        <span style={{ display: 'flex' }}>
-                          <InventoryIcon
-                            fontSize="small"
-                            color={
-                              localSelectedArticle ? 'success' : 'disabled'
-                            }
-                          />
-                        </span>
-                      </Tooltip>
-                    </InputAdornment>
-                  ) : undefined,
-                },
-              }}
-            />
-          )}
-        />
-        <TextField
-          label="Beschreibung"
-          size="small"
-          multiline
-          minRows={1}
-          value={pos.description.value}
-          onChange={(e) => onUpdate(index, 'description', e.target.value)}
-          error={!!pos.description.errorMessage}
-          helperText={pos.description.errorMessage}
-          sx={{ flex: 1, minWidth: 200 }}
-          slotProps={{
-            htmlInput: { 'data-testid': `position-description-${index}` },
-          }}
-        />
-        <Box sx={{ width: 120, flexShrink: 0 }}>
-          <DecimalTextField
-            id={`pricePerUnit-${index}`}
-            label="Preis/Einheit"
-            value={pos.pricePerUnit.value}
-            onChange={(value) => onUpdate(index, 'pricePerUnit', value)}
-            error={pos.pricePerUnit.errorMessage}
-          />
-        </Box>
-        <Box sx={{ width: 100, flexShrink: 0 }}>
-          <DecimalTextField
-            id={`amount-${index}`}
-            label="Menge"
-            value={pos.amount.value}
-            onChange={(value) => onUpdate(index, 'amount', value)}
-            error={pos.amount.errorMessage}
-          />
-        </Box>
-        <Box sx={{ width: 100, flexShrink: 0 }}>
-          <DecimalTextField
-            id={`discount-${index}`}
-            label="Rabatt %"
-            value={pos.discount.value}
-            onChange={(value) => onUpdate(index, 'discount', value)}
-            error={pos.discount.errorMessage}
-          />
-        </Box>
-        <TextField
-          label="Netto"
-          size="small"
-          value={
-            pos.netSum != null
-              ? formatNumber(pos.netSum, { currency: true })
-              : ''
+              )}
+            </Box>
+          </li>
+        )}
+        value={selectedArticle}
+        onChange={handleArticleChange}
+        inputValue={articleInputValue}
+        onInputChange={(_, value, reason) => {
+          if (reason === 'reset') return;
+          setArticleInputValue(value);
+          if (reason === 'input') {
+            hasUserEdited.current = true;
+            setArticleSearch(value);
+            setLocalSelectedArticle(null);
+          } else if (reason === 'clear') {
+            setArticleSearch('');
+            setLocalSelectedArticle(null);
+            onUpdate(index, 'articleId', '');
           }
-          disabled
-          sx={{ width: 120, flexShrink: 0 }}
+        }}
+        filterOptions={(x) => x}
+        slotProps={{ popper: { style: { minWidth: 320 } } }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Artikel"
+            size="small"
+            error={!!pos.articleId.errorMessage}
+            helperText={pos.articleId.errorMessage}
+            onBlur={() => {
+              if (!localSelectedArticle) {
+                onUpdate(index, 'articleId', articleInputValue);
+              }
+            }}
+            slotProps={{
+              htmlInput: {
+                ...params.inputProps,
+                'data-testid': `position-article-${index}`,
+              },
+              input: {
+                ...params.InputProps,
+                startAdornment: pos.articleId.value ? (
+                  <InputAdornment position="start">
+                    <Tooltip
+                      title={
+                        localSelectedArticle
+                          ? 'Bestandsartikel'
+                          : 'Kein Bestandsartikel'
+                      }
+                    >
+                      <span style={{ display: 'flex' }}>
+                        <InventoryIcon
+                          fontSize="small"
+                          color={localSelectedArticle ? 'success' : 'disabled'}
+                        />
+                      </span>
+                    </Tooltip>
+                  </InputAdornment>
+                ) : undefined,
+              },
+            }}
+          />
+        )}
+      />
+      <TextField
+        label="Beschreibung"
+        size="small"
+        multiline
+        minRows={1}
+        value={pos.description.value}
+        onChange={(e) => onUpdate(index, 'description', e.target.value)}
+        error={!!pos.description.errorMessage}
+        helperText={pos.description.errorMessage}
+        sx={{ flex: '3 1 150px' }}
+        slotProps={{
+          htmlInput: { 'data-testid': `position-description-${index}` },
+        }}
+      />
+      <Box sx={{ flex: '0 1 100px' }}>
+        <DecimalTextField
+          id={`pricePerUnit-${index}`}
+          label="Preis/Einheit"
+          value={pos.pricePerUnit.value}
+          onChange={(value) => onUpdate(index, 'pricePerUnit', value)}
+          error={pos.pricePerUnit.errorMessage}
         />
       </Box>
+      <Box sx={{ flex: '0 1 100px' }}>
+        <DecimalTextField
+          id={`amount-${index}`}
+          label="Menge"
+          value={pos.amount.value}
+          onChange={(value) => onUpdate(index, 'amount', value)}
+          error={pos.amount.errorMessage}
+        />
+      </Box>
+      <Box sx={{ flex: '0 1 100px' }}>
+        <DecimalTextField
+          id={`discount-${index}`}
+          label="Rabatt %"
+          value={pos.discount.value}
+          onChange={(value) => onUpdate(index, 'discount', value)}
+          error={pos.discount.errorMessage}
+        />
+      </Box>
+      <TextField
+        label="Netto"
+        size="small"
+        value={
+          pos.netSum != null ? formatNumber(pos.netSum, { currency: true }) : ''
+        }
+        disabled
+        sx={{ flex: '0 1 120px' }}
+      />
       <IconButton
         size="small"
         color="error"
         onClick={() => onRemove(index)}
-        sx={{ flexShrink: 0, alignSelf: 'flex-start' }}
+        sx={{ flexShrink: 0 }}
       >
         <DeleteIcon fontSize="small" />
       </IconButton>
@@ -338,6 +321,7 @@ function HeadingRow({
   return (
     <Box
       sx={{
+        flexWrap: 'wrap',
         display: 'flex',
         gap: 1,
         alignItems: 'center',
@@ -348,7 +332,6 @@ function HeadingRow({
         p: 1,
       }}
     >
-      {/* Move buttons stay anchored left, outside the wrapping flow */}
       <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <IconButton
           size="small"
@@ -365,35 +348,20 @@ function HeadingRow({
           <ArrowDownwardIcon fontSize="small" />
         </IconButton>
       </Box>
-      {/* Fields wrap among themselves */}
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 1,
-          flexWrap: 'wrap',
-          flex: 1,
-          alignItems: 'center',
+      <TextField
+        label="Überschrift"
+        size="small"
+        multiline
+        minRows={1}
+        sx={{ flexGrow: 1, flexShrink: 0, minWidth: '100px' }}
+        value={pos.text.value}
+        onChange={(e) => onUpdate(index, 'text', e.target.value)}
+        error={!!pos.text.errorMessage}
+        helperText={pos.text.errorMessage}
+        slotProps={{
+          htmlInput: { 'data-testid': `position-text-${index}` },
         }}
-      >
-        <Typography
-          variant="caption"
-          sx={{ color: 'text.secondary', flexShrink: 0, fontWeight: 'bold' }}
-        >
-          Überschrift
-        </Typography>
-        <TextField
-          label="Text"
-          size="small"
-          sx={{ flex: 1, minWidth: 200 }}
-          value={pos.text.value}
-          onChange={(e) => onUpdate(index, 'text', e.target.value)}
-          error={!!pos.text.errorMessage}
-          helperText={pos.text.errorMessage}
-          slotProps={{
-            htmlInput: { 'data-testid': `position-text-${index}` },
-          }}
-        />
-      </Box>
+      />
       <IconButton
         size="small"
         color="error"

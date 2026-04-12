@@ -746,7 +746,7 @@ export default function OrderDetailsModal({
           </Grid>
         )}
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ flexWrap: 'wrap', gap: 1, px: 2, pb: 2 }}>
         <Button onClick={onCleanAndClose}>Abbrechen</Button>
         {selectedOrderId != undefined && (
           <>
