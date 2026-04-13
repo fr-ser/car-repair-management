@@ -47,7 +47,9 @@ test('create-view-delete-document', async ({ page }) => {
   await page.getByRole('button', { name: 'Schließen' }).click();
 
   // Open the newly created order
-  const newRow = page.getByTestId(/order-row-.*/).first();
+  const newRow = page
+    .getByTestId(/order-row-.*/)
+    .filter({ hasText: uniqueTitle });
   await newRow.click();
 
   // Save as invoice
