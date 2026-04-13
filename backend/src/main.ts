@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConsoleLogger, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -7,8 +7,35 @@ import express from 'express';
 
 import { AppModule } from './app.module';
 import { blockScannersMiddleware } from './common/middleware/block-scanners.middleware';
-import { requestLogger } from './common/middleware/request-logger';
+import {
+  initRequestLogger,
+  requestLogger,
+} from './common/middleware/request-logger';
 import { GLOBAL_API_PREFIX } from './config';
+
+class TimezoneLogger extends ConsoleLogger {
+  protected getTimestamp(): string {
+    // All this to get a iso like timestamp with explicit timezone info in the format "2024-06-30T14:23:45.678+02:00"
+    const now = new Date();
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('de-DE', {
+        timeZone: 'Europe/Berlin',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        fractionalSecondDigits: 3,
+        hour12: false,
+        timeZoneName: 'longOffset',
+      })
+        .formatToParts(now)
+        .map(({ type, value }) => [type, value]),
+    );
+    return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}.${p.fractionalSecond}${p.timeZoneName.replace('GMT', '')}`;
+  }
+}
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -32,7 +59,11 @@ async function bootstrap() {
     next();
   });
 
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    logger: new TimezoneLogger(),
+  });
+
+  initRequestLogger(new Logger('HTTP'));
 
   app.use(cookieParser());
 
