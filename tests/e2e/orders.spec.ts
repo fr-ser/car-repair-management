@@ -55,8 +55,10 @@ test('create-edit-delete-order', async ({ page }) => {
     page.getByTestId(/order-row-.*/).filter({ hasText: uniqueTitle }),
   ).toHaveCount(1);
 
-  // EDIT — open the newly created order (first in list)
-  const newRow = page.getByTestId(/order-row-.*/).first();
+  // EDIT — open the newly created order
+  const newRow = page
+    .getByTestId(/order-row-.*/)
+    .filter({ hasText: uniqueTitle });
   await newRow.click();
   const updatedTitle = `Updated Auftrag ${Date.now()}`;
   await page.getByLabel('Titel').fill(updatedTitle);
