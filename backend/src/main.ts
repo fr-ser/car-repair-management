@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 
 import { AppModule } from './app.module';
+import { blockScannersMiddleware } from './common/middleware/block-scanners.middleware';
 import { requestLogger } from './common/middleware/request-logger';
 import { GLOBAL_API_PREFIX } from './config';
 
@@ -16,6 +17,7 @@ async function bootstrap() {
   // as otherwise the static file server logs are not present
   const server = express();
   server.use(requestLogger);
+  server.use(blockScannersMiddleware);
 
   // Hashed asset files (e.g. /assets/index-abc123.js) are safe to cache indefinitely
   // because Vite changes the hash whenever the content changes.
