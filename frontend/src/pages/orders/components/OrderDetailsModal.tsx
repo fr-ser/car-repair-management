@@ -366,7 +366,7 @@ export default function OrderDetailsModal({
       apiService.createDocument({
         orderId: selectedOrderId!,
         type,
-        documentDate: new Date().toISOString().slice(0, 10),
+        documentDate: formData.orderDate.value!.format('YYYY-MM-DD'),
       }),
     onSuccess: (doc) => {
       showNotification({ level: 'success', message: 'Dokument erstellt' });
