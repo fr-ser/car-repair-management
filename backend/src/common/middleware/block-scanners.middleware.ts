@@ -1,5 +1,31 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
+
+const browserLogger = new Logger('BrowserCheck');
+
+function isBrowserRequest(req: Request): boolean {
+  // Sec-Fetch-Dest is the most reliable signal, but some networks/routers strip Sec-* headers
+  if (req.headers['sec-fetch-dest']) return true;
+  // Fallback: real browsers always send Accept-Language; automated scanners typically don't
+  if (req.headers['accept-language']) return true;
+  return false;
+}
+
+export function blockNonBrowserMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (!isBrowserRequest(req)) {
+    browserLogger.warn(
+      `non-browser request: ${req.method} ${req.path} ua="${req.headers['user-agent'] ?? '-'}"`,
+    );
+    res.status(404).end();
+    return;
+  }
+
+  next();
+}
 
 const BLOCKED_PATTERNS = [
   /\.php(\?.*)?$/i,

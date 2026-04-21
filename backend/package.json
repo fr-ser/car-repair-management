@@ -46,6 +46,12 @@
     "rxjs": "^7.8.1",
     "tsx": "^4.19.0"
   },
+  "_comment_optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "npm has a but about lockfiles generated on macos being used on linux. Without this the tests in the CI fail"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.0.0"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",

@@ -1,7 +1,9 @@
 import { plainToInstance } from 'class-transformer';
 import {
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
   validateSync,
@@ -38,6 +40,10 @@ class EnvironmentVariables {
   @IsString()
   declare LOG_FILE_PATH: string;
 
+  @IsOptional()
+  @IsBoolean()
+  declare BLOCK_NON_BROWSERS: boolean;
+
   // Document company info
   @IsNotEmpty() @IsString() declare DOC_COMPANY_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_COMPANY_SUB_TITLE: string;
@@ -62,6 +68,7 @@ export type AppConfig = {
   USERNAME: string;
   PASSWORD: string;
   LOG_FILE_PATH: string;
+  BLOCK_NON_BROWSERS: boolean;
   DOC_COMPANY_TITLE: string;
   DOC_COMPANY_SUB_TITLE: string;
   DOC_STREET_AND_NUMBER: string;
@@ -85,6 +92,7 @@ export function getConfig(): AppConfig {
       USERNAME: process.env.USERNAME!,
       PASSWORD: process.env.PASSWORD!,
       LOG_FILE_PATH: process.env.LOG_FILE_PATH!,
+      BLOCK_NON_BROWSERS: process.env.BLOCK_NON_BROWSERS === 'true',
       DOC_COMPANY_TITLE: process.env.DOC_COMPANY_TITLE!,
       DOC_COMPANY_SUB_TITLE: process.env.DOC_COMPANY_SUB_TITLE!,
       DOC_STREET_AND_NUMBER: process.env.DOC_STREET_AND_NUMBER!,

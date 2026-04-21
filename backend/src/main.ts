@@ -6,12 +6,15 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 
 import { AppModule } from './app.module';
-import { blockScannersMiddleware } from './common/middleware/block-scanners.middleware';
+import {
+  blockNonBrowserMiddleware,
+  blockScannersMiddleware,
+} from './common/middleware/block-scanners.middleware';
 import {
   initRequestLogger,
   requestLogger,
 } from './common/middleware/request-logger';
-import { GLOBAL_API_PREFIX } from './config';
+import { GLOBAL_API_PREFIX, getConfig } from './config';
 
 class TimezoneLogger extends ConsoleLogger {
   protected getTimestamp(): string {
@@ -44,6 +47,9 @@ async function bootstrap() {
   // as otherwise the static file server logs are not present
   const server = express();
   server.use(requestLogger);
+  if (getConfig().BLOCK_NON_BROWSERS) {
+    server.use(blockNonBrowserMiddleware);
+  }
   server.use(blockScannersMiddleware);
 
   // Hashed asset files (e.g. /assets/index-abc123.js) are safe to cache indefinitely
