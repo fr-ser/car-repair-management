@@ -27,6 +27,12 @@
     "react-imask": "^7.6.1",
     "react-router-dom": "7.8.2"
   },
+  "_comment_optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "npm has a but about lockfiles generated on macos being used on linux. Without this the tests in the CI fail"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.0.0"
+  },
   "devDependencies": {
     "@eslint/js": "9.9.0",
     "@testing-library/dom": "^10.4.1",
