@@ -63,7 +63,11 @@ export const requestLogger = morgan(
     skip: function shouldLoggerSkip(req: Request, _: Response): boolean {
       if (getConfig().DISABLE_REQUEST_LOGGING) return true;
       else if (req.originalUrl.startsWith('/api/health')) return true;
-      else if (req.originalUrl.startsWith('/assets') && !getConfig().LOG_ASSET_REQUESTS) return true;
+      else if (
+        req.originalUrl.startsWith('/assets') &&
+        !getConfig().LOG_ASSET_REQUESTS
+      )
+        return true;
       else return false;
     },
   },

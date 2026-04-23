@@ -14,7 +14,7 @@ import {
   initRequestLogger,
   requestLogger,
 } from './common/middleware/request-logger';
-import { GLOBAL_API_PREFIX, getConfig } from './config';
+import { GLOBAL_API_PREFIX } from './config';
 
 class TimezoneLogger extends ConsoleLogger {
   protected getTimestamp(): string {

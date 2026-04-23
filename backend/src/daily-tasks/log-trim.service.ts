@@ -25,7 +25,12 @@ export class LogTrimService {
     // so older log lines are simply never loaded into memory.
     const handle = await open(logFilePath, 'r');
     const buffer = Buffer.alloc(TARGET_LOG_BYTES);
-    await handle.read(buffer, 0, TARGET_LOG_BYTES, stats.size - TARGET_LOG_BYTES);
+    await handle.read(
+      buffer,
+      0,
+      TARGET_LOG_BYTES,
+      stats.size - TARGET_LOG_BYTES,
+    );
     await handle.close();
 
     // The window boundary almost certainly falls mid-line. Skip forward to the
