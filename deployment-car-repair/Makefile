@@ -13,9 +13,10 @@ update:
 	fi
 	rm -rf ~/apps/backup-car-repair
 	-mv ~/apps/car-repair ~/apps/backup-car-repair
-	@# Carry over secrets and database from the previous install.
+	@# Carry over files from the previous install.
 	-cp ~/apps/backup-car-repair/.env ~/apps/next-car-repair
 	-cp ~/apps/backup-car-repair/production.db ~/apps/next-car-repair
+	-cp ~/apps/backup-car-repair/app.log ~/apps/next-car-repair
 	mv ~/apps/next-car-repair ~/apps/car-repair
 	pm2 startOrRestart ~/apps/deployment-car-repair/pm2.config.js
 	pm2 save
