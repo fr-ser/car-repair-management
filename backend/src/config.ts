@@ -44,6 +44,10 @@ class EnvironmentVariables {
   @IsBoolean()
   declare BLOCK_NON_BROWSERS: boolean;
 
+  @IsOptional()
+  @IsBoolean()
+  declare DISABLE_REQUEST_LOGGING: boolean;
+
   // Document company info
   @IsNotEmpty() @IsString() declare DOC_COMPANY_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_COMPANY_SUB_TITLE: string;
@@ -69,6 +73,7 @@ export type AppConfig = {
   PASSWORD: string;
   LOG_FILE_PATH: string;
   BLOCK_NON_BROWSERS: boolean;
+  DISABLE_REQUEST_LOGGING: boolean;
   DOC_COMPANY_TITLE: string;
   DOC_COMPANY_SUB_TITLE: string;
   DOC_STREET_AND_NUMBER: string;
@@ -93,6 +98,7 @@ export function getConfig(): AppConfig {
       PASSWORD: process.env.PASSWORD!,
       LOG_FILE_PATH: process.env.LOG_FILE_PATH!,
       BLOCK_NON_BROWSERS: process.env.BLOCK_NON_BROWSERS === 'true',
+      DISABLE_REQUEST_LOGGING: process.env.DISABLE_REQUEST_LOGGING === 'true',
       DOC_COMPANY_TITLE: process.env.DOC_COMPANY_TITLE!,
       DOC_COMPANY_SUB_TITLE: process.env.DOC_COMPANY_SUB_TITLE!,
       DOC_STREET_AND_NUMBER: process.env.DOC_STREET_AND_NUMBER!,

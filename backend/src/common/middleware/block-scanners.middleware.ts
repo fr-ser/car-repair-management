@@ -1,7 +1,5 @@
-import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
-
-const browserLogger = new Logger('BrowserCheck');
 
 function isBrowserRequest(req: Request): boolean {
   // Sec-Fetch-Dest is the most reliable signal, but some networks/routers strip Sec-* headers
@@ -17,10 +15,8 @@ export function blockNonBrowserMiddleware(
   next: NextFunction,
 ) {
   if (!isBrowserRequest(req)) {
-    browserLogger.warn(
-      `non-browser request: ${req.method} ${req.path} ua="${req.headers['user-agent'] ?? '-'}"`,
-    );
-    res.status(404).end();
+    res.locals['nonBrowser'] = true;
+    res.status(401).end();
     return;
   }
 

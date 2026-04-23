@@ -59,8 +59,10 @@ async function bootstrap() {
   server.use((req, res, next) => {
     if (req.path.startsWith('/assets/')) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.locals['requestType'] = 'static';
     } else if (!req.path.startsWith('/api/')) {
       res.setHeader('Cache-Control', 'no-cache');
+      res.locals['requestType'] = 'spa';
     }
     next();
   });
