@@ -28,6 +28,24 @@ make test-all             # All tests: frontend, backend, e2e
 make test-e2e-playwright  # Playwright e2e tests only
 ```
 
+### Remote target (Raspberry Pi) — always use the Makefile as reference
+
+```bash
+make deploy-ssh           # Open SSH terminal on production machine
+make deploy-script        # Copy backend/scripts/ to production machine
+make deploy-database-to-local   # Pull production DB to local (backend/production.db)
+make deploy-database-to-remote  # Push local production.db to remote as production.copy.db
+make deploy-router        # SSH tunnel to Fritz!Box UI
+```
+
+Log file (no Makefile target — use directly):
+
+```bash
+scp -P ${SSH_PORT} ${SSH_USER}@${SSH_ADDRESS}:~/apps/car-repair/app.log ./app.log
+```
+
+All remote commands use `SSH_PORT`, `SSH_USER`, and `SSH_ADDRESS` env vars.
+
 ### Backend (`backend/`)
 
 ```bash

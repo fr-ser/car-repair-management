@@ -47,9 +47,7 @@ async function bootstrap() {
   // as otherwise the static file server logs are not present
   const server = express();
   server.use(requestLogger);
-  if (getConfig().BLOCK_NON_BROWSERS) {
-    server.use(blockNonBrowserMiddleware);
-  }
+  server.use(blockNonBrowserMiddleware);
   server.use(blockScannersMiddleware);
 
   // Hashed asset files (e.g. /assets/index-abc123.js) are safe to cache indefinitely
@@ -59,10 +57,14 @@ async function bootstrap() {
   server.use((req, res, next) => {
     if (req.path.startsWith('/assets/')) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      res.locals['requestType'] = 'static';
     } else if (!req.path.startsWith('/api/')) {
       res.setHeader('Cache-Control', 'no-cache');
-      res.locals['requestType'] = 'spa';
+    }
+    // Only set a type if the crawler middlewares haven't already claimed this request.
+    if (!res.locals['requestType']) {
+      if (req.path.startsWith('/assets/')) res.locals['requestType'] = 'static';
+      else if (req.path.startsWith('/api/')) res.locals['requestType'] = 'api';
+      else res.locals['requestType'] = 'spa';
     }
     next();
   });
