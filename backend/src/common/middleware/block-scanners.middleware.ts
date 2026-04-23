@@ -1,6 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
+import { getConfig } from '@/src/config';
+
 function isBrowserRequest(req: Request): boolean {
   // Sec-Fetch-Dest is the most reliable signal, but some networks/routers strip Sec-* headers
   if (req.headers['sec-fetch-dest']) return true;
@@ -15,11 +17,12 @@ export function blockNonBrowserMiddleware(
   next: NextFunction,
 ) {
   if (!isBrowserRequest(req)) {
-    res.locals['nonBrowser'] = true;
-    res.status(401).end();
-    return;
+    res.locals['requestType'] = 'crawler';
+    if (getConfig().BLOCK_NON_BROWSERS) {
+      res.status(401).end();
+      return;
+    }
   }
-
   next();
 }
 
@@ -40,7 +43,8 @@ export function blockScannersMiddleware(
   next: NextFunction,
 ) {
   if (BLOCKED_PATTERNS.some((p) => p.test(req.path))) {
-    res.status(404).end();
+    res.locals['requestType'] = 'crawler';
+    res.status(401).end();
     return;
   }
   next();
