@@ -4,6 +4,49 @@ import { PASS_WORD, USER_NAME } from './config';
 
 const SEED_DATA_CLIENT_FIRST_NAME = 'Car Assignment';
 
+test('edit-and-delete-car', async ({ page }) => {
+  await page.goto('login');
+
+  await page.getByLabel('Benutzername').fill(USER_NAME);
+  await page.getByLabel('Passwort').fill(PASS_WORD);
+  await page.getByTestId('login-button').click();
+  await expect(page.getByTestId('login-button')).not.toBeVisible();
+
+  await page.goto('cars');
+
+  // create a car to edit and delete
+  const uniquePlate = `EDIT-${Date.now()}`;
+  await page.getByTestId('button-car-create').click();
+
+  await page.getByLabel('Kennzeichen').fill(uniquePlate);
+  await page.getByLabel('Hersteller').fill('EditMarke');
+  await page.getByLabel('Modell').fill('OriginalModell');
+
+  await page.getByTestId('button-car-save').click();
+  await page.keyboard.press('Escape');
+
+  const newRow = page
+    .getByTestId(/car-row-.*/)
+    .filter({ hasText: uniquePlate });
+  await expect(newRow).toBeVisible();
+
+  // edit: change the model field
+  await newRow.click();
+  await page.getByLabel('Modell').click({ clickCount: 3 });
+  await page.getByLabel('Modell').fill('UpdatedModell');
+  await page.getByTestId('button-car-save').click();
+  await page.keyboard.press('Escape');
+
+  await expect(newRow.getByTestId(/car-model-.*/)).toHaveText('UpdatedModell');
+
+  // delete the car
+  await newRow.hover();
+  await newRow.getByTestId(/button-car-delete-.*/).click();
+  await page.getByTestId('confirm-dialog-button-confirm').click();
+
+  await expect(newRow).not.toBeVisible();
+});
+
 test('assign-owner-to-car-and-see-it-under-client', async ({ page }) => {
   await page.goto('login');
 
