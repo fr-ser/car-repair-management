@@ -53,12 +53,6 @@ export default function useTableData<T>(
     placeholderData: [],
   });
 
-  React.useEffect(() => {
-    if (debouncedSearchTerm !== searchTerm) {
-      setPage(0);
-    }
-  }, [debouncedSearchTerm, searchTerm]);
-
   const handleChangePage = async (_: unknown, newPage: number) => {
     setPage(newPage);
     await fetchData(newPage, rowsPerPage, debouncedSearchTerm);
@@ -74,6 +68,7 @@ export default function useTableData<T>(
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    setPage(0);
   };
 
   const refetch = () => fetchData(page, rowsPerPage, debouncedSearchTerm);

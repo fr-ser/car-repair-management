@@ -62,9 +62,6 @@ function ItemRow({
   const [articleInputValue, setArticleInputValue] = React.useState(
     pos.articleId.value,
   );
-  const [localSelectedArticle, setLocalSelectedArticle] =
-    React.useState<BackendArticle | null>(null);
-  const hasUserEdited = React.useRef(false);
   const debouncedSearch = useDebounce(articleSearch, 300);
 
   const { data: articlesData } = useQuery({
@@ -77,26 +74,8 @@ function ItemRow({
     [articlesData],
   );
 
-  // Sync display value from form state until the user edits the field.
-  // Upgrades a raw article ID to the full "id – description" label once options load.
-  React.useEffect(() => {
-    if (hasUserEdited.current || localSelectedArticle) return;
-    if (!pos.articleId.value) {
-      setArticleInputValue('');
-      return;
-    }
-    const found = articleOptions.find((a) => a.id === pos.articleId.value);
-    if (found) {
-      setLocalSelectedArticle(found);
-      setArticleInputValue(found.id);
-    } else {
-      setArticleInputValue(pos.articleId.value);
-    }
-  }, [pos.articleId.value, articleOptions, localSelectedArticle]);
-
   const selectedArticle = pos.articleId.value
-    ? (articleOptions.find((a) => a.id === pos.articleId.value) ??
-      localSelectedArticle)
+    ? (articleOptions.find((a) => a.id === pos.articleId.value) ?? null)
     : null;
 
   const handleArticleChange = (
@@ -104,17 +83,14 @@ function ItemRow({
     value: BackendArticle | string | null,
   ) => {
     if (value && typeof value === 'object') {
-      setLocalSelectedArticle(value);
       onUpdate(index, 'articleId', value.id);
       onUpdate(index, 'description', value.description);
       onUpdate(index, 'pricePerUnit', formatNumber(Number(value.price)));
       setArticleInputValue(value.id);
     } else if (typeof value === 'string') {
-      setLocalSelectedArticle(null);
       onUpdate(index, 'articleId', value);
       setArticleInputValue(value);
     } else {
-      setLocalSelectedArticle(null);
       onUpdate(index, 'articleId', '');
     }
   };
@@ -180,12 +156,9 @@ function ItemRow({
           if (reason === 'reset') return;
           setArticleInputValue(value);
           if (reason === 'input') {
-            hasUserEdited.current = true;
             setArticleSearch(value);
-            setLocalSelectedArticle(null);
           } else if (reason === 'clear') {
             setArticleSearch('');
-            setLocalSelectedArticle(null);
             onUpdate(index, 'articleId', '');
           }
         }}
@@ -199,9 +172,7 @@ function ItemRow({
             error={!!pos.articleId.errorMessage}
             helperText={pos.articleId.errorMessage}
             onBlur={() => {
-              if (!localSelectedArticle) {
-                onUpdate(index, 'articleId', articleInputValue);
-              }
+              onUpdate(index, 'articleId', articleInputValue);
             }}
             slotProps={{
               htmlInput: {
@@ -214,7 +185,7 @@ function ItemRow({
                   <InputAdornment position="start">
                     <Tooltip
                       title={
-                        localSelectedArticle
+                        selectedArticle
                           ? 'Bestandsartikel'
                           : 'Kein Bestandsartikel'
                       }
@@ -222,7 +193,7 @@ function ItemRow({
                       <span style={{ display: 'flex' }}>
                         <InventoryIcon
                           fontSize="small"
-                          color={localSelectedArticle ? 'success' : 'disabled'}
+                          color={selectedArticle ? 'success' : 'disabled'}
                         />
                       </span>
                     </Tooltip>

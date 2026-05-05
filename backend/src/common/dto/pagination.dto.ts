@@ -22,11 +22,11 @@ export class SearchPaginationQueryDto {
 }
 
 export class PaginationMeta {
-  totalItems: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
+  declare totalItems: number;
+  declare page: number;
+  declare limit: number;
+  declare totalPages: number;
+  declare hasNextPage: boolean;
 }
 
 export class PaginatedResponseDto<T> {

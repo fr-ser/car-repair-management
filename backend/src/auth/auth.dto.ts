@@ -3,16 +3,16 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class LoginDto {
   @IsString()
   @IsNotEmpty()
-  userName: string;
+  declare userName: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string;
+  declare password: string;
 }
 
 export class TokenDto {
-  sub: number; // userId
-  userName: string;
-  iat: number; // issued at
-  exp: number; // expires at
+  declare sub: number; // userId
+  declare userName: string;
+  declare iat: number; // issued at
+  declare exp: number; // expires at
 }

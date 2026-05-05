@@ -63,7 +63,6 @@ function CarAutocomplete({
   onChange: (id: number | null, clientId: number | null) => void;
 }) {
   const [search, setSearch] = React.useState('');
-  const [inputValue, setInputValue] = React.useState('');
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: carsData } = useQuery({
@@ -88,19 +87,8 @@ function CarAutocomplete({
       ? (carOptions.find((c) => c.id === carId) ?? selectedCarData ?? null)
       : null;
 
-  React.useEffect(() => {
-    if (selectedCar) {
-      setInputValue(
-        `${selectedCar.carNumber ?? ''} – ${selectedCar.licensePlate}`,
-      );
-    }
-  }, [selectedCar]);
-
   const handleChange = (_: React.SyntheticEvent, value: BackendCar | null) => {
     onChange(value?.id ?? null, value?.clientId ?? null);
-    if (value) {
-      setInputValue(`${value.carNumber ?? ''} – ${value.licensePlate}`);
-    }
   };
 
   return (
@@ -111,10 +99,9 @@ function CarAutocomplete({
       }
       value={selectedCar}
       onChange={handleChange}
-      inputValue={inputValue}
-      onInputChange={(_, value) => {
-        setInputValue(value);
-        setSearch(value);
+      onInputChange={(_, value, reason) => {
+        if (reason === 'input') setSearch(value);
+        else if (reason === 'clear') setSearch('');
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (
@@ -148,7 +135,6 @@ function ClientAutocomplete({
   onChange: (id: number | null) => void;
 }) {
   const [search, setSearch] = React.useState('');
-  const [inputValue, setInputValue] = React.useState('');
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: clientsData } = useQuery({
@@ -183,20 +169,11 @@ function ClientAutocomplete({
         null)
       : null;
 
-  React.useEffect(() => {
-    if (selectedClient) {
-      setInputValue(clientOptionLabel(selectedClient));
-    }
-  }, [selectedClient]);
-
   const handleChange = (
     _: React.SyntheticEvent,
     value: BackendClient | null,
   ) => {
     onChange(value?.id ?? null);
-    if (value) {
-      setInputValue(clientOptionLabel(value));
-    }
   };
 
   return (
@@ -205,10 +182,9 @@ function ClientAutocomplete({
       getOptionLabel={(option) => clientOptionLabel(option)}
       value={selectedClient}
       onChange={handleChange}
-      inputValue={inputValue}
-      onInputChange={(_, value) => {
-        setInputValue(value);
-        if (filterClientId == null) setSearch(value);
+      onInputChange={(_, value, reason) => {
+        if (reason === 'input' && filterClientId == null) setSearch(value);
+        else if (reason === 'clear') setSearch('');
       }}
       filterOptions={(x) => x}
       renderInput={(params) => (
@@ -310,7 +286,6 @@ export default function OrderDetailsModal({
 }: OrderDetailsModalProps) {
   const { showNotification } = useNotification();
   const navigate = useNavigate();
-  const [carClientId, setCarClientId] = React.useState<number | null>(null);
 
   const { data: selectedOrder, isLoading: isOrderLoading } = useQuery({
     queryKey: ['order', selectedOrderId],
@@ -329,6 +304,13 @@ export default function OrderDetailsModal({
     removePosition,
     getPayload,
   } = useOrderForm(selectedOrder);
+
+  const { data: selectedCarData } = useQuery({
+    queryKey: ['car', formData.carId.value],
+    queryFn: () => apiService.fetchCar(formData.carId.value!),
+    enabled: formData.carId.value != null,
+  });
+  const carClientId = selectedCarData?.clientId ?? null;
 
   const queryClient = useQueryClient();
 
@@ -384,13 +366,11 @@ export default function OrderDetailsModal({
 
   const onCleanAndClose = () => {
     reloadForm();
-    setCarClientId(null);
     onClose();
   };
 
   React.useEffect(() => {
     reloadForm(selectedOrder);
-    setCarClientId(selectedOrder?.clientId ?? null);
   }, [selectedOrder, reloadForm]);
 
   const { data: clientForAutoFill } = useQuery({
@@ -402,7 +382,6 @@ export default function OrderDetailsModal({
   React.useEffect(() => {
     if (clientForAutoFill?.cars.length === 1 && formData.carId.value === null) {
       onFormInputChange('carId', clientForAutoFill.cars[0].id);
-      setCarClientId(clientForAutoFill.id);
     }
   }, [clientForAutoFill, formData.carId.value, onFormInputChange]);
 
@@ -637,7 +616,6 @@ export default function OrderDetailsModal({
                         errorMessage={formData.carId.errorMessage}
                         onChange={(id, clientId) => {
                           onFormInputChange('carId', id);
-                          setCarClientId(id !== null ? clientId : null);
                           if (
                             id !== null &&
                             clientId != null &&

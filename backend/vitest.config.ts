@@ -3,6 +3,8 @@ import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // nest.js requires "swc" so we disable oxc
+  oxc: false,
   test: {
     setupFiles: ['src/test-setup.ts'],
     include: ['**/*.{spec,e2e-spec}.[jt]s'],

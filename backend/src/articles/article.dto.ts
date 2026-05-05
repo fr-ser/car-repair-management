@@ -9,14 +9,14 @@ import {
 export class CreateArticleDto {
   @IsNotEmpty()
   @IsString()
-  id: string;
+  declare id: string;
 
   @IsString()
-  description: string;
+  declare description: string;
 
   @IsNotEmpty()
   @IsNumberString()
-  price: string;
+  declare price: string;
 
   @IsOptional()
   @IsNumberString()

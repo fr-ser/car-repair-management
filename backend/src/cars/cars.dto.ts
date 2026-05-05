@@ -37,15 +37,15 @@ export class TireFormat implements ValidatorConstraintInterface {
 export class CreateCarDto {
   @IsString()
   @IsNotEmpty()
-  licensePlate: string;
+  declare licensePlate: string;
 
   @IsString()
   @IsNotEmpty()
-  manufacturer: string;
+  declare manufacturer: string;
 
   @IsString()
   @IsNotEmpty()
-  model: string;
+  declare model: string;
 
   @IsString()
   @IsOptional()

@@ -2,13 +2,14 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IncomingMessage } from 'http';
 import pactum from 'pactum';
-import { createTestClientApp, resetDatabase } from 'test/helpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { LoginDto } from '@/src/auth/auth.dto';
 import { AuthService } from '@/src/auth/auth.service';
 import { AUTH_JWT_COOKIE_KEY } from '@/src/config';
 import { PrismaService } from '@/src/prisma/prisma.service';
+
+import { createTestClientApp, resetDatabase } from './helpers';
 
 describe('Auth e2e', () => {
   let app: INestApplication;

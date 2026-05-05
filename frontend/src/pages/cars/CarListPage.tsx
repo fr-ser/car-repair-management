@@ -1,7 +1,8 @@
 import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import { NEW_ENTITY_ID } from '@/src/utils/routes';
 
 import CarDetailsModal from './components/CarDetailsModal';
 import CarsTable from './components/CarsTable';
@@ -12,38 +13,13 @@ export default function CarListPage() {
   const { id: idParam } = useParams();
   const navigate = useNavigate();
 
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [selectedId, setSelectedId] = React.useState<number | undefined>(
-    undefined,
-  );
+  const modalOpen = !!idParam;
+  const selectedId =
+    idParam && idParam !== NEW_ENTITY_ID ? Number(idParam) : undefined;
 
-  React.useEffect(() => {
-    if (idParam) {
-      setSelectedId(Number(idParam));
-      setModalOpen(true);
-    } else {
-      setModalOpen(false);
-      setSelectedId(undefined);
-    }
-  }, [idParam]);
-
-  const handleOpen = (carId: number) => {
-    setSelectedId(carId);
-    setModalOpen(true);
-  };
-
-  const handleCreate = () => {
-    setSelectedId(undefined);
-    setModalOpen(true);
-  };
-
-  const handleClose = () => {
-    setModalOpen(false);
-    setSelectedId(undefined);
-    if (idParam) {
-      navigate('/cars', { replace: true });
-    }
-  };
+  const handleOpen = (carId: number) => navigate(`/cars/${carId}`);
+  const handleCreate = () => navigate(`/cars/${NEW_ENTITY_ID}`);
+  const handleClose = () => navigate('/cars', { replace: true });
 
   return (
     <Box>

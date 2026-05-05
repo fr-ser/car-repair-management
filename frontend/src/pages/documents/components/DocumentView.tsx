@@ -85,8 +85,12 @@ export function DocumentView({ document }: Props) {
         ? 'Überweisung'
         : (document.paymentMethod ?? '');
 
-  // Running item index (headings don't count)
-  let itemIndex = 0;
+  // Pre-compute sequential item numbers (headings are skipped, so they get 0)
+  const itemIndices = document.positions.reduce<number[]>((acc, pos) => {
+    const prev = acc[acc.length - 1] ?? 0;
+    acc.push(pos.type === 'heading' ? 0 : prev + 1);
+    return acc;
+  }, []);
 
   return (
     <div
@@ -241,7 +245,7 @@ export function DocumentView({ document }: Props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {document.positions.map((pos) => {
+          {document.positions.map((pos, posIdx) => {
             if (pos.type === 'heading') {
               const headingCellSx = {
                 border: '1px solid #bdbdbd',
@@ -265,7 +269,7 @@ export function DocumentView({ document }: Props) {
               );
             }
 
-            itemIndex += 1;
+            const itemIndex = itemIndices[posIdx];
             const price =
               pos.pricePerUnit != null ? Number(pos.pricePerUnit) : 0;
             const amount = pos.amount != null ? Number(pos.amount) : 0;
