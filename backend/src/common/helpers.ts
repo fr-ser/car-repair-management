@@ -114,7 +114,7 @@ export function getItemSum(items: { price?: number; amount?: number }[]) {
   return round(
     items.reduce((curr, item) => {
       if (item.price == null || item.amount == null) return curr;
-      else return (curr += round(item.price * item.amount, 2));
+      else return curr + round(item.price * item.amount, 2);
     }, 0),
     2,
   );

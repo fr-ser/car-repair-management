@@ -60,7 +60,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setSelectedIds(new Set());

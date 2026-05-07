@@ -135,8 +135,11 @@ function ItemRow({
             ? option
             : `${option.id} – ${option.description}`
         }
-        renderOption={(props, option) => (
-          <li {...props} key={typeof option === 'string' ? option : option.id}>
+        renderOption={({ key: _key, ...optionProps }, option) => (
+          <li
+            key={typeof option === 'string' ? option : option.id}
+            {...optionProps}
+          >
             <Box>
               <Typography variant="body2" fontWeight="bold">
                 {typeof option === 'string' ? option : option.id}
@@ -358,7 +361,7 @@ export default function OrderPositionsEditor({
       {positions.map((pos, index) =>
         pos.type === 'heading' ? (
           <HeadingRow
-            key={index}
+            key={pos.id}
             pos={pos}
             index={index}
             onUpdate={onUpdate}
@@ -369,7 +372,7 @@ export default function OrderPositionsEditor({
           />
         ) : (
           <ItemRow
-            key={index}
+            key={pos.id}
             pos={pos}
             index={index}
             onUpdate={onUpdate}

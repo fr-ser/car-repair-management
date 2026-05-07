@@ -2,7 +2,7 @@
  * This function is for compile time checking of completeness of if statements
  * It needs to be passed the parameter, that has been checked exhaustively
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 export function neverFunction(_: never): never {
   throw new Error('This function should not have been called.');
 }

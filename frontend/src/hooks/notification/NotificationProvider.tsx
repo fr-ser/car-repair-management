@@ -1,16 +1,12 @@
 import { Snackbar, SnackbarCloseReason } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import React, { ReactNode, createContext, useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 
 import {
   DEFAULT_NOTIFICATION_OPTIONS,
-  NotificationContextType,
+  NotificationContext,
   NotificationOptions,
 } from './types';
-
-export const NotificationContext = createContext<
-  NotificationContextType | undefined
->(undefined);
 
 interface NotificationProviderProps {
   children: ReactNode;
@@ -47,7 +43,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   );
 
   return (
-    <NotificationContext.Provider value={{ showNotification }}>
+    <NotificationContext value={{ showNotification }}>
       {children}
       <Snackbar
         open={open}
@@ -59,6 +55,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
           {options.message}
         </Alert>
       </Snackbar>
-    </NotificationContext.Provider>
+    </NotificationContext>
   );
 };

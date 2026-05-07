@@ -80,7 +80,7 @@ function getFromFromClient(data?: BackendCar): CarForm {
 }
 
 export function useCarForm(data?: BackendCar) {
-  const [formData, setFormData] = React.useState<CarForm>(
+  const [formData, setFormData] = React.useState<CarForm>(() =>
     getFromFromClient(data),
   );
 

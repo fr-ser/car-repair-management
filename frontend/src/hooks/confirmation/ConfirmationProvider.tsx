@@ -6,17 +6,13 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import React, { ReactNode, createContext, useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 
 import {
-  ConfirmationContextType,
+  ConfirmationContext,
   ConfirmationOptions,
   DEFAULT_OPTIONS,
 } from './types';
-
-export const ConfirmationContext = createContext<
-  ConfirmationContextType | undefined
->(undefined);
 
 interface ConfirmationProviderProps {
   children: ReactNode;
@@ -63,7 +59,7 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
   }, [promise]);
 
   return (
-    <ConfirmationContext.Provider value={{ confirm }}>
+    <ConfirmationContext value={{ confirm }}>
       {children}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{options.title}</DialogTitle>
@@ -82,6 +78,6 @@ export const ConfirmationProvider: React.FC<ConfirmationProviderProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </ConfirmationContext.Provider>
+    </ConfirmationContext>
   );
 };

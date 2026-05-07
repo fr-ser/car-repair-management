@@ -342,12 +342,18 @@ export function DocumentView({ document }: Props) {
         <tbody>
           <tr>
             {[
-              formatNumber(netTotal, { currency: true }),
-              formatNumber(vatAmount, { currency: true }),
-              formatNumber(grossTotal, { currency: true }),
-            ].map((v, i) => (
+              { key: 'net', value: formatNumber(netTotal, { currency: true }) },
+              {
+                key: 'vat',
+                value: formatNumber(vatAmount, { currency: true }),
+              },
+              {
+                key: 'gross',
+                value: formatNumber(grossTotal, { currency: true }),
+              },
+            ].map(({ key, value }) => (
               <td
-                key={i}
+                key={key}
                 style={{
                   width: '33%',
                   border: '1px solid #000',
@@ -355,7 +361,7 @@ export function DocumentView({ document }: Props) {
                   padding: '2px 4px',
                 }}
               >
-                {v}
+                {value}
               </td>
             ))}
           </tr>
