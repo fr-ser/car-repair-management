@@ -46,11 +46,11 @@ export enum PositionType {
 
 export class CreateOrderPositionDto {
   @IsEnum(PositionType)
-  type: PositionType;
+  declare type: PositionType;
 
   @IsInt()
   @Min(0)
-  sortOrder: number;
+  declare sortOrder: number;
 
   @IsOptional()
   @IsString()
@@ -80,7 +80,7 @@ export class CreateOrderPositionDto {
 export class CreateOrderDto {
   @IsNotEmpty()
   @IsString()
-  title: string;
+  declare title: string;
 
   @IsOptional()
   @IsString()
@@ -88,7 +88,7 @@ export class CreateOrderDto {
 
   @IsDateString()
   @MaxLength(10)
-  orderDate: string;
+  declare orderDate: string;
 
   @IsOptional()
   @IsNumberString()
@@ -108,10 +108,10 @@ export class CreateOrderDto {
   paymentDueDate?: string;
 
   @IsInt()
-  carId: number;
+  declare carId: number;
 
   @IsInt()
-  clientId: number;
+  declare clientId: number;
 
   @IsOptional()
   @IsArray()

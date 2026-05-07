@@ -7,25 +7,23 @@ import MaskedTextField from './MaskedTextField';
 
 interface CustomProps {
   onChange: (event: { target: { value: string } }) => void;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-const NumberInputMask = React.forwardRef<HTMLInputElement, CustomProps>(
-  function NumberTextField(props, ref) {
-    const { onChange, ...other } = props;
-    return (
-      <IMaskInput
-        {...other}
-        mask={Number}
-        scale={5}
-        thousandsSeparator={THOUSANDS_SEPARATOR}
-        radix={DECIMAL_SEPARATOR}
-        inputRef={ref}
-        onAccept={(value) => onChange({ target: { value } })}
-        overwrite
-      />
-    );
-  },
-);
+function NumberInputMask({ onChange, ref, ...other }: CustomProps) {
+  return (
+    <IMaskInput
+      {...other}
+      mask={Number}
+      scale={5}
+      thousandsSeparator={THOUSANDS_SEPARATOR}
+      radix={DECIMAL_SEPARATOR}
+      inputRef={ref}
+      onAccept={(value) => onChange({ target: { value } })}
+      overwrite
+    />
+  );
+}
 
 interface DecimalTextFieldProps {
   value: string;

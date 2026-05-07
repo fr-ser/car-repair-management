@@ -162,7 +162,7 @@ describe('DocumentsService', () => {
         limit: 10,
         skip: 0,
         search: undefined,
-      } as never);
+      });
 
       expect(result.data).toEqual(docs);
       expect(result.meta.totalItems).toBe(1);
@@ -177,7 +177,7 @@ describe('DocumentsService', () => {
         limit: 10,
         skip: 0,
         search: 'Smith',
-      } as never);
+      });
 
       expect(mockPrisma.document.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

@@ -1,3 +1,5 @@
+import { createContext } from 'react';
+
 export interface ConfirmationOptions {
   message: string;
   title?: string;
@@ -15,3 +17,7 @@ export const DEFAULT_OPTIONS = {
   confirmText: 'Bestätigen',
   cancelText: 'Abbrechen',
 };
+
+export const ConfirmationContext = createContext<
+  ConfirmationContextType | undefined
+>(undefined);

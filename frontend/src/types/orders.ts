@@ -44,6 +44,7 @@ export type UpdateOrderRequest = Partial<CreateOrderRequest>;
 type OrderFormField<V = string> = { value: V; errorMessage?: string };
 
 export type PositionFormRow = {
+  id: string;
   type: PositionType;
   // heading
   text: OrderFormField;

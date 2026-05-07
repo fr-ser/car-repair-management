@@ -43,7 +43,7 @@ function getFromFromClient(data?: BackendClient): ClientForm {
 }
 
 export function useClientForm(data?: BackendClient) {
-  const [formData, setFormData] = React.useState<ClientForm>(
+  const [formData, setFormData] = React.useState<ClientForm>(() =>
     getFromFromClient(data),
   );
 

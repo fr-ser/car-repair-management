@@ -85,8 +85,11 @@ export default function OrdersCard({ clientId, carId }: OrdersCardProps) {
         ) : orders.length === 0 ? (
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ py: 2, textAlign: 'center' }}
+            sx={{
+              color: 'text.secondary',
+              py: 2,
+              textAlign: 'center',
+            }}
           >
             Keine Aufträge vorhanden
           </Typography>
@@ -106,8 +109,11 @@ export default function OrdersCard({ clientId, carId }: OrdersCardProps) {
                 >
                   <Typography
                     variant="caption"
-                    fontWeight={600}
-                    sx={{ minWidth: 36, fontFamily: 'monospace' }}
+                    sx={{
+                      fontWeight: 600,
+                      minWidth: 36,
+                      fontFamily: 'monospace',
+                    }}
                   >
                     {order.orderNumber}
                   </Typography>
@@ -132,8 +138,10 @@ export default function OrdersCard({ clientId, carId }: OrdersCardProps) {
                   />
                   <Typography
                     variant="caption"
-                    color="text.disabled"
-                    sx={{ whiteSpace: 'nowrap' }}
+                    sx={{
+                      color: 'text.disabled',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
                     {order.orderDate}
                   </Typography>
@@ -163,8 +171,8 @@ export default function OrdersCard({ clientId, carId }: OrdersCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               variant="caption"
-              color="text.secondary"
               sx={{
+                color: 'text.secondary',
                 display: 'block',
                 textAlign: 'center',
                 py: 0.75,

@@ -24,7 +24,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import useConfirmation from '@/src/hooks/confirmation/useConfirmation';
 import useNotification from '@/src/hooks/notification/useNotification';
@@ -60,11 +60,17 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
 
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
 
-  useEffect(() => {
+  const handlePageChange = (event: unknown, newPage: number) => {
     setSelectedIds(new Set());
-  }, [page, searchTerm]);
+    handlers.onPageChange(event, newPage);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedIds(new Set());
+    handlers.onSearchChange(event);
+  };
 
   const allOnPageSelected =
     documents.length > 0 && documents.every((doc) => selectedIds.has(doc.id));
@@ -136,7 +142,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
               fullWidth
               placeholder="Suche nach Dokumentennummer oder Kunde"
               value={searchTerm}
-              onChange={handlers.onSearchChange}
+              onChange={handleSearchChange}
               slotProps={{
                 input: {
                   startAdornment: (
@@ -262,7 +268,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
                 count={totalItems}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={handlers.onPageChange}
+                onPageChange={handlePageChange}
                 onRowsPerPageChange={handlers.onRowsPerPageChange}
                 sx={{
                   '& .MuiTablePagination-selectLabel': {

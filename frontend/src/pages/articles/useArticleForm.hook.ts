@@ -18,7 +18,7 @@ function getFormFromArticle(data?: BackendArticle): ArticleForm {
 }
 
 export function useArticleForm(data?: BackendArticle) {
-  const [formData, setFormData] = React.useState<ArticleForm>(
+  const [formData, setFormData] = React.useState<ArticleForm>(() =>
     getFormFromArticle(data),
   );
 

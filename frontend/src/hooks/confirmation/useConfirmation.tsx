@@ -1,10 +1,9 @@
-import { useContext } from 'react';
+import { use } from 'react';
 
-import { ConfirmationContext } from './ConfirmationProvider';
-import { ConfirmationContextType } from './types';
+import { ConfirmationContext, ConfirmationContextType } from './types';
 
 const useConfirmation = (): ConfirmationContextType => {
-  const context = useContext(ConfirmationContext);
+  const context = use(ConfirmationContext);
   if (!context) {
     throw new Error(
       'useConfirmation must be used within a ConfirmationProvider',

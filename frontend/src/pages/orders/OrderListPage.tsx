@@ -1,7 +1,8 @@
 import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+
+import { NEW_ENTITY_ID } from '@/src/utils/routes';
 
 import OrderDetailsModal from './components/OrderDetailsModal';
 import OrdersTable from './components/OrdersTable';
@@ -18,38 +19,13 @@ export default function OrderListPage() {
   const carIdParam = searchParams.get('carId');
   const carId = carIdParam ? Number(carIdParam) : undefined;
 
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [selectedId, setSelectedId] = React.useState<number | undefined>(
-    undefined,
-  );
+  const modalOpen = !!idParam;
+  const selectedId =
+    idParam && idParam !== NEW_ENTITY_ID ? Number(idParam) : undefined;
 
-  React.useEffect(() => {
-    if (idParam) {
-      setSelectedId(Number(idParam));
-      setModalOpen(true);
-    } else {
-      setModalOpen(false);
-      setSelectedId(undefined);
-    }
-  }, [idParam]);
-
-  const handleOpen = (orderId: number) => {
-    setSelectedId(orderId);
-    setModalOpen(true);
-  };
-
-  const handleCreate = () => {
-    setSelectedId(undefined);
-    setModalOpen(true);
-  };
-
-  const handleClose = () => {
-    setModalOpen(false);
-    setSelectedId(undefined);
-    if (idParam) {
-      navigate('/orders', { replace: true });
-    }
-  };
+  const handleOpen = (orderId: number) => navigate(`/orders/${orderId}`);
+  const handleCreate = () => navigate(`/orders/${NEW_ENTITY_ID}`);
+  const handleClose = () => navigate('/orders', { replace: true });
 
   return (
     <Box>

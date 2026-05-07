@@ -511,13 +511,16 @@ function renderSumTable(
   const netSum = data.order.positions.reduce(
     (acc: number, item: InvoicePosition) => {
       if ('heading' in item) return acc;
-      return (acc += parseFloat(
-        (
-          (item.pricePerUnit as number) *
-          (item.amount as number) *
-          (1 - (item.discount as number) / 100)
-        ).toFixed(2),
-      ));
+      return (
+        acc +
+        parseFloat(
+          (
+            (item.pricePerUnit as number) *
+            (item.amount as number) *
+            (1 - (item.discount as number) / 100)
+          ).toFixed(2),
+        )
+      );
     },
     0,
   );

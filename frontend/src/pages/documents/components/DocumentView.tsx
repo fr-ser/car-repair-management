@@ -85,8 +85,11 @@ export function DocumentView({ document }: Props) {
         ? 'Überweisung'
         : (document.paymentMethod ?? '');
 
-  // Running item index (headings don't count)
-  let itemIndex = 0;
+  // Pre-compute sequential item numbers (headings are skipped, so they get 0)
+  let itemCount = 0;
+  const itemIndices = document.positions.map((pos) =>
+    pos.type === 'heading' ? 0 : ++itemCount,
+  );
 
   return (
     <div
@@ -241,7 +244,7 @@ export function DocumentView({ document }: Props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {document.positions.map((pos) => {
+          {document.positions.map((pos, posIdx) => {
             if (pos.type === 'heading') {
               const headingCellSx = {
                 border: '1px solid #bdbdbd',
@@ -265,7 +268,7 @@ export function DocumentView({ document }: Props) {
               );
             }
 
-            itemIndex += 1;
+            const itemIndex = itemIndices[posIdx];
             const price =
               pos.pricePerUnit != null ? Number(pos.pricePerUnit) : 0;
             const amount = pos.amount != null ? Number(pos.amount) : 0;
@@ -338,12 +341,18 @@ export function DocumentView({ document }: Props) {
         <tbody>
           <tr>
             {[
-              formatNumber(netTotal, { currency: true }),
-              formatNumber(vatAmount, { currency: true }),
-              formatNumber(grossTotal, { currency: true }),
-            ].map((v, i) => (
+              { key: 'net', value: formatNumber(netTotal, { currency: true }) },
+              {
+                key: 'vat',
+                value: formatNumber(vatAmount, { currency: true }),
+              },
+              {
+                key: 'gross',
+                value: formatNumber(grossTotal, { currency: true }),
+              },
+            ].map(({ key, value }) => (
               <td
-                key={i}
+                key={key}
                 style={{
                   width: '33%',
                   border: '1px solid #000',
@@ -351,7 +360,7 @@ export function DocumentView({ document }: Props) {
                   padding: '2px 4px',
                 }}
               >
-                {v}
+                {value}
               </td>
             ))}
           </tr>

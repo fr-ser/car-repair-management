@@ -24,6 +24,7 @@ function computeNetSum(row: PositionFormRow): number {
 
 function makeEmptyHeading(): PositionFormRow {
   return {
+    id: crypto.randomUUID(),
     type: 'heading',
     text: { value: '' },
     articleId: { value: '' },
@@ -36,6 +37,7 @@ function makeEmptyHeading(): PositionFormRow {
 
 function makeEmptyItem(): PositionFormRow {
   return {
+    id: crypto.randomUUID(),
     type: 'item',
     text: { value: '' },
     articleId: { value: '' },
@@ -51,6 +53,7 @@ function positionFromBackend(
   pos: BackendOrderWithPositions['positions'][number],
 ): PositionFormRow {
   const row: PositionFormRow = {
+    id: String(pos.id),
     type: pos.type as PositionType,
     text: { value: pos.text ?? '' },
     articleId: { value: pos.articleId ?? '' },
@@ -94,7 +97,7 @@ function getFormFromOrder(data?: BackendOrderWithPositions): OrderForm {
 }
 
 export function useOrderForm(data?: BackendOrderWithPositions) {
-  const [formData, setFormData] = React.useState<OrderForm>(
+  const [formData, setFormData] = React.useState<OrderForm>(() =>
     getFormFromOrder(data),
   );
 

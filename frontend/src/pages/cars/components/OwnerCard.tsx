@@ -100,7 +100,12 @@ export default function OwnerCard({
               <PersonIcon
                 sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }}
               />
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
                 Kein Eigentümer zugeordnet
               </Typography>
             </Box>
@@ -121,7 +126,12 @@ export default function OwnerCard({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="body1" fontWeight={500}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontWeight: 500,
+                    }}
+                  >
                     {clientDisplayName(ownerData)}
                   </Typography>
                   <Tooltip title="In neuem Tab öffnen">
@@ -139,16 +149,20 @@ export default function OwnerCard({
                 </Box>
                 <Typography
                   variant="caption"
-                  display="block"
-                  color="text.secondary"
+                  sx={{
+                    display: 'block',
+                    color: 'text.secondary',
+                  }}
                 >
                   {ownerData.clientNumber}
                 </Typography>
                 {ownerData.phoneNumber && (
                   <Typography
                     variant="caption"
-                    display="block"
-                    color="text.secondary"
+                    sx={{
+                      display: 'block',
+                      color: 'text.secondary',
+                    }}
                   >
                     {ownerData.phoneNumber}
                   </Typography>
@@ -170,7 +184,6 @@ export default function OwnerCard({
           )}
         </CardContent>
       </Card>
-
       <Dialog
         open={assignDialogOpen}
         onClose={() => setAssignDialogOpen(false)}
@@ -194,8 +207,9 @@ export default function OwnerCard({
                 {...params}
                 label="Kunde suchen"
                 slotProps={{
+                  ...params.slotProps,
                   htmlInput: {
-                    ...params.inputProps,
+                    ...params.slotProps.htmlInput,
                     'data-testid': 'owner-autocomplete',
                   },
                 }}

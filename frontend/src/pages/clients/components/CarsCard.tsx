@@ -83,10 +83,20 @@ export default function CarsCard({
         {cars.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <CarIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               Noch keine Fahrzeuge zugeordnet
             </Typography>
-            <Typography variant="caption" color="text.disabled">
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.disabled',
+              }}
+            >
               Klicken Sie auf "Auto Zuordnen" um ein Fahrzeug hinzuzufügen
             </Typography>
           </Box>
@@ -135,11 +145,21 @@ export default function CarsCard({
                   }
                   secondary={
                     <Box>
-                      <Typography variant="caption" display="block">
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: 'block',
+                        }}
+                      >
                         Kennzeichen: {car.licensePlate}
                       </Typography>
                       {car.firstRegistration && (
-                        <Typography variant="caption" display="block">
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: 'block',
+                          }}
+                        >
                           Erstzulassung: {car.firstRegistration}
                         </Typography>
                       )}
