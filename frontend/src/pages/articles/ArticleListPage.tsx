@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import useModalState from '@/src/hooks/useModalState';
 import { BackendArticle } from '@/src/types/backend-contracts';
@@ -7,9 +8,8 @@ import { BackendArticle } from '@/src/types/backend-contracts';
 import ArticleDetailsModal from './components/ArticleDetailsModal';
 import ArticlesTable from './components/ArticlesTable';
 
-const queryClient = new QueryClient();
-
 export default function ArticleListPage() {
+  const [queryClient] = useState(() => new QueryClient());
   const { open, selected, handleOpen, handleCreate, handleClose } =
     useModalState<BackendArticle>();
 

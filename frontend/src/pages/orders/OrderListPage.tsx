@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { NEW_ENTITY_ID } from '@/src/utils/routes';
@@ -7,9 +8,8 @@ import { NEW_ENTITY_ID } from '@/src/utils/routes';
 import OrderDetailsModal from './components/OrderDetailsModal';
 import OrdersTable from './components/OrdersTable';
 
-const queryClient = new QueryClient();
-
 export default function OrderListPage() {
+  const [queryClient] = useState(() => new QueryClient());
   const { id: idParam } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

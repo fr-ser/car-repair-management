@@ -50,7 +50,6 @@ export default function useTableData<T>(
   const queryResult = useQuery({
     queryKey: [queryKey, page, rowsPerPage, debouncedSearchTerm],
     queryFn: () => fetchData(page, rowsPerPage, debouncedSearchTerm),
-    placeholderData: [],
   });
 
   const handleChangePage = async (_: unknown, newPage: number) => {
