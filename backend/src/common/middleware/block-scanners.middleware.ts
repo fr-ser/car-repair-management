@@ -17,7 +17,7 @@ export function blockNonBrowserMiddleware(
   next: NextFunction,
 ) {
   if (!isBrowserRequest(req)) {
-    res.locals['requestType'] = 'crawler';
+    res.locals['requestType'] = 'non-browser';
     if (getConfig().BLOCK_NON_BROWSERS) {
       res.status(401).end();
       return;
@@ -43,7 +43,7 @@ export function blockScannersMiddleware(
   next: NextFunction,
 ) {
   if (BLOCKED_PATTERNS.some((p) => p.test(req.path))) {
-    res.locals['requestType'] = 'crawler';
+    res.locals['requestType'] = 'scanner';
     res.status(401).end();
     return;
   }

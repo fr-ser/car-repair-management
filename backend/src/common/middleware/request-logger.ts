@@ -29,17 +29,17 @@ const stream = {
   },
 };
 
-// Every request gets exactly one tag. Crawler requests are blocked before the type
-// middleware runs, so the two are mutually exclusive. Max width: '[crawler] ' = 10 chars.
-// The WARN_SENTINEL is embedded here so the stream can route crawler lines to logger.warn
+// Every request gets exactly one tag. Max width: '[non-browser]' = 13 chars.
+// The WARN_SENTINEL is embedded here so the stream can route warn-level lines to logger.warn
 // without a separate token (a separate token returning '' would render as '-' in morgan).
 morgan.token('req-tags', (_req: Request, res: Response) => {
   const type = res.locals['requestType'] as string | undefined;
-  if (type === 'crawler') return WARN_SENTINEL + '[crawler] ';
-  if (type === 'static') return '[static]  ';
-  if (type === 'spa') return '[spa]     ';
-  if (type === 'api') return '[api]     ';
-  return '          ';
+  if (type === 'non-browser') return WARN_SENTINEL + '[non-browser]';
+  if (type === 'scanner') return WARN_SENTINEL + '[scanner]    ';
+  if (type === 'static') return '[static]     ';
+  if (type === 'spa') return '[spa]        ';
+  if (type === 'api') return '[api]        ';
+  return '             ';
 });
 
 morgan.token('res-size', (_req: Request, res: Response) => {
@@ -50,11 +50,12 @@ morgan.token('res-size', (_req: Request, res: Response) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)}mb`;
 });
 
-// Example log lines (tags padded to 10 chars; asset requests skipped unless LOG_ASSET_REQUESTS=true):
-// [Nest] 19607  - …    WARN [HTTP] [crawler]  ::1 localhost GET /.env - status:404 …
-// [Nest] 19607  - …     LOG [HTTP] [api]      ::1 localhost GET /api/orders - status:200 …
-// [Nest] 19607  - …     LOG [HTTP] [spa]      ::1 localhost GET / - status:200 …
-// [Nest] 19607  - …     LOG [HTTP] [static]   ::1 localhost GET /assets/index-abc.js - status:200 …
+// Example log lines (tags padded to 13 chars; asset requests skipped unless LOG_ASSET_REQUESTS=true):
+// [Nest] 19607  - …    WARN [HTTP] [scanner]     ::1 localhost GET /.env - status:401 …
+// [Nest] 19607  - …    WARN [HTTP] [non-browser] ::1 localhost GET /api/orders - status:401 …
+// [Nest] 19607  - …     LOG [HTTP] [api]         ::1 localhost GET /api/orders - status:200 …
+// [Nest] 19607  - …     LOG [HTTP] [spa]         ::1 localhost GET / - status:200 …
+// [Nest] 19607  - …     LOG [HTTP] [static]      ::1 localhost GET /assets/index-abc.js - status:200 …
 export const requestLogger = morgan(
   ':req-tags:remote-addr :req[Host] :method :url - status::status size::res-size time::response-time[0]ms',
   {
