@@ -86,11 +86,10 @@ export function DocumentView({ document }: Props) {
         : (document.paymentMethod ?? '');
 
   // Pre-compute sequential item numbers (headings are skipped, so they get 0)
-  const itemIndices = document.positions.reduce<number[]>((acc, pos) => {
-    const prev = acc[acc.length - 1] ?? 0;
-    acc.push(pos.type === 'heading' ? 0 : prev + 1);
-    return acc;
-  }, []);
+  let itemCount = 0;
+  const itemIndices = document.positions.map((pos) =>
+    pos.type === 'heading' ? 0 : ++itemCount,
+  );
 
   return (
     <div
