@@ -119,7 +119,13 @@ export default function CarDetailsModal({
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={4} pt={1}>
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              pt: 1,
+            }}
+          >
             <Grid size={{ xs: 12, lg: 8 }}>
               <Card elevation={2}>
                 <CardContent sx={{ pt: 0 }}>

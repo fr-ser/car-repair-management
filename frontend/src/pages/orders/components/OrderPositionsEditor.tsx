@@ -141,11 +141,21 @@ function ItemRow({
             {...optionProps}
           >
             <Box>
-              <Typography variant="body2" fontWeight="bold">
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 'bold',
+                }}
+              >
                 {typeof option === 'string' ? option : option.id}
               </Typography>
               {typeof option !== 'string' && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                  }}
+                >
                   {option.description}
                 </Typography>
               )}
@@ -178,12 +188,13 @@ function ItemRow({
               onUpdate(index, 'articleId', articleInputValue);
             }}
             slotProps={{
+              ...params.slotProps,
               htmlInput: {
-                ...params.inputProps,
+                ...params.slotProps.htmlInput,
                 'data-testid': `position-article-${index}`,
               },
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 startAdornment: pos.articleId.value ? (
                   <InputAdornment position="start">
                     <Tooltip

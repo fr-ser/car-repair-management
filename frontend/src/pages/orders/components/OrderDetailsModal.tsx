@@ -112,8 +112,9 @@ function CarAutocomplete({
           error={!!errorMessage}
           helperText={errorMessage}
           slotProps={{
+            ...params.slotProps,
             htmlInput: {
-              ...params.inputProps,
+              ...params.slotProps.htmlInput,
               'data-testid': 'order-autocomplete-car',
             },
           }}
@@ -195,8 +196,9 @@ function ClientAutocomplete({
           error={!!errorMessage}
           helperText={errorMessage}
           slotProps={{
+            ...params.slotProps,
             htmlInput: {
-              ...params.inputProps,
+              ...params.slotProps.htmlInput,
               'data-testid': 'order-autocomplete-client',
             },
           }}
@@ -231,7 +233,12 @@ function OrderDocumentsCard({ orderId }: { orderId: number }) {
         </Typography>
         {isPending && <CircularProgress size={20} />}
         {!isPending && (!documents || documents.length === 0) && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             Noch keine Dokumente
           </Typography>
         )}
@@ -259,7 +266,12 @@ function OrderDocumentsCard({ orderId }: { orderId: number }) {
                   <Typography variant="body2">
                     {documentTypeLabel(doc.type)} {doc.documentNumber}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                    }}
+                  >
                     {doc.documentDate}
                   </Typography>
                 </Box>
@@ -415,7 +427,13 @@ export default function OrderDetailsModal({
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={4} pt={1}>
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              pt: 1,
+            }}
+          >
             <Grid size={{ xs: 12 }}>
               {/* Daten card */}
               <Card elevation={2} sx={{ mb: 3 }}>
@@ -708,7 +726,12 @@ export default function OrderDetailsModal({
                       MwSt ({Math.round(vatRate * 100)}%):{' '}
                       {formatNumber(vatAmount, { currency: true })}
                     </Typography>
-                    <Typography variant="body1" fontWeight={600}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: 600,
+                      }}
+                    >
                       Brutto: {formatNumber(grossTotal, { currency: true })}
                     </Typography>
                   </Box>

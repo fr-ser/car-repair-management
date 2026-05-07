@@ -96,7 +96,13 @@ export default function ArticleDetailsModal({
         </Box>
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={4} pt={1}>
+        <Grid
+          container
+          spacing={4}
+          sx={{
+            pt: 1,
+          }}
+        >
           <Grid size={{ xs: 12 }}>
             <Card elevation={2}>
               <CardContent>
