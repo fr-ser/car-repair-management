@@ -59,16 +59,8 @@ jobs:
             backend/package-lock.json
             frontend/package-lock.json
 
-      - name: Install backend deps
-        working-directory: backend
-        run: npm ci
-
-      - name: Install frontend deps
-        working-directory: frontend
-        run: npm ci
-
-      - name: Install deps
-        run: npm ci
+      - name: Install all deps
+        run: make install
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium --only-shell

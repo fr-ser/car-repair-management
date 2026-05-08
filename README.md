@@ -53,11 +53,11 @@ make install
 
 Run the following commands in separate terminals:
 
-- Start backend: `make up-be`
-- Start frontend: `make up-fe`
+- Start backend: `make start-be`
+- Start frontend: `make start-fe`
 
 If not done before a local development database should also be created:
-`make --directory backend db-init`
+`make --directory backend init_db`
 
 This will create also a database seed with a user:
 
@@ -76,9 +76,10 @@ make build
 
 ## Testing
 
-Run Playwright end-to-end tests: `make test-e2e-playwright`
+Run tests across the entire project: `make test-all`
+Run root-level tests: `make test`
 
-In order to run tests with a UI use: `npx playwright test --ui`
+In order to run tests with a UI use: `make test-e2e-dev`
 
 ---
 
