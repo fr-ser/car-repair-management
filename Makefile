@@ -1,25 +1,21 @@
-# Top-level Makefile
 .PHONY: *
 
 help: ## Show help
-	@echo "[global]"
 	@echo "Available commands:"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-
-install: ## install all the dependencies for both BE and FE and setup local database
+install-all: ## install all the dependencies for both BE and FE
 	./check-prereqs.sh
 	npm install
-	@$(MAKE) --directory backend install
-	@$(MAKE) --directory frontend install
-	@$(MAKE) --directory backend init_db
+	cd backend && npm install
+	cd frontend && npm install
 
-up-be: ## start BE locally
-	@$(MAKE) --directory backend up
+start-be: ## start BE locally
+	@$(MAKE) --directory backend start
 
-up-fe: ## start FE locally
-	@$(MAKE) --directory frontend up
+start-fe: ## start FE locally
+	cd frontend && npm run dev
 
 # this command is used by playwright to start all services for testing
 start-playwright-services:
@@ -27,35 +23,32 @@ start-playwright-services:
 	cd backend && npx dotenv -e .env.test tsx prisma/seed/playwright.ts
 	cd backend && DISABLE_REQUEST_LOGGING=false CONFIG_PATH=.env.test node dist/main
 
-test-e2e-playwright: ## run playwright e2e tests
-	cd backend && npx dotenv -e .env.test prisma generate
-	cd frontend && npm run build -- --mode test
-	cd backend && npm run build
-	npx playwright test
-
-test-e2e-playwright-dev: ## run playwright UI tests against the running development instance
-	CONFIG_PATH=./backend/.env.development PLAYWRIGHT_PORT=5173 npx playwright test --ui
-
-format: ## Format files (root only)
-	npx eslint --fix
-
 format-all: ## Format files in root, backend, and frontend
 	npx eslint --fix
 	cd backend && npm run format
 	cd frontend && npm run format
 
-test: ## run all tests
-	npx eslint
-	@$(MAKE) test-e2e-playwright
+test-all: ## run all tests across all levels
+	cd frontend && npm run test
+	@$(MAKE) --directory backend test
+	@$(MAKE) test-e2e
 
+test-e2e: ## run playwright e2e tests
+	cd backend && npx dotenv -e .env.test prisma generate
+	cd frontend && npm run build -- --mode test
+	cd backend && npm run build
+	npx playwright test
 
-build: ## build backend and frontend for production
+test-e2e-dev: ## run playwright UI tests against the running development instance
+	CONFIG_PATH=./backend/.env.development PLAYWRIGHT_PORT=5173 npx playwright test --ui
+
+build-all: ## build backend and frontend for production
 	cd backend && npm run build
 	cd frontend && npm run build
 	mkdir -p backend/dist/static
 	cp -r frontend/dist/. backend/dist/static
 
-deploy-build: test-all build ## build, test, and upload to production machine
+deploy-build: test-all build-all ## build, test, and upload to production machine
 	@test -f backend/.env.production || (echo "Production env for the frontend not found!" && exit 1)
 
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'mkdir -p ~/apps/next-car-repair'
@@ -86,8 +79,3 @@ deploy-database-to-local: ## copy the production database to the local machine
 
 deploy-database-to-remote: ## copy the local database to the production machine
 	scp -P $${SSH_PORT} ./backend/production.db $${SSH_USER}@$${SSH_ADDRESS}:~/apps/car-repair/production.copy.db
-
-test-all: ## run all tests (including backend and frontend)
-	@$(MAKE) --directory frontend test
-	@$(MAKE) --directory backend test
-	@$(MAKE) test

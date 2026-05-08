@@ -5,13 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:non-interactive": "npx vite dev --clearScreen false",
+    "start:dev": "npm run dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "preview": "vite preview",
-    "test": "vitest run",
-    "test:cov": "vitest run --coverage"
+    "test": "eslint . && vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

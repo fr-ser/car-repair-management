@@ -14,18 +14,30 @@ This project is the successor of a legacy application (`werkstattapp-legacy`, al
 The legacy app defines all business logic and domain rules — refer to it when in doubt about what the application should do.
 Do not follow its technical patterns; use the conventions established in this repository instead.
 
+## Tooling Conventions
+
+**Make** is for three things:
+
+- Cross-workspace commands that span multiple packages (`build-all`, `test-all`, `format-all`, `install-all`)
+- Multi-step or complex commands that benefit from Makefile's sequential syntax (deployment targets, `test-e2e`, `start-playwright-services`)
+- Custom dev commands specific to this project (`start-be`, `start-fe`, `setup-clean-test-database`, `db-create-migration`, trigger commands, `run-prisma-studio`)
+
+**npm run** is for the classic per-package commands only: `dev`, `build`, `test`, `lint`, `format`.
+These stay in `package.json` for familiarity — CI, editors, and developers expect them there.
+
+When adding a new command: if it is `dev/build/test/lint/format`, add it to the relevant `package.json`.
+Everything else goes in the `Makefile`.
+
 ## Commands
 
 ### Root (Makefile)
 
 ```bash
-make up-be                # Start backend (dev mode)
-make up-fe                # Start frontend (dev mode)
-make build                # Build both for production
-make format               # Auto-fix lint issues (ESLint --fix)
-make test                 # Lint + Playwright e2e tests
+make install-all          # Install all dependencies
+make build-all            # Build both for production
+make format-all           # Auto-fix lint issues (root, backend, frontend)
 make test-all             # All tests: frontend, backend, e2e
-make test-e2e-playwright  # Playwright e2e tests only
+make test-e2e-dev         # Playwright e2e tests with UI
 ```
 
 ### Remote target (Raspberry Pi) — always use the Makefile as reference
@@ -49,14 +61,20 @@ All remote commands use `SSH_PORT`, `SSH_USER`, and `SSH_ADDRESS` env vars.
 ### Backend (`backend/`)
 
 ```bash
-make test                      # Lint + unit + e2e tests
+make test                      # Lint + type check + unit + e2e tests
 make setup-clean-test-database # Recreate clean test DB
+npm run build                  # Compile TypeScript
+npm run lint                   # Run ESLint
+npm run format                 # Auto-fix ESLint
 ```
 
 ### Frontend (`frontend/`)
 
 ```bash
-make test  # Lint + unit tests
+npm run build   # Production build
+npm run test    # Lint + unit tests
+npm run lint    # Run ESLint
+npm run format  # Auto-fix ESLint + Prettier
 ```
 
 ## Architecture
