@@ -5,12 +5,11 @@ help: ## Show help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-install-all: ## install all the dependencies for both BE and FE and setup local database
+install-all: ## install all the dependencies for both BE and FE
 	./check-prereqs.sh
 	npm install
 	cd backend && npm install
 	cd frontend && npm install
-	@$(MAKE) --directory backend init_db
 
 start-be: ## start BE locally
 	@$(MAKE) --directory backend start

@@ -9,7 +9,7 @@ Make sure you have the following installed:
 - [Node.js](https://nodejs.org/) (recommended via [asdf](https://asdf-vm.com))
 - [Make](https://www.gnu.org/software/make/)
 
-You can run the following command `./check-prereqs.sh` to check the requirements or simply run `make install`, requirements will be checked before trying to install the env!
+You can run the following command `./check-prereqs.sh` to check the requirements or simply run `make install-all`, requirements will be checked before trying to install the env!
 
 ---
 
@@ -21,8 +21,7 @@ You can run the following command `./check-prereqs.sh` to check the requirements
 │   ├── src/      # Backend source code
 │   └── Makefile  # Backend-specific commands
 ├── frontend/     # Frontend service (UI application)
-│   ├── src/      # Frontend source code
-│   └── Makefile  # Frontend-specific commands
+│   └── src/      # Frontend source code
 ├── Makefile      # Top-level commands (orchestrates backend & frontend)
 └── README.md     # This file
 ```
@@ -44,7 +43,7 @@ make help
 Install all dependencies for backend and frontend:
 
 ```bash
-make install
+make install-all
 ```
 
 ---
@@ -56,10 +55,13 @@ Run the following commands in separate terminals:
 - Start backend: `make start-be`
 - Start frontend: `make start-fe`
 
-If not done before a local development database should also be created:
-`make --directory backend init_db`
+On first run, also initialise the local development database:
 
-This will create also a database seed with a user:
+```bash
+cd backend && make db-init
+```
+
+This creates a seeded database with a default user:
 
 - local user: `admin`
 - local password: `local`
@@ -69,7 +71,7 @@ This will create also a database seed with a user:
 Build backend and frontend assets:
 
 ```bash
-make build
+make build-all
 ```
 
 ---
@@ -77,9 +79,8 @@ make build
 ## Testing
 
 Run tests across the entire project: `make test-all`
-Run root-level tests: `make test`
 
-In order to run tests with a UI use: `make test-e2e-dev`
+In order to run e2e tests with a UI use: `make test-e2e-dev`
 
 ---
 
