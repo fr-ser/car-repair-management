@@ -145,6 +145,10 @@ All non-user-facing values must be in English: variable names, constants, enum v
   This includes production environment files (`.env`, `.env.production`, `deployment/production/`, `.envrc`) and any other file listed in `.gitignore`.
   These may contain secrets or production configuration that must not be accessed or modified by an agent unless the user explicitly approved it.
 
+- **The app is accessed over plain HTTP (no HTTPS) in production** — users open it directly via the Raspberry Pi's local IP address.
+  Do not use browser APIs that require a secure context (e.g. `crypto.randomUUID`, `navigator.clipboard`, Web Bluetooth, etc.).
+  Use plain alternatives instead (e.g. a module-level counter or `Math.random()`-based ID for local keys).
+
 - **Backend scripts (`backend/scripts/`) must be plain `.js` files using only Node.js built-ins.**
   The production machine (Raspberry Pi ARMv7) cannot compile native addons and `prisma generate` fails there.
   Use `node:sqlite` (built into Node.js ≥ 22.5) for database access.

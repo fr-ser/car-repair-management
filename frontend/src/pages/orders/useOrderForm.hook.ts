@@ -22,9 +22,14 @@ function computeNetSum(row: PositionFormRow): number {
   return price * amount * (1 - discount / 100);
 }
 
+// crypto.randomUUID() requires a secure context (HTTPS) — unavailable when accessing via plain HTTP on the local network
+function generatePositionId(): string {
+  return `new-${Date.now()}-${Math.random()}`;
+}
+
 function makeEmptyHeading(): PositionFormRow {
   return {
-    id: crypto.randomUUID(),
+    id: generatePositionId(),
     type: 'heading',
     text: { value: '' },
     articleId: { value: '' },
@@ -37,7 +42,7 @@ function makeEmptyHeading(): PositionFormRow {
 
 function makeEmptyItem(): PositionFormRow {
   return {
-    id: crypto.randomUUID(),
+    id: generatePositionId(),
     type: 'item',
     text: { value: '' },
     articleId: { value: '' },
