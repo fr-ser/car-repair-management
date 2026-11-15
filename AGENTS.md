@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 Keep this file updated when new patterns emerge.
 
@@ -108,14 +108,17 @@ The backend also serves the compiled frontend as static files.
 - `types/` — Shared TypeScript types
 - `theme.ts` — MUI theme
 
-State management uses TanStack Query for all server state. The app uses German locale (dayjs, date formats).
+State management uses TanStack Query for all server state.
+The app uses German locale (dayjs, date formats).
 
 ### Data model
 
 **Client** — has many **Cars** (optional FK).
 **Car** stores extensive vehicle details (registration, engine, service dates).
 **Article** is inventory.
-**Order** (Auftrag) — belongs to one **Car** and one **Client**. Has many **OrderPositions** (headings or items). Items can reference an **Article** (adjusts article inventory on save/update/delete).
+**Order** (Auftrag) — belongs to one **Car** and one **Client**.
+Has many **OrderPositions** (headings or items).
+Items can reference an **Article** (adjusts article inventory on save/update/delete).
 **User** stores hashed credentials only.
 
 Dates are stored as strings in SQLite (no native Date type).
@@ -134,11 +137,13 @@ Dates are stored as strings in SQLite (no native Date type).
 
 ### Import ordering (Prettier)
 
-Enforced by `@trivago/prettier-plugin-sort-imports`: external packages → `@/` paths → relative imports. Single quotes throughout.
+Enforced by `@trivago/prettier-plugin-sort-imports`: external packages → `@/` paths → relative imports.
+Single quotes throughout.
 
 ### Import paths (Frontend)
 
-Prefer `@/src/...` absolute imports over relative ones. Allowed exceptions:
+Prefer `@/src/...` absolute imports over relative ones.
+Allowed exceptions:
 
 - Direct siblings in the same directory (e.g. `./utils`)
 - Test files going one level up to the file under test (e.g. `../ComponentName` from a `__tests__/` folder)
@@ -150,7 +155,8 @@ Exception: when a file has a single export whose name matches the filename, use 
 
 ### Language
 
-All non-user-facing values must be in English: variable names, constants, enum values, database field values, seed data content, comments, commit messages, test descriptions, and any other code-level strings. German is only used where it is directly displayed to the end user in the UI (e.g. button labels, column headers, form labels, error messages shown on screen).
+All non-user-facing values must be in English: variable names, constants, enum values, database field values, seed data content, comments, commit messages, test descriptions, and any other code-level strings.
+German is only used where it is directly displayed to the end user in the UI (e.g. button labels, column headers, form labels, error messages shown on screen).
 
 ## AI Agent instructions
 
@@ -159,9 +165,13 @@ All non-user-facing values must be in English: variable names, constants, enum v
 
 - In markdown files, use one sentence per line in prose paragraphs.
 
-- **IMPORTANT: Never read or write gitignored files without approval.**
-  This includes production environment files (`.env`, `.env.production`, `deployment/production/`, `.envrc`) and any other file listed in `.gitignore`.
-  These may contain secrets or production configuration that must not be accessed or modified by an agent unless the user explicitly approved it.
+- **CRITICAL: Never touch or read production environment files.**
+  Never read, open, inspect, edit, or touch any production environment files in this repository (such as `.env.production`, `backend/.env.production`, `frontend/.env.production`, or any file containing production environment configurations).
+  These files contain sensitive production secrets and credentials and must remain strictly untouched and unread by agents under all circumstances.
+
+- **Never read or write gitignored files without approval.**
+  This includes local configuration and environment files (`.env`, `deployment/production/`, `.envrc`) and any other file listed in `.gitignore`.
+  These may contain secrets or configuration that must not be accessed or modified by an agent unless the user explicitly approved it.
 
 - **The app is accessed over plain HTTP (no HTTPS) in production** — users open it directly via the Raspberry Pi's local IP address.
   Do not use browser APIs that require a secure context (e.g. `crypto.randomUUID`, `navigator.clipboard`, Web Bluetooth, etc.).
