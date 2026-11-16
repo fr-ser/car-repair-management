@@ -56,7 +56,9 @@ class EnvironmentVariables {
   @IsNotEmpty() @IsString() declare DOC_COMPANY_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_COMPANY_SUB_TITLE: string;
   @IsNotEmpty() @IsString() declare DOC_STREET_AND_NUMBER: string;
-  @IsNotEmpty() @IsString() declare DOC_ZIP_AND_CITY: string;
+  @IsNotEmpty() @IsString() declare DOC_POSTAL_CODE?: string;
+  @IsNotEmpty() @IsString() declare DOC_CITY?: string;
+  @IsNotEmpty() @IsString() declare DOC_ZIP_AND_CITY?: string;
   @IsNotEmpty() @IsString() declare DOC_PHONE_NUMBER: string;
   @IsNotEmpty() @IsString() declare DOC_EMAIL: string;
   @IsNotEmpty() @IsString() declare DOC_OWNER: string;
@@ -82,6 +84,8 @@ export type AppConfig = {
   DOC_COMPANY_TITLE: string;
   DOC_COMPANY_SUB_TITLE: string;
   DOC_STREET_AND_NUMBER: string;
+  DOC_POSTAL_CODE: string;
+  DOC_CITY: string;
   DOC_ZIP_AND_CITY: string;
   DOC_PHONE_NUMBER: string;
   DOC_EMAIL: string;
@@ -108,6 +112,8 @@ export function getConfig(): AppConfig {
       DOC_COMPANY_TITLE: process.env.DOC_COMPANY_TITLE!,
       DOC_COMPANY_SUB_TITLE: process.env.DOC_COMPANY_SUB_TITLE!,
       DOC_STREET_AND_NUMBER: process.env.DOC_STREET_AND_NUMBER!,
+      DOC_POSTAL_CODE: process.env.DOC_POSTAL_CODE!,
+      DOC_CITY: process.env.DOC_CITY!,
       DOC_ZIP_AND_CITY: process.env.DOC_ZIP_AND_CITY!,
       DOC_PHONE_NUMBER: process.env.DOC_PHONE_NUMBER!,
       DOC_EMAIL: process.env.DOC_EMAIL!,

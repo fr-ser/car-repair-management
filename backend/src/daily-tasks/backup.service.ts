@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { renderPDF } from '@/src/documents/renderPDF';
+import { embedZugferd } from '@/src/documents/zugferd';
 import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { DropboxService } from './dropbox.service';
@@ -110,15 +111,35 @@ export class BackupService {
       return;
     }
 
+    const failures: Error[] = [];
     for (const doc of documents) {
-      const pdf = await renderPDF(doc);
-      const year = doc.documentDate.slice(0, 4);
-      const filename = `${doc.documentNumber ?? doc.id}.pdf`;
-      await this.dropbox.uploadFile(
-        `${DOC_BACKUP_FOLDER}/${year}/${filename}`,
-        pdf,
-      );
-      this.logger.log(`Document backup uploaded: ${year}/${filename}`);
+      try {
+        let pdf = await renderPDF(doc);
+        if (doc.type === 'invoice') {
+          pdf = await embedZugferd(pdf, doc);
+        }
+        const year = doc.documentDate.slice(0, 4);
+        const filename = `${doc.documentNumber ?? doc.id}.pdf`;
+        await this.dropbox.uploadFile(
+          `${DOC_BACKUP_FOLDER}/${year}/${filename}`,
+          pdf,
+        );
+        this.logger.log(`Document backup uploaded: ${year}/${filename}`);
+      } catch (error) {
+        const failure = new Error(`Document backup failed for ${doc.id}`, {
+          cause: error,
+        });
+        this.logger.error(
+          failure.message,
+          error instanceof Error ? error.stack : String(error),
+        );
+        failures.push(failure);
+      }
+    }
+
+    if (failures.length > 0) {
+      // Keep the checkpoint unchanged so failed documents are retried.
+      throw new AggregateError(failures, 'Document backup failed');
     }
 
     await this.writeLastRunTimestamp();

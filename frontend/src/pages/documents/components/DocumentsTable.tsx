@@ -4,6 +4,7 @@ import {
   Download as DownloadIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -113,10 +114,21 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
 
   async function handleDownloadSelected() {
     try {
-      await apiClient.downloadDocumentsPdf([...selectedIds]);
-    } catch {
+      if (selectedIds.size === 1) {
+        const document = documents.find((doc) => selectedIds.has(doc.id));
+        if (!document) {
+          throw new Error('Selected document is not available');
+        }
+        await apiClient.downloadDocumentPdf(document);
+      } else {
+        await apiClient.downloadDocumentsPdf([...selectedIds]);
+      }
+    } catch (error) {
       showNotification({
-        message: 'PDF-Download fehlgeschlagen',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'PDF-Download fehlgeschlagen',
         level: 'error',
       });
     }
@@ -164,6 +176,14 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
               </Button>
             )}
           </Box>
+
+          {selectedIds.size > 1 && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              Hinweis: Sammel-PDFs sind reine Druckansichten und keine gültigen
+              E-Rechnungen. Für den steuerrechtlichen Vorsteuerabzug laden Sie
+              Rechnungen bitte einzeln herunter.
+            </Alert>
+          )}
 
           {isPending ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>

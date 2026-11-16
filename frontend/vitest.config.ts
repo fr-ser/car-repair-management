@@ -5,6 +5,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
+      '@shared': path.resolve(__dirname, '../backend/src/common'),
+      'decimal.js': path.resolve(
+        __dirname,
+        'node_modules/decimal.js/decimal.mjs',
+      ),
     },
   },
   test: {

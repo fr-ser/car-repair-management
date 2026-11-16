@@ -8,6 +8,7 @@ import { PrismaService } from '@/src/prisma/prisma.service';
 
 import { CreateDocumentDto, DOCUMENT_TYPE } from './document.dto';
 import { renderMultiplePDF, renderPDF } from './renderPDF';
+import { buildZugferdInvoiceData, embedZugferd } from './zugferd';
 
 const documentInclude = {
   positions: { orderBy: { sortOrder: 'asc' as const } },
@@ -47,39 +48,46 @@ export class DocumentsService {
       const isOffer = dto.type === DOCUMENT_TYPE.OFFER;
       const documentNumber = isOffer ? `${prefix}${seq}-K` : `${prefix}${seq}`;
 
-      const document = await tx.document.create({
-        data: {
-          documentNumber,
-          type: dto.type,
-          documentDate,
-          orderId: order.id,
-          paymentMethod: order.paymentMethod,
-          paymentDueDate: order.paymentDueDate,
-          clientNumber: order.client.clientNumber,
-          clientCompany: order.client.company,
-          clientFirstName: order.client.firstName,
-          clientLastName: order.client.lastName,
-          clientStreet: order.client.street,
-          clientPostalCode: order.client.postalCode,
-          clientCity: order.client.city,
-          carLicensePlate: order.car.licensePlate,
-          carManufacturer: order.car.manufacturer,
-          carModel: order.car.model,
-          carVin: order.car.vin,
-          carMileage: order.kmStand,
-          positions: {
-            create: order.positions.map((p) => ({
-              type: p.type,
-              sortOrder: p.sortOrder,
-              text: p.text,
-              articleId: p.articleId,
-              description: p.description,
-              pricePerUnit: p.pricePerUnit,
-              amount: p.amount,
-              discount: p.discount,
-            })),
-          },
+      const data = {
+        documentNumber,
+        type: dto.type,
+        documentDate,
+        orderId: order.id,
+        paymentMethod: order.paymentMethod,
+        paymentDueDate: order.paymentDueDate,
+        clientNumber: order.client.clientNumber,
+        clientCompany: order.client.company?.trim() ?? null,
+        clientFirstName: order.client.firstName?.trim() ?? null,
+        clientLastName: order.client.lastName?.trim() ?? null,
+        clientStreet: order.client.street,
+        clientPostalCode: order.client.postalCode,
+        clientCity: order.client.city,
+        carLicensePlate: order.car.licensePlate,
+        carManufacturer: order.car.manufacturer.trim(),
+        carModel: order.car.model.trim(),
+        carVin: order.car.vin,
+        carMileage: order.kmStand,
+        positions: {
+          create: order.positions.map((p) => ({
+            type: p.type,
+            sortOrder: p.sortOrder,
+            text: p.text,
+            articleId: p.articleId?.trim() ?? null,
+            description: p.description?.trim() ?? null,
+            pricePerUnit: p.pricePerUnit,
+            amount: p.amount,
+            discount: p.discount,
+          })),
         },
+      };
+
+      if (!isOffer) {
+        // just to validate that it is possible or throw otherwise
+        buildZugferdInvoiceData({ ...data, positions: data.positions.create });
+      }
+
+      const document = await tx.document.create({
+        data,
         include: documentInclude,
       });
 
@@ -137,7 +145,11 @@ export class DocumentsService {
       include: documentInclude,
     });
 
-    return renderPDF(document);
+    const basePdf = await renderPDF(document);
+    if (document.type === DOCUMENT_TYPE.INVOICE) {
+      return embedZugferd(basePdf, document);
+    }
+    return basePdf;
   }
 
   async getBulkPdf(ids: number[]): Promise<Buffer> {

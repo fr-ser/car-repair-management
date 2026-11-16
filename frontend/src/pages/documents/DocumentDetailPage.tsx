@@ -17,6 +17,7 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import useNotification from '@/src/hooks/notification/useNotification';
 import * as apiService from '@/src/services/backend-service';
 import { DOCUMENT_TYPE } from '@/src/types/documents';
 
@@ -28,6 +29,7 @@ function DocumentDetailContent() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const documentId = Number(id);
+  const { showNotification } = useNotification();
 
   const {
     data: document,
@@ -61,15 +63,24 @@ function DocumentDetailContent() {
                   color="primary"
                   startIcon={<PictureAsPdfIcon />}
                   size="small"
-                  onClick={() =>
-                    apiService.downloadDocumentPdf(
-                      document.id,
-                      `${document.documentNumber ?? document.id}.pdf`,
-                    )
-                  }
+                  onClick={async () => {
+                    try {
+                      await apiService.downloadDocumentPdf(document);
+                    } catch (error) {
+                      showNotification({
+                        message:
+                          error instanceof Error
+                            ? error.message
+                            : 'PDF-Download fehlgeschlagen',
+                        level: 'error',
+                      });
+                    }
+                  }}
                   data-testid="button-document-download-pdf"
                 >
-                  PDF herunterladen
+                  {document.type === DOCUMENT_TYPE.INVOICE
+                    ? 'PDF / E-Rechnung (ZUGFeRD) herunterladen'
+                    : 'PDF herunterladen'}
                 </Button>
               )}
               {document && (

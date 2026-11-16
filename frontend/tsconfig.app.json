@@ -22,7 +22,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@shared/*": ["../backend/src/common/*"],
+      "decimal.js": ["./node_modules/decimal.js"]
     },
   },
   "include": [

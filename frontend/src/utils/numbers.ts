@@ -1,54 +1,11 @@
-const CURRENCY_SYMBOL = '€';
-const LOCALE = 'de-DE';
+import { CURRENCY_SYMBOL, NUMBER_LOCALE } from '@shared/number-format';
+
+export { formatInvoiceLineNumber, formatNumber } from '@shared/number-format';
+
 export const THOUSANDS_SEPARATOR =
-  getLocaleFormatInfo(LOCALE).thousandsSeparator;
-export const DECIMAL_SEPARATOR = getLocaleFormatInfo(LOCALE).decimalSeparator;
-/**
- * This function formats a number into a string with a specific number of decimals
- * and optionally adds a currency symbol
- *
- * Defaults:
- * - currency: false
- * - minDecimals: 0 (2 if currency is true): Superseded by currency flag
- * - maxDecimals: 5 (2 if currency is true): Superseded by currency flag
- * - undefinedAs: "-"
- */
-export function formatNumber(
-  number: number | undefined | null,
-  options?: {
-    currency?: boolean;
-    minDecimals?: number;
-    maxDecimals?: number;
-    undefinedAs?: string;
-  },
-): string {
-  let minDecimals = 0;
-  let maxDecimals = 5;
-  if (options?.minDecimals != null) {
-    minDecimals = options.minDecimals;
-  }
-  if (options?.maxDecimals != null) {
-    maxDecimals = options.maxDecimals;
-  }
-  if (options?.currency) {
-    minDecimals = 2;
-    maxDecimals = 2;
-  }
-
-  if (number == null) {
-    return options?.undefinedAs ?? '-';
-  }
-
-  let result = number.toLocaleString(LOCALE, {
-    minimumFractionDigits: minDecimals,
-    maximumFractionDigits: maxDecimals,
-  });
-
-  if (options?.currency) {
-    result = `${result} ${CURRENCY_SYMBOL}`;
-  }
-  return result;
-}
+  getLocaleFormatInfo(NUMBER_LOCALE).thousandsSeparator;
+export const DECIMAL_SEPARATOR =
+  getLocaleFormatInfo(NUMBER_LOCALE).decimalSeparator;
 
 /**
  * Get the thousands separator and decimal separator for a given locale
