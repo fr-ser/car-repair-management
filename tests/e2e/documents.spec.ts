@@ -12,7 +12,6 @@ test('create-view-delete-document', async ({ page }) => {
 
   // Navigate to orders and create a fresh order
   await page.goto('orders');
-  await page.waitForTimeout(500);
 
   await page.getByTestId('button-order-create').click();
 
@@ -46,7 +45,7 @@ test('create-view-delete-document', async ({ page }) => {
   await page.getByLabel('Menge').fill('1');
 
   await page.getByTestId('button-order-save').click();
-  await page.waitForTimeout(500);
+  await expect(page.getByText('Auftrag erstellt')).toBeVisible();
 
   // Close the dialog (save keeps it open by design)
   await page.getByRole('button', { name: 'Schließen' }).click();
@@ -61,7 +60,8 @@ test('create-view-delete-document', async ({ page }) => {
   await page.getByTestId('button-order-save-as-invoice').click();
 
   // Should redirect to /documents/:id
-  await expect(page).toHaveURL(/\/documents\/\d+/);
+  await expect(page).toHaveURL(/\/documents\/\d+/, { timeout: 15_000 });
+  const documentId = new URL(page.url()).pathname.split('/').pop();
 
   // Document view should show car license plate
   await expect(
@@ -70,25 +70,20 @@ test('create-view-delete-document', async ({ page }) => {
 
   // Navigate to documents list
   await page.goto('documents');
-  await page.waitForTimeout(500);
 
-  // The invoice row must be visible — filter by type label to avoid matching the offer test running in parallel
-  const docRow = page
-    .getByTestId(/document-row-.*/)
-    .filter({ hasText: 'Rechnung' });
+  const docRow = page.getByTestId(`document-row-${documentId}`);
   await expect(docRow).toBeVisible();
+  await expect(docRow).toContainText('Rechnung');
 
   // Delete the document
   await docRow.hover();
   await docRow.getByTestId(/button-document-delete-.*/).click();
   await page.getByTestId('confirm-dialog-button-confirm').click();
-  await page.waitForTimeout(500);
 
   await expect(docRow).not.toBeVisible();
 
   // Cleanup: delete the test order
   await page.goto('orders');
-  await page.waitForTimeout(500);
   const orderRow = page
     .getByTestId(/order-row-.*/)
     .filter({ hasText: uniqueTitle });
@@ -106,7 +101,6 @@ test('create-offer-document', async ({ page }) => {
   await expect(page.getByTestId('login-button')).not.toBeVisible();
 
   await page.goto('orders');
-  await page.waitForTimeout(500);
 
   await page.getByTestId('button-order-create').click();
 
@@ -135,7 +129,7 @@ test('create-offer-document', async ({ page }) => {
     .click();
 
   await page.getByTestId('button-order-save').click();
-  await page.waitForTimeout(500);
+  await expect(page.getByText('Auftrag erstellt')).toBeVisible();
 
   await page.getByRole('button', { name: 'Schließen' }).click();
 
@@ -148,7 +142,8 @@ test('create-offer-document', async ({ page }) => {
   await page.getByTestId('button-order-save-as-offer').click();
 
   // Should redirect to /documents/:id
-  await expect(page).toHaveURL(/\/documents\/\d+/);
+  await expect(page).toHaveURL(/\/documents\/\d+/, { timeout: 15_000 });
+  const documentId = new URL(page.url()).pathname.split('/').pop();
 
   // Document view should show car license plate
   await expect(
@@ -157,21 +152,18 @@ test('create-offer-document', async ({ page }) => {
 
   // Cleanup: navigate to documents list and delete the offer
   await page.goto('documents');
-  await page.waitForTimeout(500);
 
-  const docRow = page
-    .getByTestId(/document-row-.*/)
-    .filter({ hasText: 'Kostenvoranschlag' });
+  const docRow = page.getByTestId(`document-row-${documentId}`);
   await expect(docRow).toBeVisible();
+  await expect(docRow).toContainText('Kostenvoranschlag');
 
   await docRow.hover();
   await docRow.getByTestId(/button-document-delete-.*/).click();
   await page.getByTestId('confirm-dialog-button-confirm').click();
-  await page.waitForTimeout(500);
+  await expect(docRow).not.toBeVisible();
 
   // Cleanup: delete the test order
   await page.goto('orders');
-  await page.waitForTimeout(500);
   const orderRow = page
     .getByTestId(/order-row-.*/)
     .filter({ hasText: uniqueTitle });
