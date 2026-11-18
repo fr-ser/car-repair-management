@@ -40,6 +40,11 @@ test('create-view-delete-document', async ({ page }) => {
     .first()
     .click();
 
+  await page.getByRole('button', { name: 'Position hinzufügen' }).click();
+  await page.getByTestId('position-description-0').fill('Test service');
+  await page.getByLabel('Preis/Einheit').fill('50');
+  await page.getByLabel('Menge').fill('1');
+
   await page.getByTestId('button-order-save').click();
   await page.waitForTimeout(500);
 

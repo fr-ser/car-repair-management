@@ -1,9 +1,21 @@
 import fs from 'fs';
+import path from 'path';
 import PDFDocument from 'pdfkit';
 
 import { Prisma } from '@/src/generated/prisma/client';
 
-import { formatIsoDateString, getVatRate } from '@/src/common/helpers';
+import {
+  getDefaultPaymentTerms,
+  toPaymentMethodLabel,
+} from '@/src/common/document-format';
+import {
+  formatInvoiceLineNumber,
+  formatIsoDateString,
+  formatNumber,
+  getVatRate,
+  invoiceLineNet,
+  invoiceTotals,
+} from '@/src/common/helpers';
 import { AppConfig, getConfig } from '@/src/config';
 
 // ── Public input types ────────────────────────────────────────────────────────
@@ -57,6 +69,7 @@ interface InvoiceData {
     date: string;
     paymentMethod: string;
     paymentDueDate?: string;
+    paymentTerms?: string;
     mileage?: string;
     positions: InvoicePosition[];
   };
@@ -85,12 +98,6 @@ interface PageState {
 
 // ── Mapping: public model → internal render format ────────────────────────────
 
-function toPaymentMethodLabel(method: string | null): string {
-  if (method === 'cash') return 'Bar';
-  if (method === 'bank_transfer') return 'Überweisung';
-  return method ?? '';
-}
-
 function toInvoiceData(doc: DocumentForRender): InvoiceData {
   return {
     documentNumber: doc.documentNumber ?? String(doc.documentNumber),
@@ -99,11 +106,12 @@ function toInvoiceData(doc: DocumentForRender): InvoiceData {
       date: doc.documentDate,
       paymentMethod: toPaymentMethodLabel(doc.paymentMethod),
       paymentDueDate: doc.paymentDueDate ?? undefined,
+      paymentTerms: getDefaultPaymentTerms(doc.type, doc.paymentDueDate),
       mileage:
         doc.carMileage != null
           ? typeof doc.carMileage === 'string'
             ? doc.carMileage
-            : new Intl.NumberFormat('de-DE').format(Number(doc.carMileage))
+            : formatNumber(Number(doc.carMileage))
           : undefined,
       positions: doc.positions.map((p) => {
         if (p.type === 'heading') {
@@ -137,11 +145,6 @@ function toInvoiceData(doc: DocumentForRender): InvoiceData {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-const numberFormatter = new Intl.NumberFormat('de-DE', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
 
 // Passed as the y argument to pdfkit text() calls that should continue from doc.y
 const CONTINUE_Y = null as unknown as number;
@@ -191,10 +194,10 @@ const COL_X = [
   pageOptions.margins.left, // Pos.
   mmToPx(25), // Art.-Nr.
   mmToPx(53), // Bezeichnung
-  mmToPx(117), // Preis / Einheit
-  mmToPx(140), // Rabatt
-  mmToPx(155), // Menge
-  mmToPx(170), // Preis (Netto)
+  mmToPx(107), // Preis / Einheit
+  mmToPx(130), // Rabatt
+  mmToPx(145), // Menge
+  mmToPx(165), // Preis (Netto)
   pageOptions.size[0] - pageOptions.margins.right, // end boundary
 ];
 
@@ -209,7 +212,7 @@ function renderSubHeader(
     pageOptions.size[0] - pageOptions.margins.left - pageOptions.margins.right;
 
   doc
-    .font('Times-Roman')
+    .font('Invoice-Regular')
     .fontSize(25)
     .text(
       cfg.DOC_COMPANY_TITLE,
@@ -220,7 +223,7 @@ function renderSubHeader(
         align: 'center',
       },
     )
-    .font('Times-Roman')
+    .font('Invoice-Regular')
     .fontSize(14)
     .text(cfg.DOC_COMPANY_SUB_TITLE, pageOptions.margins.left, doc.y - 5, {
       width: contentWidth,
@@ -246,7 +249,7 @@ function renderSubHeader(
     });
 
   doc
-    .font('Times-Bold')
+    .font('Invoice-Bold')
     .fontSize(18)
     .text(data.documentType, pageOptions.margins.left, mmToPx(40), {
       width: contentWidth,
@@ -271,9 +274,9 @@ function renderInfoTable(doc: PDFKit.PDFDocument, data: InvoiceData): void {
   for (const [key, value] of leftTableText) {
     const yPosition = doc.y;
     doc
-      .font('Times-Bold')
+      .font('Invoice-Bold')
       .text(`${key}: `, mmToPx(22), yPosition)
-      .font('Times-Roman')
+      .font('Invoice-Regular')
       .text(value, mmToPx(50), yPosition, { lineGap: 3.7, width: mmToPx(55) });
 
     doc
@@ -286,7 +289,7 @@ function renderInfoTable(doc: PDFKit.PDFDocument, data: InvoiceData): void {
   }
 
   const rightTableText: [string, string][] = [
-    ['Zahlungsart', data.order.paymentMethod],
+    ['Zahlungsart', data.order.paymentMethod || ' '],
     ['Kundennummer', data.client.clientNumber || ' '],
     ['Kennzeichen', data.vehicle.licensePlate],
     ['Hersteller', data.vehicle.manufacturer || ' '],
@@ -299,9 +302,9 @@ function renderInfoTable(doc: PDFKit.PDFDocument, data: InvoiceData): void {
   for (const [key, value] of rightTableText) {
     const yPosition = doc.y;
     doc
-      .font('Times-Bold')
+      .font('Invoice-Bold')
       .text(`${key}: `, mmToPx(110), yPosition)
-      .font('Times-Roman')
+      .font('Invoice-Regular')
       .text(value, mmToPx(150), yPosition, {
         lineGap: 3.7,
         width: pageOptions.size[0] - pageOptions.margins.right - mmToPx(150),
@@ -339,7 +342,7 @@ function renderPositionsTable(
       'Preis (Netto)',
     ];
 
-    doc.font('Times-Roman').fontSize(10);
+    doc.font('Invoice-Regular').fontSize(10);
     for (let i = 0; i < headers.length; i++) {
       doc.text(headers[i], COL_X[i], pageState.currY, {
         width: COL_X[i + 1] - COL_X[i],
@@ -373,7 +376,30 @@ function renderPositionsTable(
       'articleId' in position ? (position.articleId as string) : '',
       { width: COL_X[2] - COL_X[1] },
     );
-    const rowHeight = Math.max(heightArticleNumber, heightDescription);
+    let rowHeight = Math.max(heightArticleNumber, heightDescription);
+    if (!('heading' in position)) {
+      const numericValues = [
+        formatInvoiceLineNumber(position.pricePerUnit as number),
+        `${formatInvoiceLineNumber(position.discount as number)} %`,
+        formatInvoiceLineNumber(position.amount as number),
+        formatInvoiceLineNumber(
+          invoiceLineNet(
+            position.pricePerUnit as number,
+            position.amount as number,
+            position.discount as number,
+          ),
+        ),
+      ];
+      doc.font('Invoice-Regular').fontSize(9);
+      for (let i = 0; i < numericValues.length; i++) {
+        rowHeight = Math.max(
+          rowHeight,
+          doc.heightOfString(numericValues[i], {
+            width: COL_X[i + 4] - COL_X[i + 3],
+          }),
+        );
+      }
+    }
 
     if (newPageCheck(doc, pageState, rowHeight)) {
       renderTableHeader();
@@ -381,7 +407,7 @@ function renderPositionsTable(
 
     if ('heading' in position) {
       doc
-        .font('Times-Bold')
+        .font('Invoice-Bold')
         .fontSize(10)
         .text((position.heading as string).trim(), COL_X[2], pageState.currY, {
           width: COL_X[3] - COL_X[2],
@@ -391,7 +417,7 @@ function renderPositionsTable(
       posCounter++;
 
       doc
-        .font('Times-Roman')
+        .font('Invoice-Regular')
         .fontSize(10)
         .text(posCounter.toString(), COL_X[0], pageState.currY, {
           width: COL_X[1] - COL_X[0],
@@ -409,28 +435,30 @@ function renderPositionsTable(
         )
         .fontSize(9)
         .text(
-          numberFormatter.format(position.pricePerUnit as number),
+          formatInvoiceLineNumber(position.pricePerUnit as number),
           COL_X[3],
           pageState.currY,
           { width: COL_X[4] - COL_X[3], align: 'center' },
         )
         .text(
-          numberFormatter.format(position.discount as number) + ' %',
+          formatInvoiceLineNumber(position.discount as number) + ' %',
           COL_X[4],
           pageState.currY,
           { width: COL_X[5] - COL_X[4], align: 'center' },
         )
         .text(
-          numberFormatter.format(position.amount as number),
+          formatInvoiceLineNumber(position.amount as number),
           COL_X[5],
           pageState.currY,
           { width: COL_X[6] - COL_X[5], align: 'center' },
         )
         .text(
-          numberFormatter.format(
-            (position.pricePerUnit as number) *
-              (position.amount as number) *
-              (1 - (position.discount as number) / 100),
+          formatInvoiceLineNumber(
+            invoiceLineNet(
+              position.pricePerUnit as number,
+              position.amount as number,
+              position.discount as number,
+            ),
           ),
           COL_X[6],
           pageState.currY,
@@ -473,7 +501,7 @@ function renderSumTable(
     pageState.currY = mmToPx(215);
   }
 
-  doc.fontSize(12).font('Times-Bold');
+  doc.fontSize(12).font('Invoice-Bold');
   newPageCheck(doc, pageState, doc.currentLineHeight() * 4);
 
   const left = pageOptions.margins.left;
@@ -513,32 +541,31 @@ function renderSumTable(
       if ('heading' in item) return acc;
       return (
         acc +
-        parseFloat(
-          (
-            (item.pricePerUnit as number) *
-            (item.amount as number) *
-            (1 - (item.discount as number) / 100)
-          ).toFixed(2),
+        invoiceLineNet(
+          item.pricePerUnit as number,
+          item.amount as number,
+          item.discount as number,
         )
       );
     },
     0,
   );
+  const totals = invoiceTotals(netSum, vatRate);
 
   doc
-    .font('Times-Roman')
-    .text(numberFormatter.format(netSum) + ' €', left, pageState.currY, {
+    .font('Invoice-Regular')
+    .text(formatNumber(totals.net, { currency: true }), left, pageState.currY, {
       width: colWidth,
       align: 'center',
     })
     .text(
-      numberFormatter.format(netSum * vatRate) + ' €',
+      formatNumber(totals.vat, { currency: true }),
       left + colWidth,
       pageState.currY,
       { width: colWidth, align: 'center' },
     )
     .text(
-      numberFormatter.format(netSum * (1 + vatRate)) + ' €',
+      formatNumber(totals.gross, { currency: true }),
       left + colWidth * 2,
       pageState.currY,
       { width: colWidth, align: 'center' },
@@ -586,47 +613,46 @@ function renderFooter(
   const contentWidth =
     pageOptions.size[0] - pageOptions.margins.left - pageOptions.margins.right;
   const centeredOpts = { width: contentWidth, align: 'center' as const };
+  const serviceNumber = `Unsere Servicenummer ist ${cfg.DOC_PHONE_NUMBER}`;
+  const openingHours = 'Sie erreichen uns täglich von 8:00 bis 20:00';
+  const paymentLine = data.order.paymentDueDate
+    ? `Bitte zahlen Sie die Rechnung fristgerecht bis zum ${formatIsoDateString(data.order.paymentDueDate)}.`
+    : data.order.paymentTerms;
+  const serviceDate =
+    'Rechnungsdatum entspricht Leistungs- bzw. Ausführungsdatum.';
+  const signature =
+    'Dieser Beleg wurde maschinell erstellt und ist auch ohne Unterschrift gültig.';
 
-  doc.font('Times-Roman').fontSize(11);
-  doc.moveDown(2);
+  doc.font('Invoice-Regular').fontSize(11);
+  doc.moveDown(paymentLine ? 1 : 2);
   pageState.currY = doc.y;
-  newPageCheck(doc, pageState, doc.currentLineHeight() * 7);
+  const footerHeight = [
+    serviceNumber,
+    openingHours,
+    ...(paymentLine ? [paymentLine] : []),
+    serviceDate,
+    signature,
+  ].reduce(
+    (height, line) => height + doc.heightOfString(line, centeredOpts),
+    doc.currentLineHeight(true),
+  );
+  // Preserve the existing minimum reservation while accounting for wrapped text.
+  newPageCheck(
+    doc,
+    pageState,
+    Math.max(doc.currentLineHeight() * 7, footerHeight),
+  );
 
-  doc.text(
-    `Unsere Servicenummer ist ${cfg.DOC_PHONE_NUMBER}`,
-    pageOptions.margins.left,
-    CONTINUE_Y,
-    centeredOpts,
-  );
-  doc.text(
-    'Sie erreichen uns täglich von 8:00 bis 20:00',
-    pageOptions.margins.left,
-    CONTINUE_Y,
-    centeredOpts,
-  );
+  doc.text(serviceNumber, pageOptions.margins.left, CONTINUE_Y, centeredOpts);
+  doc.text(openingHours, pageOptions.margins.left, CONTINUE_Y, centeredOpts);
   doc.moveDown(1);
 
-  if (data.order.paymentDueDate) {
-    doc.text(
-      `Bitte zahlen Sie die Rechnung fristgerecht bis zum ${formatIsoDateString(data.order.paymentDueDate)}.`,
-      pageOptions.margins.left,
-      CONTINUE_Y,
-      centeredOpts,
-    );
+  if (paymentLine) {
+    doc.text(paymentLine, pageOptions.margins.left, CONTINUE_Y, centeredOpts);
   }
 
-  doc.text(
-    'Rechnungsdatum entspricht Leistungs- bzw. Ausführungsdatum.',
-    pageOptions.margins.left,
-    CONTINUE_Y,
-    centeredOpts,
-  );
-  doc.text(
-    'Dieser Beleg wurde maschinell erstellt und ist auch ohne Unterschrift gültig.',
-    pageOptions.margins.left,
-    CONTINUE_Y,
-    centeredOpts,
-  );
+  doc.text(serviceDate, pageOptions.margins.left, CONTINUE_Y, centeredOpts);
+  doc.text(signature, pageOptions.margins.left, CONTINUE_Y, centeredOpts);
 
   pageState.currY = doc.y;
   newPageCheck(doc, pageState, doc.currentLineHeight() * 6);
@@ -637,13 +663,13 @@ function renderFooter(
       underline: true,
       continued: true,
     })
-    .font('Times-Bold')
+    .font('Invoice-Bold')
     .text('BIC', { underline: true, continued: true })
-    .font('Times-Roman')
+    .font('Invoice-Regular')
     .text(`: ${cfg.DOC_BIC}) `, { underline: true, continued: true })
-    .font('Times-Bold')
+    .font('Invoice-Bold')
     .text('IBAN', { underline: true, continued: true })
-    .font('Times-Roman')
+    .font('Invoice-Regular')
     .text(`: ${cfg.DOC_IBAN}`, { underline: true })
     .text(
       `${cfg.DOC_COMPANY_TITLE} - Inh. ${cfg.DOC_OWNER} - ${cfg.DOC_STREET_AND_NUMBER} - ${cfg.DOC_ZIP_AND_CITY}`,
@@ -694,8 +720,17 @@ function initPdfStream(options: RenderOptions): {
 } {
   const pdfDoc = new PDFDocument({
     ...pageOptions,
+    pdfVersion: '1.7',
     compress: options.compress ?? true,
   });
+  pdfDoc.registerFont(
+    'Invoice-Regular',
+    path.join(__dirname, 'fonts', 'LiberationSerif-Regular.ttf'),
+  );
+  pdfDoc.registerFont(
+    'Invoice-Bold',
+    path.join(__dirname, 'fonts', 'LiberationSerif-Bold.ttf'),
+  );
   if (options.savePath) pdfDoc.pipe(fs.createWriteStream(options.savePath));
 
   const chunks: Buffer[] = [];

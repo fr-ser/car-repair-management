@@ -50,7 +50,7 @@ function makeDocument(positions: Position[]): BackendDocumentWithPositions {
   } as BackendDocumentWithPositions;
 }
 
-function makeItem(id: number, sortOrder: number): Position {
+function makeItem(id: number, sortOrder: number, price = '10.00'): Position {
   return {
     id,
     documentId: 1,
@@ -59,7 +59,7 @@ function makeItem(id: number, sortOrder: number): Position {
     text: null,
     articleId: `ART-${id}`,
     description: `Item ${id}`,
-    pricePerUnit: '10.00',
+    pricePerUnit: price,
     amount: '1.00',
     discount: '0.00',
     createdAt: new Date(),
@@ -85,6 +85,42 @@ function makeHeading(id: number, sortOrder: number): Position {
 }
 
 describe('DocumentView', () => {
+  it('formats document dates and payment method consistently with the PDF', () => {
+    const document = {
+      ...makeDocument([makeItem(1, 0)]),
+      documentDate: '2024-01-02',
+      paymentDueDate: '2024-02-05',
+      paymentMethod: 'bank_transfer',
+    };
+
+    render(<DocumentView document={document} />);
+
+    expect(screen.getByText('02.01.2024')).toBeInTheDocument();
+    expect(screen.getByText('Zahlungsziel: 05.02.2024')).toBeInTheDocument();
+    expect(screen.getByText('Überweisung')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Sofort ohne Abzug zahlbar'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows default payment terms for an invoice without a due date', () => {
+    render(<DocumentView document={makeDocument([makeItem(1, 0)])} />);
+
+    expect(screen.getByText('Sofort ohne Abzug zahlbar')).toBeInTheDocument();
+  });
+
+  it('does not show default payment terms on an offer', () => {
+    const document = {
+      ...makeDocument([makeItem(1, 0)]),
+      type: 'offer' as const,
+    };
+    render(<DocumentView document={document} />);
+
+    expect(
+      screen.queryByText('Sofort ohne Abzug zahlbar'),
+    ).not.toBeInTheDocument();
+  });
+
   it('numbers items sequentially without resetting after a heading', () => {
     // positions: item, item, heading, item — third item should be Pos. 3, not 1
     const positions = [
@@ -127,5 +163,25 @@ describe('DocumentView', () => {
       .filter((cell) => /^\d+$/.test(cell.textContent ?? ''));
 
     expect(posCells.map((c) => c.textContent)).toEqual(['1']);
+  });
+
+  it('sums rounded line amounts and rounds VAT before computing the gross total', () => {
+    const positions = [makeItem(1, 0, '0.335'), makeItem(2, 1, '0.335')];
+
+    render(<DocumentView document={makeDocument(positions)} />);
+
+    expect(screen.getByText('0,68 €')).toBeInTheDocument();
+    expect(screen.getByText('0,13 €')).toBeInTheDocument();
+    expect(screen.getByText('0,81 €')).toBeInTheDocument();
+  });
+
+  it('rounds decimal half cents consistently with the e-invoice', () => {
+    const positions = [makeItem(1, 0, '1.005'), makeItem(2, 1, '1.005')];
+
+    render(<DocumentView document={makeDocument(positions)} />);
+
+    expect(screen.getByText('2,02 €')).toBeInTheDocument();
+    expect(screen.getByText('0,38 €')).toBeInTheDocument();
+    expect(screen.getByText('2,40 €')).toBeInTheDocument();
   });
 });

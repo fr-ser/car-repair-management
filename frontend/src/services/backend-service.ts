@@ -15,7 +15,7 @@ import {
 } from '@/src/types/backend-contracts';
 import { CreateCarRequest, UpdateCarRequest } from '@/src/types/cars';
 import { CreateClientRequest } from '@/src/types/clients';
-import { CreateDocumentRequest } from '@/src/types/documents';
+import { CreateDocumentRequest, DOCUMENT_TYPE } from '@/src/types/documents';
 import * as Errors from '@/src/types/errors';
 import { CreateOrderRequest, UpdateOrderRequest } from '@/src/types/orders';
 
@@ -209,38 +209,46 @@ export function deleteDocument(documentId: number) {
 }
 
 export async function downloadDocumentPdf(
-  documentId: number,
-  filename: string,
+  document: Pick<BackendDocument, 'id' | 'type' | 'documentNumber'>,
 ) {
-  const response = await fetch(`/api/documents/${documentId}/pdf`);
-  if (!response.ok) throw new Error('PDF download failed');
-  const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+  const filename =
+    document.type === DOCUMENT_TYPE.INVOICE
+      ? `${document.documentNumber ?? document.id}_ZUGFeRD.pdf`
+      : `${document.documentNumber ?? document.id}.pdf`;
+  await downloadPdf(`/api/documents/${document.id}/pdf`, filename);
 }
 
 export async function downloadDocumentsPdf(ids: number[]) {
-  const response = await fetch('/api/documents/bulk-pdf', {
+  await downloadPdf('/api/documents/bulk-pdf', 'documents.pdf', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ids }),
   });
-  if (!response.ok) throw new Error('PDF download failed');
-  const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'documents.pdf';
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function handleErrorResponse(response: Response, responseData: any) {
+async function downloadPdf(url: string, filename: string, init?: RequestInit) {
+  const response = await fetch(url, init);
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type') ?? '';
+    const data: unknown =
+      response.status !== 401 &&
+      (contentType.includes('application/json') ||
+        contentType.includes('+json'))
+        ? await response.json()
+        : undefined;
+    handleErrorResponse(response, data);
+    return;
+  }
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(blobUrl);
+}
+
+function handleErrorResponse(response: Response, responseData: unknown) {
   if (response.ok) return;
 
   if (response.status === 401) {
@@ -248,11 +256,18 @@ function handleErrorResponse(response: Response, responseData: any) {
     return;
   }
 
-  let errorMessage: string;
-  if (typeof responseData.message === 'string') {
-    errorMessage = responseData.message || 'Unknown error';
-  } else {
-    errorMessage = responseData.message?.[0] || 'Unknown error';
+  let errorMessage = 'Unknown error';
+  if (
+    typeof responseData === 'object' &&
+    responseData !== null &&
+    'message' in responseData
+  ) {
+    const message = responseData.message;
+    if (typeof message === 'string' && message) {
+      errorMessage = message;
+    } else if (Array.isArray(message) && typeof message[0] === 'string') {
+      errorMessage = message[0] || errorMessage;
+    }
   }
   throw new Errors.RequestError(`Error! ${errorMessage}`);
 }

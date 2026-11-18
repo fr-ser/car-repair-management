@@ -119,6 +119,56 @@ describe('DocumentsService', () => {
       );
     });
 
+    it('trims invoice snapshot fields when saving', async () => {
+      mockPrisma.order.findUnique.mockResolvedValue({
+        ...mockOrder,
+        client: {
+          ...mockOrder.client,
+          company: '  Example Co.  ',
+          firstName: '  Max  ',
+          lastName: '  Smith  ',
+        },
+        car: { ...mockOrder.car, manufacturer: '  VW  ', model: '  Golf  ' },
+        positions: [
+          { ...mockOrder.positions[0], description: null, articleId: null },
+          {
+            ...mockOrder.positions[1],
+            articleId: '  ART-1  ',
+            description: '  Oil  ',
+          },
+        ],
+      });
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+          mockPrisma.document.count.mockResolvedValue(0);
+          mockPrisma.document.create.mockResolvedValue({ id: 1 });
+          return fn(mockPrisma);
+        },
+      );
+
+      await service.create({
+        orderId: 1,
+        type: 'invoice',
+        documentDate: '2026-03-17',
+      });
+
+      expect(mockPrisma.document.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          data: expect.objectContaining({
+            clientCompany: 'Example Co.',
+            clientFirstName: 'Max',
+            clientLastName: 'Smith',
+            carManufacturer: 'VW',
+            carModel: 'Golf',
+            positions: {
+              create: [mockOrder.positions[0], mockOrder.positions[1]],
+            },
+          }),
+        }),
+      );
+    });
+
     it('appends -K suffix for offer type', async () => {
       mockPrisma.order.findUnique.mockResolvedValue(mockOrder);
 
@@ -148,6 +198,73 @@ describe('DocumentsService', () => {
           }),
         }),
       );
+    });
+
+    it.each([
+      [
+        'missing quantity',
+        [{ ...mockOrder.positions[1], amount: null }],
+        'Quantity and price are required for invoice line 1',
+      ],
+      [
+        'missing price',
+        [{ ...mockOrder.positions[1], pricePerUnit: null }],
+        'Quantity and price are required for invoice line 1',
+      ],
+      [
+        'no items',
+        [mockOrder.positions[0]],
+        'An invoice must have at least one line item',
+      ],
+      [
+        'invalid discount',
+        [{ ...mockOrder.positions[1], discount: '101' }],
+        'Invoice line 1 contains invalid numeric values',
+      ],
+    ])(
+      'rejects an invoice with %s before saving',
+      async (_, positions, message) => {
+        mockPrisma.order.findUnique.mockResolvedValue({
+          ...mockOrder,
+          positions,
+        });
+        mockPrisma.$transaction.mockImplementation(
+          async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+            mockPrisma.document.count.mockResolvedValue(0);
+            return fn(mockPrisma);
+          },
+        );
+
+        await expect(
+          service.create({
+            orderId: 1,
+            type: 'invoice',
+            documentDate: '2026-03-17',
+          }),
+        ).rejects.toThrow(message);
+        expect(mockPrisma.document.create).not.toHaveBeenCalled();
+      },
+    );
+
+    it('still permits incomplete positions on offers', async () => {
+      mockPrisma.order.findUnique.mockResolvedValue({
+        ...mockOrder,
+        positions: [mockOrder.positions[0]],
+      });
+      mockPrisma.$transaction.mockImplementation(
+        async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => {
+          mockPrisma.document.count.mockResolvedValue(0);
+          mockPrisma.document.create.mockResolvedValue({ id: 1 });
+          return fn(mockPrisma);
+        },
+      );
+
+      await service.create({
+        orderId: 1,
+        type: 'offer',
+        documentDate: '2026-03-17',
+      });
+      expect(mockPrisma.document.create).toHaveBeenCalledOnce();
     });
   });
 

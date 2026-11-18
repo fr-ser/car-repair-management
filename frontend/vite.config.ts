@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        '@shared': path.resolve(__dirname, '../backend/src/common'),
+        'decimal.js': path.resolve(
+          __dirname,
+          'node_modules/decimal.js/decimal.mjs',
+        ),
       },
     },
     build: {
@@ -43,6 +48,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      fs: {
+        allow: [__dirname, path.resolve(__dirname, '../backend/src/common')],
+      },
       // the server proxy allows us to avoid cross origin request (and cookie) issues
       proxy: {
         '/api': {

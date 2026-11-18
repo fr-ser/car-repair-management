@@ -3,6 +3,11 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import {
+  formatIsoDateString,
+  getDefaultPaymentTerms,
+  toPaymentMethodLabel,
+} from '@shared/document-format';
 
 import {
   DOC_BANK,
@@ -20,8 +25,8 @@ import {
 } from '@/src/config';
 import { BackendDocumentWithPositions } from '@/src/types/backend-contracts';
 import { DOCUMENT_TYPE } from '@/src/types/documents';
-import { getVatRate } from '@/src/utils/helpers';
-import { formatNumber } from '@/src/utils/numbers';
+import { getVatRate, invoiceLineNet, invoiceTotals } from '@/src/utils/helpers';
+import { formatInvoiceLineNumber, formatNumber } from '@/src/utils/numbers';
 
 // Shared cell styles matching legacy invoice
 const infoLabelSx = {
@@ -71,19 +76,17 @@ export function DocumentView({ document }: Props) {
     const price = p.pricePerUnit != null ? Number(p.pricePerUnit) : 0;
     const amount = p.amount != null ? Number(p.amount) : 0;
     const discount = p.discount != null ? Number(p.discount) : 0;
-    return sum + price * amount * (1 - discount / 100);
+    return sum + invoiceLineNet(price, amount, discount);
   }, 0);
 
   const vatRate = getVatRate(document.documentDate);
-  const vatAmount = netTotal * vatRate;
-  const grossTotal = netTotal + vatAmount;
+  const totals = invoiceTotals(netTotal, vatRate);
 
-  const paymentMethodLabel =
-    document.paymentMethod === 'cash'
-      ? 'Bar'
-      : document.paymentMethod === 'bank_transfer'
-        ? 'Überweisung'
-        : (document.paymentMethod ?? '');
+  const paymentMethodLabel = toPaymentMethodLabel(document.paymentMethod);
+  const paymentTerms = getDefaultPaymentTerms(
+    document.type,
+    document.paymentDueDate,
+  );
 
   // Pre-compute sequential item numbers (headings are skipped, so they get 0)
   let itemCount = 0;
@@ -127,7 +130,7 @@ export function DocumentView({ document }: Props) {
         <span>
           {DOC_STREET_AND_NUMBER} / {DOC_ZIP_AND_CITY} / E-Mail: {DOC_EMAIL}
         </span>
-        <span>{document.documentDate.split('-').reverse().join('.')}</span>
+        <span>{formatIsoDateString(document.documentDate)}</span>
       </div>
 
       {/* ── Document type ── */}
@@ -218,12 +221,12 @@ export function DocumentView({ document }: Props) {
           <TableRow>
             {[
               { label: 'Pos.', width: '10mm' },
-              { label: 'Art.-Nr.', width: '25mm' },
-              { label: 'Bezeichnung', width: '67mm' },
+              { label: 'Art.-Nr.', width: '28mm' },
+              { label: 'Bezeichnung', width: '54mm' },
               { label: 'Preis / Einheit', width: '23mm' },
-              { label: 'Rabatt', width: '25mm' },
-              { label: 'Menge', width: '25mm' },
-              { label: 'Preis (Netto)', width: '25mm' },
+              { label: 'Rabatt', width: '15mm' },
+              { label: 'Menge', width: '20mm' },
+              { label: 'Preis (Netto)', width: '30mm' },
             ].map(({ label, width }) => (
               <TableCell
                 key={label}
@@ -273,7 +276,7 @@ export function DocumentView({ document }: Props) {
               pos.pricePerUnit != null ? Number(pos.pricePerUnit) : 0;
             const amount = pos.amount != null ? Number(pos.amount) : 0;
             const discount = pos.discount != null ? Number(pos.discount) : 0;
-            const net = price * amount * (1 - discount / 100);
+            const net = invoiceLineNet(price, amount, discount);
             const cellSx = {
               border: '1px solid #bdbdbd',
               textAlign: 'center' as const,
@@ -281,23 +284,24 @@ export function DocumentView({ document }: Props) {
               fontSize: '14px',
               padding: '2px 4px',
             };
+            const numericCellSx = { ...cellSx, whiteSpace: 'nowrap' as const };
 
             return (
               <TableRow key={pos.id}>
                 <TableCell sx={cellSx}>{itemIndex}</TableCell>
                 <TableCell sx={cellSx}>{pos.articleId ?? ''}</TableCell>
                 <TableCell sx={cellSx}>{pos.description ?? ''}</TableCell>
-                <TableCell sx={cellSx}>
-                  {formatNumber(price, { minDecimals: 2, maxDecimals: 2 })}
+                <TableCell sx={numericCellSx}>
+                  {formatInvoiceLineNumber(price)}
                 </TableCell>
                 <TableCell
-                  sx={cellSx}
-                >{`${formatNumber(discount, { minDecimals: 2, maxDecimals: 2 })} %`}</TableCell>
-                <TableCell sx={cellSx}>
-                  {formatNumber(amount, { minDecimals: 2, maxDecimals: 2 })}
+                  sx={numericCellSx}
+                >{`${formatInvoiceLineNumber(discount)} %`}</TableCell>
+                <TableCell sx={numericCellSx}>
+                  {formatInvoiceLineNumber(amount)}
                 </TableCell>
-                <TableCell sx={cellSx}>
-                  {formatNumber(net, { minDecimals: 2, maxDecimals: 2 })}
+                <TableCell sx={numericCellSx}>
+                  {formatInvoiceLineNumber(net)}
                 </TableCell>
               </TableRow>
             );
@@ -341,14 +345,17 @@ export function DocumentView({ document }: Props) {
         <tbody>
           <tr>
             {[
-              { key: 'net', value: formatNumber(netTotal, { currency: true }) },
+              {
+                key: 'net',
+                value: formatNumber(totals.net, { currency: true }),
+              },
               {
                 key: 'vat',
-                value: formatNumber(vatAmount, { currency: true }),
+                value: formatNumber(totals.vat, { currency: true }),
               },
               {
                 key: 'gross',
-                value: formatNumber(grossTotal, { currency: true }),
+                value: formatNumber(totals.gross, { currency: true }),
               },
             ].map(({ key, value }) => (
               <td
@@ -386,8 +393,11 @@ export function DocumentView({ document }: Props) {
         </div>
         {document.paymentDueDate && (
           <div style={{ marginBottom: '6px' }}>
-            Zahlungsziel: {document.paymentDueDate}
+            Zahlungsziel: {formatIsoDateString(document.paymentDueDate)}
           </div>
+        )}
+        {paymentTerms && (
+          <div style={{ marginBottom: '6px' }}>{paymentTerms}</div>
         )}
         <div>
           Rechnungsdatum entspricht Leistungs- bzw. Ausführungsdatum.

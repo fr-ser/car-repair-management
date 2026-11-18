@@ -90,5 +90,5 @@ make test-all
 - Look at an existing test file in the same layer (unit/e2e/playwright) before writing a new one — match its import style, structure, and mock setup.
 - Backend unit tests use `vi.fn()` mocks on a `mockPrisma` object injected into the service under test.
 - Playwright tests log in via the login page; credentials come from `tests/e2e/config.ts`.
-- All test-level strings (descriptions, seed data, mock values) must be in English (see Language rule in CLAUDE.md).
+- All test-level strings (descriptions, seed data, mock values) must be in English (see Language rule in AGENTS.md).
 
