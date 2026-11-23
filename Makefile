@@ -57,8 +57,10 @@ deploy-build: test-all build-all ## build, test, and upload to production machin
 	rsync -az -e "ssh -p $${SSH_PORT}" ./backend/scripts/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/next-car-repair/scripts
 	rsync -az -e "ssh -p $${SSH_PORT}" ./deployment-car-repair/ $${SSH_USER}@$${SSH_ADDRESS}:~/apps/deployment-car-repair
 
-	@echo "To replace the old version run 'make deploy-upgrade' here or"
-	@echo "'cd ~/apps/deployment && make update' on the deployment target"
+	@echo ""
+	@echo "To replace the old version run "
+	@echo ""
+	@echo "make deploy-upgrade"
 
 deploy-upgrade: ## update the application on the production machine (causes downtime)
 	ssh -p $${SSH_PORT} $${SSH_USER}@$${SSH_ADDRESS} 'cd ~/apps/deployment-car-repair && make update'

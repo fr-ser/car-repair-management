@@ -14,7 +14,7 @@
     "lint": "eslint",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "dotenv -e .env.test -- vitest run src",
-    "test:e2e": "dotenv -e .env.test -- vitest run test --no-file-parallelism --coverage"
+    "test:e2e": "dotenv -e .env.test -- vitest run test --no-file-parallelism"
   },
   "dependencies": {
     "@e-invoice-eu/core": "^3.4.3",
@@ -71,7 +71,6 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/pdfkit": "0.11.0",
     "@types/supertest": "^7.2.0",
-    "@vitest/coverage-v8": "^4.1.5",
     "dotenv-cli": "^11.0.0",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.0.1",
