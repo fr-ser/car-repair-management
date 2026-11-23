@@ -62,6 +62,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
   const { confirm } = useConfirmation();
   const { showNotification } = useNotification();
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setSelectedIds(new Set());
@@ -113,6 +114,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
   }
 
   async function handleDownloadSelected() {
+    setIsDownloading(true);
     try {
       if (selectedIds.size === 1) {
         const document = documents.find((doc) => selectedIds.has(doc.id));
@@ -131,6 +133,8 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
             : 'PDF-Download fehlgeschlagen',
         level: 'error',
       });
+    } finally {
+      setIsDownloading(false);
     }
   }
 
@@ -169,6 +173,7 @@ export function DocumentsTable({ handleViewDocument }: DocumentsTableProps) {
               <Button
                 variant="outlined"
                 startIcon={<DownloadIcon />}
+                disabled={isDownloading}
                 onClick={handleDownloadSelected}
                 sx={{ whiteSpace: 'nowrap' }}
               >

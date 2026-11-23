@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -85,5 +86,53 @@ describe('DocumentsTable downloads', () => {
       expect(apiClient.downloadDocumentsPdf).toHaveBeenCalledWith([1, 2]);
     });
     expect(apiClient.downloadDocumentPdf).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    'disables the download while the %s bulk request is pending',
+    async (bulk) => {
+      let finishDownload!: () => void;
+      const download = new Promise<void>((resolve) => {
+        finishDownload = resolve;
+      });
+      vi.mocked(
+        bulk ? apiClient.downloadDocumentsPdf : apiClient.downloadDocumentPdf,
+      ).mockReturnValueOnce(download);
+
+      render(<DocumentsTable handleViewDocument={vi.fn()} />);
+      fireEvent.click(
+        within(screen.getByTestId('document-row-1')).getByRole('checkbox'),
+      );
+      if (bulk) {
+        fireEvent.click(
+          within(screen.getByTestId('document-row-2')).getByRole('checkbox'),
+        );
+      }
+      const button = screen.getByRole('button', {
+        name: `PDF (${bulk ? 2 : 1})`,
+      });
+      fireEvent.click(button);
+      expect(button).toBeDisabled();
+      await act(async () => finishDownload());
+      expect(button).toBeEnabled();
+    },
+  );
+
+  it('reenables the download after a failure', async () => {
+    let failDownload!: (error: Error) => void;
+    vi.mocked(apiClient.downloadDocumentPdf).mockReturnValueOnce(
+      new Promise<void>((_, reject) => {
+        failDownload = reject;
+      }),
+    );
+    render(<DocumentsTable handleViewDocument={vi.fn()} />);
+    fireEvent.click(
+      within(screen.getByTestId('document-row-1')).getByRole('checkbox'),
+    );
+    const button = screen.getByRole('button', { name: 'PDF (1)' });
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    await act(async () => failDownload(new Error('Download failed')));
+    expect(button).toBeEnabled();
   });
 });

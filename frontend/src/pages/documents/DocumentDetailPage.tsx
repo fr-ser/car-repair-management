@@ -15,6 +15,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useNotification from '@/src/hooks/notification/useNotification';
@@ -30,6 +31,7 @@ function DocumentDetailContent() {
   const navigate = useNavigate();
   const documentId = Number(id);
   const { showNotification } = useNotification();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const {
     data: document,
@@ -63,9 +65,17 @@ function DocumentDetailContent() {
                   color="primary"
                   startIcon={<PictureAsPdfIcon />}
                   size="small"
+                  disabled={isDownloading}
                   onClick={async () => {
+                    setIsDownloading(true);
                     try {
-                      await apiService.downloadDocumentPdf(document);
+                      const downloadPromise =
+                        apiService.downloadDocumentPdf(document);
+                      showNotification({
+                        message: 'Dokument wird erstellt',
+                        autoHideDuration: 8000,
+                      });
+                      await downloadPromise;
                     } catch (error) {
                       showNotification({
                         message:
@@ -74,6 +84,8 @@ function DocumentDetailContent() {
                             : 'PDF-Download fehlgeschlagen',
                         level: 'error',
                       });
+                    } finally {
+                      setIsDownloading(false);
                     }
                   }}
                   data-testid="button-document-download-pdf"
