@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "eslint . --fix",
     "preview": "vite preview",
-    "test": "eslint . && vitest run --coverage"
+    "test": "eslint . && vitest run"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -43,7 +43,6 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "^4.1.5",
     "autoprefixer": "^10.4.21",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
